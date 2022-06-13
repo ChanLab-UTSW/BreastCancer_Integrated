@@ -69,13 +69,19 @@ library(genefu)
 
 
 
+#Load in Integrated Primary Object =================
+
+setwd("/project/InternalMedicine/Chan_lab/shared/FinalObjects")
+combo.reference <- readRDS("SCTRefwithUMAP_pc70res5_6222.rds")
+
+
 #Cluster Labeling (UScore) =========================
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 # This labels the clusters as a whole using the UCell package
-# Paper: https://www.sciencedirect.com/science/article/pii/S2001037021002816?via%3Dihub 
+# Paper: https://www.sciencedirect.com/science/article/pii/S2001037021002"celltype_final"6?via%3Dihub 
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -83,10 +89,14 @@ library(genefu)
 
 DefaultAssay(combo.reference) <- "RNA"
 #https://www.biostars.org/p/395951/
+
 #https://github.com/satijalab/seurat/issues/5738
 #https://github.com/satijalab/seurat/issues/5847
 
 combo.reference <- NormalizeData(combo.reference, assay = "RNA")
+
+DimPlot(combo.reference, reduction = "umap", label = TRUE, raster = FALSE)+ ggtitle(label = "Cell Type (PC = 40)") #+ NoLegend()
+
 
 #NK __________________________________________________________________
 
@@ -98,12 +108,10 @@ pdf("test.pdf")
 FeaturePlot(object = combo.reference, features = "signature_1NK.mark2", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) + ggtitle(label = "UCell's NK Signature (PC = 40)")
 dev.off()
 
-Idents(combo.reference) <- combo.reference$integrated_snn_res.7
+
 combo.reference <- RenameIdents(combo.reference, `109` = "NK Cells", `35` = "NK Cells", 
                                 `27` = "NK Cells", `75` = "NK Cells", 
                                 `156` = "NK Cells", `83` = "NK Cells")
-
-##really making sure Tcells are not included in the NK cluster
 NK <- subset(combo.reference, idents = "NK Cells")
 NK <- AddModuleScore_UCell(NK, features = "CD3", name = "CD3", assay = "RNA")
 NK <- AddModuleScore_UCell(NK, features = "CD3D", name = "CD3D", assay = "RNA")
@@ -128,7 +136,6 @@ Idents(combo.reference, cells = noTcd3d) <- "T Cells"
 noTcd4 <- WhichCells(NK, expression = signature_1CD4 > 0.4)
 Idents(combo.reference, cells = noTcd4) <- "T Cells"
 
-
 notenoughNK <- WhichCells(NK, expression = signature_1NK.mark2 < 0.05)
 Idents(combo.reference, cells = notenoughNK) <- "T Cells"
 
@@ -148,7 +155,6 @@ pdf("test.pdf")
 FeaturePlot(object = combo.reference, features = "signature_1T_karacd4", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) + ggtitle(label = "Chung's T Cell Signature (PC = 40)")
 dev.off()
 
-Idents(combo.reference) <- combo.reference$integrated_snn_res.7
 combo.reference <- RenameIdents(combo.reference, `95` = "T Cells", `115` = "T Cells",
                                 `10` = "T Cells", `12` = "T Cells", `183` = "T Cells",
                                 `149` = "T Cells", `63` = "T Cells", `148` = "T Cells",
@@ -165,7 +171,6 @@ combo.reference <- RenameIdents(combo.reference, `95` = "T Cells", `115` = "T Ce
                                 `47` = "T Cells", `16` = "T Cells", `54` = "T Cells",
                                 `28` = "T Cells", `71` = "T Cells", `69` = "T Cells",
                                 `76` = "T Cells", `107` = "T Cells", `36` = "T Cells")
-
 
 #B Cells __________________________________________________________________
 
@@ -302,19 +307,18 @@ Myoepi_wuNguyen <- list(c("KRT5",
                           "PTPRC-"))
 combo.reference <- AddModuleScore_UCell(combo.reference, features = Myoepi_wuNguyen, name = "Myoepi_wuNguyen", assay = "RNA")  
 pdf("test.pdf")
-FeaturePlot(object = combo.reference, features = "signature_1Myoepi_wuNguyen", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) 
+FeaturePlot(object = combo.reference, features = "signature_1Myoepi_wuNguyen", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) + ggtitle(label = "Wu's Myoepithelial Signature (PC = 40)")
 dev.off()
-FeaturePlot(object = combo.reference, features = "EPCAM", order = TRUE, label = TRUE, min.cutoff = 0,  raster = FALSE) 
+FeaturePlot(object = combo.reference, features = "EPCAM", order = TRUE, label = TRUE, min.cutoff = 0,  raster = FALSE) + ggtitle(label = "Wu's Myoepithelial Signature (PC = 40)")
 
 combo.reference <- RenameIdents(combo.reference, `59` = "Myoepithelial Cells")
-
 
 #PVL _________________________
 
 PVL.mark <- list(c("MCAM", "ACTA2", "PDGFRB", "PTPRC-", "EPCAM-")) #from "Stromal subclasses resemble diverse..." (new Wu 2021)
 combo.reference <- AddModuleScore_UCell(combo.reference, features = PVL.mark, name = "newWuPVL", assay = "RNA")  
 pdf("test.pdf")
-FeaturePlot(object = combo.reference, features = "signature_1newWuPVL", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) 
+FeaturePlot(object = combo.reference, features = "signature_1newWuPVL", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) + ggtitle(label = "New Wu's PVL Signature (PC = 40)")
 dev.off()
 combo.reference <- RenameIdents(combo.reference, `56` = "Perivascular-like (PVL) Cells",
                                 `155` = "Perivascular-like (PVL) Cells", `124` = "Perivascular-like (PVL) Cells",
@@ -335,7 +339,7 @@ fibro_wumelan <- list(c("FAP",
                         "PTPRC-"))
 combo.reference <- AddModuleScore_UCell(combo.reference, features = fibro_wumelan, name = "fibro_wumelan", assay = "RNA")  
 pdf("test.pdf")
-FeaturePlot(object = combo.reference, features = "signature_1fibro_wumelan", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) 
+FeaturePlot(object = combo.reference, features = "signature_1fibro_wumelan", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) + ggtitle(label = "Karaayvaz's Stroma Signature (PC = 40)")
 dev.off()
 
 combo.reference <- RenameIdents(combo.reference, `100` = "Fibroblasts",`171` = "Fibroblasts", 
@@ -355,7 +359,7 @@ endo_kara <- list(c("PECAM1",
                     "EPCAM-"))
 combo.reference <- AddModuleScore_UCell(combo.reference, features = endo_kara, name = "endokara", assay = "RNA")  
 pdf("test.pdf")
-FeaturePlot(object = combo.reference, features = "signature_1endokara", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) 
+FeaturePlot(object = combo.reference, features = "signature_1endokara", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) + ggtitle(label = "Karaayvaz's Endothelial Signature (PC = 40)")
 dev.off()
 combo.reference <- RenameIdents(combo.reference, `174` = "Endothelial Cells", `144` = "Endothelial Cells",
                                 `116` = "Endothelial Cells", `77` = "Endothelial Cells", `24` = "Endothelial Cells",
@@ -377,8 +381,7 @@ Idents(combo.reference, Savas.cells) <- "T Cells"
 Idents(combo.reference, AziziT.cells) <- "T Cells"
 
 
-
-#T cell subsets (UScore) ========================
+#T cell subsets ========================
 
 Tcellsub <- subset(combo.reference, idents = "T Cells")
 
@@ -430,6 +433,15 @@ DimHeatmap(Tcellsub.combo, dims = 45:55, cells = 500, balanced = TRUE)
 DimHeatmap(Tcellsub.combo, dims = 55:65, cells = 500, balanced = TRUE)
 dev.off()
 
+#Epi.all.combo <- readRDS(file = "Epiprim_withUMAPrenamednewmarkes.rds") #start here to get actual clustering
+
+Tcellsub.combo <- FindNeighbors(Tcellsub.combo, reduction = "pca", dims = 1:60)
+
+resolution.range <- c(0.05, 0.1, 0.2, 0.4, 0.7, 1.0, 1.3, 1.6)
+Tcellsub.combo <- FindClusters(Tcellsub.combo, resolution = resolution.range)
+pdf("test.pdf", width = 14.22, height = 13.01)
+clustree(Tcellsub.combo, prefix = "integrated_snn_res.", node_colour = "sc3_stability", layout = "sugiyama")
+dev.off()
 
 DefaultAssay(Tcellsub.combo) <- "integrated"
 
@@ -446,6 +458,7 @@ DimPlot(Tcellsub.combo, reduction = "umap", label = TRUE, repel = TRUE, raster =
 
 
 DefaultAssay(Tcellsub.combo) <- "RNA"
+Tcellsub.combo <- NormalizeData(Tcellsub.combo, assay = "RNA")
 
 
 
@@ -485,7 +498,6 @@ Tcellsub.combo <- AddModuleScore_UCell(Tcellsub.combo, features = CD4sig, name =
 pdf("test.pdf")
 FeaturePlot(object = Tcellsub.combo, features = "signature_1CD4sig", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) + ggtitle(label = "Karaayvaz's Endothelial Signature (PC = 40)")
 dev.off()
-
 Tcellsub.combo <- RenameIdents(Tcellsub.combo, `12` = "CD4+ T Cells",
                                `45` = "CD4+ T Cells", `60` = "CD4+ T Cells",
                                `10` = "CD4+ T Cells", `57` = "CD4+ T Cells",
@@ -504,7 +516,7 @@ Tcellsub.combo <- RenameIdents(Tcellsub.combo, `12` = "CD4+ T Cells",
                                `66` = "CD4+ T Cells", `75` = "CD4+ T Cells",
                                `74` = "CD4+ T Cells", `25` = "CD4+ T Cells",
                                `24` = "CD4+ T Cells", `6` = "CD4+ T Cells",
-                               `10` = "CD4+ T Cells", `9` = "CD4+ T Cells", 
+                               `10` = "CD4+ T Cells", `9` = "CD4+ T Cells",
                                `44` = "CD4+ T Cells",
                                `36` = "CD4+ T Cells", `30` = "CD4+ T Cells",
                                `13` = "CD4+ T Cells", `47` = "CD4+ T Cells")
@@ -521,7 +533,6 @@ Tcellsub.combo <- RenameIdents(Tcellsub.combo, `40` = "Regulatory T Cells", `1` 
                                `0` = "Regulatory T Cells", `43` = "Regulatory T Cells")
 
 
-
 CD8 <- WhichCells(Tcellsub.combo, idents = "CD8+ T Cells")
 CD4 <- WhichCells(Tcellsub.combo, idents = "CD4+ T Cells")
 Treg <- WhichCells(Tcellsub.combo, idents = "Regulatory T Cells")
@@ -530,7 +541,7 @@ Idents(combo.reference, cells = CD8) <- "CD8+ T Cells"
 Idents(combo.reference, cells = CD4) <- "CD4+ T Cells"
 Idents(combo.reference, cells = Treg) <- "Regulatory T Cells"
 
-#myeloid cell subset (UScore) ==============================
+#myeloid cell subset ==============================
 
 Myecellsub <- subset(combo.reference, idents = "Myeloid Cells")
 
@@ -570,6 +581,7 @@ Mye.anchors <- FindIntegrationAnchors(object.list = Myecellsub.list, normalizati
                                       anchor.features = Mye.features, reference = reference.list)
 
 Myecellsub.combo <- IntegrateData(anchorset = Mye.anchors, normalization.method = "SCT", k.weight = 52)
+
 DefaultAssay(Myecellsub.combo) <- "integrated"
 
 Myecellsub.combo <- RunPCA(Myecellsub.combo, npcs = 100, verbose = FALSE)
@@ -592,6 +604,14 @@ DimHeatmap(Myecellsub.combo, dims = 55:65, cells = 500, balanced = TRUE)
 dev.off()
 
 
+Myecellsub.combo <- FindNeighbors(Myecellsub.combo, reduction = "pca", dims = 1:60)
+
+resolution.range <- c(0.05, 0.1, 0.2, 0.4, 0.7, 1.0, 1.3, 1.6)
+Myecellsub.combo <- FindClusters(Myecellsub.combo, resolution = resolution.range)
+pdf("test.pdf", width = 14.22, height = 13.01)
+clustree(Myecellsub.combo, prefix = "integrated_snn_res.", node_colour = "sc3_stability", layout = "sugiyama")
+dev.off()
+
 DefaultAssay(Myecellsub.combo) <- "integrated"
 Myecellsub.combo <- FindNeighbors(Myecellsub.combo, reduction = "pca", dims = 1:50)
 Myecellsub.combo <- FindClusters(Myecellsub.combo, resolution = 3)
@@ -606,6 +626,7 @@ DimPlot(Myecellsub.combo, reduction = "umap", label = TRUE, repel = TRUE, raster
 
 
 DefaultAssay(Myecellsub.combo) <- "RNA"
+Myecellsub.combo <- NormalizeData(Myecellsub.combo, assay = "RNA")
 
 
 #MDSc __________________________________________________________________
@@ -655,9 +676,7 @@ Myecellsub.combo <- RenameIdents(Myecellsub.combo, `39` = "Macrophages", `30` = 
                                  `34` = "Macrophages", `44` = "Macrophages", `22` = "Macrophages",
                                  `20` = "Macrophages", `7` = "Macrophages", `41` = "Macrophages",
                                  `5` = "Macrophages", `6` = "Macrophages", `11` = "Macrophages",
-                                 `8` = "Macrophages", `23` = "Macrophages")
-
-Myecellsub.combo <- RenameIdents(Myecellsub.combo, `40` = "Macrophages", `33` = "Macrophages",
+                                 `8` = "Macrophages", `23` = "Macrophages", `40` = "Macrophages", `33` = "Macrophages",
                                  `1` = "Macrophages")
 #Monocytes __________________________________________________________________
 
@@ -720,9 +739,6 @@ dev.off()
 Myecellsub.combo <- RenameIdents(Myecellsub.combo, `29` = "Mast Cells", `12` = "Mast Cells",
                                  `27` = "Mast Cells")
 
-pdf("test.pdf")
-dev.off()
-
 
 
 MDSC <- WhichCells(Myecellsub.combo, idents = "MDSCs")
@@ -741,7 +757,7 @@ Idents(combo.reference, cells = Mast) <- "Mast Cells"
 
 
 combo.reference$celltype_UCell <- Idents(combo.reference)
-
+combo.reference$celltype_final <- Idents(combo.reference)
 
 #Marker and Expression Tests ========================================
 
@@ -1847,7 +1863,7 @@ for (cell in names(Unknown.Cells.list)) {
   colnames(NK.test) <- cell
   rownames(NK.test) <- c(test.NK, "PTPRC")
   NK.exp.sum <- colSums(NK.test)
-  NK.exp.avg <- NK.exp.sum/69059  #average expression (denominator is #rows of dataset)
+  NK.exp.avg <- NK.exp.sum/nrow(combo.reference)  #average expression (denominator is #rows of dataset)
   #NK.exp.avg <- colMeans(NK.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
   
   
@@ -1857,7 +1873,7 @@ for (cell in names(Unknown.Cells.list)) {
   colnames(Tcell.test) <- cell
   rownames(Tcell.test) <- c(test.T, "PTPRC")
   T.exp.sum <- colSums(Tcell.test)
-  T.exp.avg <- T.exp.sum/69059  #average expression (denominator is #rows of dataset)
+  T.exp.avg <- T.exp.sum/nrow(combo.reference)  #average expression (denominator is #rows of dataset)
   #T.exp.avg <- colMeans(Tcell.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
   
   
@@ -1867,7 +1883,7 @@ for (cell in names(Unknown.Cells.list)) {
   colnames(Bcell.test) <- cell
   rownames(Bcell.test) <- c(test.B, "PTPRC")
   B.exp.sum <- colSums(Bcell.test)
-  B.exp.avg <- B.exp.sum/69059  #average expression (denominator is #rows of dataset)
+  B.exp.avg <- B.exp.sum/nrow(combo.reference)  #average expression (denominator is #rows of dataset)
   #B.exp.avg <- colMeans(Bcell.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
   
   
@@ -1878,7 +1894,7 @@ for (cell in names(Unknown.Cells.list)) {
   colnames(Plasmacell.test) <- cell
   rownames(Plasmacell.test) <- c(test.Plasma, "PTPRC")
   Plasma.exp.sum <- colSums(Plasmacell.test)
-  Plasma.exp.avg <- Plasma.exp.sum/69059  #average expression (denominator is #rows of dataset)
+  Plasma.exp.avg <- Plasma.exp.sum/nrow(combo.reference)  #average expression (denominator is #rows of dataset)
   #Plasma.exp.avg <- colMeans(Plasmacell.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
   
   
@@ -1888,7 +1904,7 @@ for (cell in names(Unknown.Cells.list)) {
   colnames(Myeloid.test) <- cell
   rownames(Myeloid.test) <- c(test.Mye, "PTPRC")
   Myeloid.exp.sum <- colSums(Myeloid.test)
-  Myeloid.exp.avg <- Myeloid.exp.sum/69059 #average expression (denominator is #rows of dataset)
+  Myeloid.exp.avg <- Myeloid.exp.sum/nrow(combo.reference) #average expression (denominator is #rows of dataset)
   #Myeloid.exp.avg <- colMeans(Myeloid.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
   
   
@@ -1898,7 +1914,7 @@ for (cell in names(Unknown.Cells.list)) {
   colnames(MyoEpi.test) <- cell
   rownames(MyoEpi.test) <- c(test.MyoEpi)
   MyoEpi.exp.sum <- colSums(MyoEpi.test)
-  MyoEpi.exp.avg <- MyoEpi.exp.sum/69059 #average expression (denominator is #rows of dataset)
+  MyoEpi.exp.avg <- MyoEpi.exp.sum/nrow(combo.reference) #average expression (denominator is #rows of dataset)
   #MyoEpi.exp.avg <- colMeans(MyoEpi.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
   
   
@@ -1908,7 +1924,7 @@ for (cell in names(Unknown.Cells.list)) {
   colnames(PVL.test) <- cell
   rownames(PVL.test) <- c(test.PVL)
   PVL.exp.sum <- colSums(PVL.test)
-  PVL.exp.avg <- PVL.exp.sum/69059 #average expression (denominator is #rows of dataset)
+  PVL.exp.avg <- PVL.exp.sum/nrow(combo.reference) #average expression (denominator is #rows of dataset)
   #PVL.exp.avg <- colMeans(PVL.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
   
   
@@ -1919,7 +1935,7 @@ for (cell in names(Unknown.Cells.list)) {
   colnames(Fibro.test) <- cell
   rownames(Fibro.test) <- c(test.Fibro)
   Fibro.exp.sum <- colSums(Fibro.test)
-  Fibro.exp.avg <- Fibro.exp.sum/69059 #average expression (denominator is #rows of dataset)
+  Fibro.exp.avg <- Fibro.exp.sum/nrow(combo.reference) #average expression (denominator is #rows of dataset)
   #Fibro.exp.avg <- colMeans(Fibro.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
   
   
@@ -1930,7 +1946,7 @@ for (cell in names(Unknown.Cells.list)) {
   colnames(Endo.test) <- cell
   rownames(Endo.test) <- c(test.Endo)
   Endo.exp.sum <- colSums(Endo.test)
-  Endo.exp.avg <- Endo.exp.sum/69059 #average expression (denominator is #rows of dataset)
+  Endo.exp.avg <- Endo.exp.sum/nrow(combo.reference) #average expression (denominator is #rows of dataset)
   #Endo.exp.avg <- colMeans(Endo.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
   
   
@@ -1941,7 +1957,7 @@ for (cell in names(Unknown.Cells.list)) {
   colnames(Epi.test) <- cell
   rownames(Epi.test) <- c(test.Epi, test.StrongEpi)
   Epi.exp.sum <- colSums(Epi.test)
-  Epi.exp.avg <- Epi.exp.sum/69059 #average expression (denominator is #rows of dataset)
+  Epi.exp.avg <- Epi.exp.sum/nrow(combo.reference) #average expression (denominator is #rows of dataset)
   #Epi.exp.avg <- colMeans(Epi.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
   
   
@@ -1975,7 +1991,7 @@ for (cell in names(Unknown.Cells.list)) {
       colnames(CD8T.test) <- cell
       rownames(CD8T.test) <-c("CD8A","CD8B")
       CD8.exp.sum <- colSums(CD8T.test)
-      CD8.exp.avg <- CD8.exp.sum/69059 
+      CD8.exp.avg <- CD8.exp.sum/nrow(combo.reference) 
       #CD8.exp.avg <- colMeans(CD8T.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
     }
     else {
@@ -1988,7 +2004,7 @@ for (cell in names(Unknown.Cells.list)) {
       colnames(CD4.test) <- cell
       rownames(CD4.test) <-c("CD4")
       CD4.exp.sum <- colSums(CD4.test)
-      CD4.exp.avg <- CD4.exp.sum/69059 
+      CD4.exp.avg <- CD4.exp.sum/nrow(combo.reference) 
       #CD4.exp.avg <- colMeans(CD4.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
     }  
     else {
@@ -2000,7 +2016,7 @@ for (cell in names(Unknown.Cells.list)) {
       colnames(Treg.test) <- cell
       rownames(Treg.test) <-c("FOXP3")
       Treg.exp.sum <- colSums(Treg.test)
-      Treg.exp.avg <- Treg.exp.sum/69059 
+      Treg.exp.avg <- Treg.exp.sum/nrow(combo.reference) 
       #Treg.exp.avg <- colMeans(Treg.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
     }  
     else {
@@ -2076,7 +2092,7 @@ for (cell in names(Unknown.Cells.list)) {
                               "IL4R",
                               "HLA-DRA")
       MDSc.exp.sum <- colSums(MDSc.test)
-      MDSc.exp.avg <- MDSc.exp.sum/69059 
+      MDSc.exp.avg <- MDSc.exp.sum/nrow(combo.reference) 
       #MDSc.exp.avg <- colMeans(MDSc.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
     }
     else {
@@ -2097,7 +2113,7 @@ for (cell in names(Unknown.Cells.list)) {
                                "EREG", "IL1B", "LYVE1", "PLTP",
                                "SELENOP", "C1QC", "C1QA", "APOE")
       Macro.exp.sum <- colSums(Macro.test)
-      Macro.exp.avg <- Macro.exp.sum/69059 
+      Macro.exp.avg <- Macro.exp.sum/nrow(combo.reference) 
       #Macro.exp.avg <- colMeans(Macro.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
     }
     else {
@@ -2112,7 +2128,7 @@ for (cell in names(Unknown.Cells.list)) {
       colnames(Mono.test) <- cell
       rownames(Mono.test) <-c("FCN1", "S100A9", "S100A8", "FCGR3A", "LST1", "LILRB2")
       Mono.exp.sum <- colSums(Mono.test)
-      Mono.exp.avg <- Mono.exp.sum/69059 
+      Mono.exp.avg <- Mono.exp.sum/nrow(combo.reference) 
       #Mono.exp.avg <- colMeans(Mono.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
     }
     else {
@@ -2135,7 +2151,7 @@ for (cell in names(Unknown.Cells.list)) {
                               "CSF3R", #TCGA, Chung
                               "S100A9","TNF","CD274")
       Neut.exp.sum <- colSums(Neut.test)
-      Neut.exp.avg <- Neut.exp.sum/69059 
+      Neut.exp.avg <- Neut.exp.sum/nrow(combo.reference) 
       #Neut.exp.avg <- colMeans(Neut.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
     }
     else {
@@ -2158,7 +2174,7 @@ for (cell in names(Unknown.Cells.list)) {
                             "CD1C", "FCER1A","HLA-DQA1", 
                             "LAMP3", "CCR7", "FSCN1")
       DC.exp.sum <- colSums(DC.test)
-      DC.exp.avg <- DC.exp.sum/69059 
+      DC.exp.avg <- DC.exp.sum/nrow(combo.reference) 
       #DC.exp.avg <- colMeans(DC.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
     }
     else {
@@ -2171,7 +2187,7 @@ for (cell in names(Unknown.Cells.list)) {
       colnames(Mast.test) <- cell
       rownames(Mast.test) <-c("KIT","TPSAB1","CPA4")
       Mast.exp.sum <- colSums(Mast.test)
-      Mast.exp.avg <- Mast.exp.sum/69059 
+      Mast.exp.avg <- Mast.exp.sum/nrow(combo.reference) 
       #Mast.exp.avg <- colMeans(Mast.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
     }
     else {
@@ -2308,7 +2324,7 @@ table(MarkerBased.dataframe$V1)
 
 
 cell.result <- list()
-#test cell: Aziziimmune_BC3_48068
+#test cell: Aziziimmune_BC3_4"RefineExpBased"68
 for (cell in names(markersum.list)) {
   
   extract <- markersum.list[[cell]]
@@ -2337,7 +2353,7 @@ for (cell in names(markersum.list)) {
   colnames(NK.test) <- cell
   rownames(NK.test) <- c(test.NK, "PTPRC")
   NK.exp.sum <- colSums(NK.test)
-  NK.exp.avg <- NK.exp.sum/69059  #average expression (denominator is #rows of dataset)
+  NK.exp.avg <- NK.exp.sum/nrow(combo.reference)  #average expression (denominator is #rows of dataset)
   #NK.exp.avg <- colMeans(NK.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
   
   
@@ -2347,7 +2363,7 @@ for (cell in names(markersum.list)) {
   colnames(Tcell.test) <- cell
   rownames(Tcell.test) <- c(test.T, "PTPRC")
   T.exp.sum <- colSums(Tcell.test)
-  T.exp.avg <- T.exp.sum/69059  #average expression (denominator is #rows of dataset)
+  T.exp.avg <- T.exp.sum/nrow(combo.reference)  #average expression (denominator is #rows of dataset)
   #T.exp.avg <- colMeans(Tcell.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
   
   
@@ -2357,7 +2373,7 @@ for (cell in names(markersum.list)) {
   colnames(Bcell.test) <- cell
   rownames(Bcell.test) <- c(test.B, "PTPRC")
   B.exp.sum <- colSums(Bcell.test)
-  B.exp.avg <- B.exp.sum/69059  #average expression (denominator is #rows of dataset)
+  B.exp.avg <- B.exp.sum/nrow(combo.reference)  #average expression (denominator is #rows of dataset)
   #B.exp.avg <- colMeans(Bcell.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
   
   
@@ -2368,7 +2384,7 @@ for (cell in names(markersum.list)) {
   colnames(Plasmacell.test) <- cell
   rownames(Plasmacell.test) <- c(test.Plasma, "PTPRC")
   Plasma.exp.sum <- colSums(Plasmacell.test)
-  Plasma.exp.avg <- Plasma.exp.sum/69059  #average expression (denominator is #rows of dataset)
+  Plasma.exp.avg <- Plasma.exp.sum/nrow(combo.reference)  #average expression (denominator is #rows of dataset)
   #Plasma.exp.avg <- colMeans(Plasmacell.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
   
   
@@ -2378,7 +2394,7 @@ for (cell in names(markersum.list)) {
   colnames(Myeloid.test) <- cell
   rownames(Myeloid.test) <- c(test.Mye, "PTPRC")
   Myeloid.exp.sum <- colSums(Myeloid.test)
-  Myeloid.exp.avg <- Myeloid.exp.sum/69059 #average expression (denominator is #rows of dataset)
+  Myeloid.exp.avg <- Myeloid.exp.sum/nrow(combo.reference) #average expression (denominator is #rows of dataset)
   #Myeloid.exp.avg <- colMeans(Myeloid.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
   
   
@@ -2388,7 +2404,7 @@ for (cell in names(markersum.list)) {
   colnames(MyoEpi.test) <- cell
   rownames(MyoEpi.test) <- c(test.MyoEpi)
   MyoEpi.exp.sum <- colSums(MyoEpi.test)
-  MyoEpi.exp.avg <- MyoEpi.exp.sum/69059 #average expression (denominator is #rows of dataset)
+  MyoEpi.exp.avg <- MyoEpi.exp.sum/nrow(combo.reference) #average expression (denominator is #rows of dataset)
   #MyoEpi.exp.avg <- colMeans(MyoEpi.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
   
   
@@ -2398,7 +2414,7 @@ for (cell in names(markersum.list)) {
   colnames(PVL.test) <- cell
   rownames(PVL.test) <- c(test.PVL)
   PVL.exp.sum <- colSums(PVL.test)
-  PVL.exp.avg <- PVL.exp.sum/69059 #average expression (denominator is #rows of dataset)
+  PVL.exp.avg <- PVL.exp.sum/nrow(combo.reference) #average expression (denominator is #rows of dataset)
   #PVL.exp.avg <- colMeans(PVL.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
   
   
@@ -2409,7 +2425,7 @@ for (cell in names(markersum.list)) {
   colnames(Fibro.test) <- cell
   rownames(Fibro.test) <- c(test.Fibro)
   Fibro.exp.sum <- colSums(Fibro.test)
-  Fibro.exp.avg <- Fibro.exp.sum/69059 #average expression (denominator is #rows of dataset)
+  Fibro.exp.avg <- Fibro.exp.sum/nrow(combo.reference) #average expression (denominator is #rows of dataset)
   #Fibro.exp.avg <- colMeans(Fibro.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
   
   
@@ -2420,7 +2436,7 @@ for (cell in names(markersum.list)) {
   colnames(Endo.test) <- cell
   rownames(Endo.test) <- c(test.Endo)
   Endo.exp.sum <- colSums(Endo.test)
-  Endo.exp.avg <- Endo.exp.sum/69059 #average expression (denominator is #rows of dataset)
+  Endo.exp.avg <- Endo.exp.sum/nrow(combo.reference) #average expression (denominator is #rows of dataset)
   #Endo.exp.avg <- colMeans(Endo.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
   
   
@@ -2431,7 +2447,7 @@ for (cell in names(markersum.list)) {
   colnames(Epi.test) <- cell
   rownames(Epi.test) <- c(test.Epi, test.StrongEpi)
   Epi.exp.sum <- colSums(Epi.test)
-  Epi.exp.avg <- Epi.exp.sum/69059 #average expression (denominator is #rows of dataset)
+  Epi.exp.avg <- Epi.exp.sum/nrow(combo.reference) #average expression (denominator is #rows of dataset)
   #Epi.exp.avg <- colMeans(Epi.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
   
   
@@ -2465,7 +2481,7 @@ for (cell in names(markersum.list)) {
       colnames(CD8T.test) <- cell
       rownames(CD8T.test) <-c("CD8A","CD8B")
       CD8.exp.sum <- colSums(CD8T.test)
-      CD8.exp.avg <- CD8.exp.sum/69059 
+      CD8.exp.avg <- CD8.exp.sum/nrow(combo.reference) 
       #CD8.exp.avg <- colMeans(CD8T.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
     }
     else {
@@ -2478,7 +2494,7 @@ for (cell in names(markersum.list)) {
       colnames(CD4.test) <- cell
       rownames(CD4.test) <-c("CD4")
       CD4.exp.sum <- colSums(CD4.test)
-      CD4.exp.avg <- CD4.exp.sum/69059 
+      CD4.exp.avg <- CD4.exp.sum/nrow(combo.reference) 
       #CD4.exp.avg <- colMeans(CD4.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
     }  
     else {
@@ -2490,7 +2506,7 @@ for (cell in names(markersum.list)) {
       colnames(Treg.test) <- cell
       rownames(Treg.test) <-c("FOXP3")
       Treg.exp.sum <- colSums(Treg.test)
-      Treg.exp.avg <- Treg.exp.sum/69059 
+      Treg.exp.avg <- Treg.exp.sum/nrow(combo.reference) 
       #Treg.exp.avg <- colMeans(Treg.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
     }  
     else {
@@ -2566,7 +2582,7 @@ for (cell in names(markersum.list)) {
                               "IL4R",
                               "HLA-DRA")
       MDSc.exp.sum <- colSums(MDSc.test)
-      MDSc.exp.avg <- MDSc.exp.sum/69059 
+      MDSc.exp.avg <- MDSc.exp.sum/nrow(combo.reference) 
       #MDSc.exp.avg <- colMeans(MDSc.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
     }
     else {
@@ -2587,7 +2603,7 @@ for (cell in names(markersum.list)) {
                                "EREG", "IL1B", "LYVE1", "PLTP",
                                "SELENOP", "C1QC", "C1QA", "APOE")
       Macro.exp.sum <- colSums(Macro.test)
-      Macro.exp.avg <- Macro.exp.sum/69059 
+      Macro.exp.avg <- Macro.exp.sum/nrow(combo.reference) 
       #Macro.exp.avg <- colMeans(Macro.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
     }
     else {
@@ -2602,7 +2618,7 @@ for (cell in names(markersum.list)) {
       colnames(Mono.test) <- cell
       rownames(Mono.test) <-c("FCN1", "S100A9", "S100A8", "FCGR3A", "LST1", "LILRB2")
       Mono.exp.sum <- colSums(Mono.test)
-      Mono.exp.avg <- Mono.exp.sum/69059 
+      Mono.exp.avg <- Mono.exp.sum/nrow(combo.reference) 
       #Mono.exp.avg <- colMeans(Mono.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
     }
     else {
@@ -2625,7 +2641,7 @@ for (cell in names(markersum.list)) {
                               "CSF3R", #TCGA, Chung
                               "S100A9","TNF","CD274")
       Neut.exp.sum <- colSums(Neut.test)
-      Neut.exp.avg <- Neut.exp.sum/69059 
+      Neut.exp.avg <- Neut.exp.sum/nrow(combo.reference) 
       #Neut.exp.avg <- colMeans(Neut.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
     }
     else {
@@ -2648,7 +2664,7 @@ for (cell in names(markersum.list)) {
                             "CD1C", "FCER1A","HLA-DQA1", 
                             "LAMP3", "CCR7", "FSCN1")
       DC.exp.sum <- colSums(DC.test)
-      DC.exp.avg <- DC.exp.sum/69059 
+      DC.exp.avg <- DC.exp.sum/nrow(combo.reference) 
       #DC.exp.avg <- colMeans(DC.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
     }
     else {
@@ -2661,7 +2677,7 @@ for (cell in names(markersum.list)) {
       colnames(Mast.test) <- cell
       rownames(Mast.test) <-c("KIT","TPSAB1","CPA4")
       Mast.exp.sum <- colSums(Mast.test)
-      Mast.exp.avg <- Mast.exp.sum/69059 
+      Mast.exp.avg <- Mast.exp.sum/nrow(combo.reference) 
       #Mast.exp.avg <- colMeans(Mast.test) #average expression (taken from Cheng) #https://github.com/Sijin-ZhangLab/PanMyeloid/blob/master/Signature_gene_sets_analysis.R
     }
     else {
@@ -3056,7 +3072,7 @@ combo.reference <- readRDS("PrimObject_6422.rds")
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-combo.reference@meta.data[1:20,c(75, 77:78)]
+combo.reference@meta.data[1:20,c(75, 77:80)]
 #75 = UCell
 #77 = markerbased
 #78 = expression based only
@@ -3064,104 +3080,104 @@ table(combo.reference$MarkerBasedKara)
 
 combo.reference$RefineMarkerBased <- "hi"
 for (i in 1:nrow(combo.reference@meta.data)) {
-  combo.reference@meta.data[i,79] <-ifelse(is.na(combo.reference@meta.data[i,77]),
-                                           as.character(combo.reference@meta.data[i,75]), as.character(combo.reference@meta.data[i,77]))
+  combo.reference@meta.data[i,"RefineMarkerBased"] <-ifelse(is.na(combo.reference@meta.data[i,"markerbased"]),
+                                           as.character(combo.reference@meta.data[i,"celltype_UCell"]), as.character(combo.reference@meta.data[i,"markerbased"]))
 }
 
 for (i in 1:nrow(combo.reference@meta.data)) {
   
-  if (combo.reference@meta.data[i,79] == "Unspecific T Cells")
+  if (combo.reference@meta.data[i,"RefineMarkerBased"] == "Unspecific T Cells")
   {
-    if ((combo.reference@meta.data[i,75] == "CD8+ T Cells") |
-        (combo.reference@meta.data[i,75] == "CD4+ T Cells") |
-        (combo.reference@meta.data[i,75] == "Regulatory T Cells")) 
+    if ((combo.reference@meta.data[i,"celltype_UCell"] == "CD8+ T Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "CD4+ T Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Regulatory T Cells")) 
     {
-      combo.reference@meta.data[i,79] <- as.character(combo.reference@meta.data[i,75])
+      combo.reference@meta.data[i,"RefineMarkerBased"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
       
     }
     else {
-      combo.reference@meta.data[i,79] <- "not Tcell by UScore"
+      combo.reference@meta.data[i,"RefineMarkerBased"] <- "not Tcell by UScore"
     }  
   }
   
-  else if (combo.reference@meta.data[i,79] == "T Cells")
+  else if (combo.reference@meta.data[i,"RefineMarkerBased"] == "T Cells")
   {
-    if ((combo.reference@meta.data[i,75] == "CD8+ T Cells") |
-        (combo.reference@meta.data[i,75] == "CD4+ T Cells") |
-        (combo.reference@meta.data[i,75] == "Regulatory T Cells")) 
+    if ((combo.reference@meta.data[i,"celltype_UCell"] == "CD8+ T Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "CD4+ T Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Regulatory T Cells")) 
     {
-      combo.reference@meta.data[i,79] <- as.character(combo.reference@meta.data[i,75])
+      combo.reference@meta.data[i,"RefineMarkerBased"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
       
     }
     else {
-      combo.reference@meta.data[i,79] <- "not Tcell by UScore"
+      combo.reference@meta.data[i,"RefineMarkerBased"] <- "not Tcell by UScore"
     }
     
   }
-  else if (combo.reference@meta.data[i,79] == "Unspecific Myeloid Cells")
+  else if (combo.reference@meta.data[i,"RefineMarkerBased"] == "Unspecific Myeloid Cells")
   {
-    if ((combo.reference@meta.data[i,75] == "Macrophages") |
-        (combo.reference@meta.data[i,75] == "Mast Cells") |
-        (combo.reference@meta.data[i,75] == "Monocytes") |
-        (combo.reference@meta.data[i,75] == "Dendritic Cells") |
-        (combo.reference@meta.data[i,75] == "Neutrophils") |
-        (combo.reference@meta.data[i,75] == "MDSCs")) 
+    if ((combo.reference@meta.data[i,"celltype_UCell"] == "Macrophages") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Mast Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Monocytes") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Dendritic Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Neutrophils") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "MDSCs")) 
     {
-      combo.reference@meta.data[i,79] <- as.character(combo.reference@meta.data[i,75])
+      combo.reference@meta.data[i,"RefineMarkerBased"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
       
     }
     else {
-      combo.reference@meta.data[i,79] <- "not Myeloid cell by UScore"
+      combo.reference@meta.data[i,"RefineMarkerBased"] <- "not Myeloid cell by UScore"
     }  
   }
-  else if (combo.reference@meta.data[i,79] == "Myeloid Cells")
+  else if (combo.reference@meta.data[i,"RefineMarkerBased"] == "Myeloid Cells")
   {
-    if ((combo.reference@meta.data[i,75] == "Macrophages") |
-        (combo.reference@meta.data[i,75] == "Mast Cells") |
-        (combo.reference@meta.data[i,75] == "Monocytes") |
-        (combo.reference@meta.data[i,75] == "Dendritic Cells") |
-        (combo.reference@meta.data[i,75] == "Neutrophils") |
-        (combo.reference@meta.data[i,75] == "MDSCs")) 
+    if ((combo.reference@meta.data[i,"celltype_UCell"] == "Macrophages") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Mast Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Monocytes") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Dendritic Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Neutrophils") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "MDSCs")) 
     {
-      combo.reference@meta.data[i,79] <- as.character(combo.reference@meta.data[i,75])
+      combo.reference@meta.data[i,"RefineMarkerBased"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
       
     }
     else {
-      combo.reference@meta.data[i,79] <- "not Myeloid cell by UScore"
+      combo.reference@meta.data[i,"RefineMarkerBased"] <- "not Myeloid cell by UScore"
     }  
   }
-  else if (combo.reference@meta.data[i,79] == "Unknown")
+  else if (combo.reference@meta.data[i,"RefineMarkerBased"] == "Unknown")
   {
-    combo.reference@meta.data[i,79] <- as.character(combo.reference@meta.data[i,75])
+    combo.reference@meta.data[i,"RefineMarkerBased"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
   }
-  else if (combo.reference@meta.data[i,79] == "Zero Expression for All Markers")
+  else if (combo.reference@meta.data[i,"RefineMarkerBased"] == "Zero Expression for All Markers")
   {
-    combo.reference@meta.data[i,79] <- as.character(combo.reference@meta.data[i,75])
+    combo.reference@meta.data[i,"RefineMarkerBased"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
   }
-  else if (combo.reference@meta.data[i,79] == "Non-Specific Immune Cells")
+  else if (combo.reference@meta.data[i,"RefineMarkerBased"] == "Non-Specific Immune Cells")
   {
-    if ((combo.reference@meta.data[i,75] == "CD8+ T Cells") |
-        (combo.reference@meta.data[i,75] == "CD4+ T Cells") |
-        (combo.reference@meta.data[i,75] == "Regulatory T Cells") | 
-        (combo.reference@meta.data[i,75] == "NK Cells") |
-        (combo.reference@meta.data[i,75] == "B Cells") |
-        (combo.reference@meta.data[i,75] == "Plasma Cells") |
-        (combo.reference@meta.data[i,75] == "MDSCs") |
-        (combo.reference@meta.data[i,75] == "Macrophages") |
-        (combo.reference@meta.data[i,75] == "Monocytes") |
-        (combo.reference@meta.data[i,75] == "Neutrophils") |
-        (combo.reference@meta.data[i,75] == "Dendritic Cells") |
-        (combo.reference@meta.data[i,75] == "Mast Cells")) 
+    if ((combo.reference@meta.data[i,"celltype_UCell"] == "CD8+ T Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "CD4+ T Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Regulatory T Cells") | 
+        (combo.reference@meta.data[i,"celltype_UCell"] == "NK Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "B Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Plasma Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "MDSCs") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Macrophages") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Monocytes") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Neutrophils") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Dendritic Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Mast Cells")) 
     {
-      combo.reference@meta.data[i,79] <- as.character(combo.reference@meta.data[i,75])
+      combo.reference@meta.data[i,"RefineMarkerBased"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
       
     }
     else {
-      combo.reference@meta.data[i,79] <- "not immune cell by UScore"
+      combo.reference@meta.data[i,"RefineMarkerBased"] <- "not immune cell by UScore"
     }  }
   
   else {
-    combo.reference@meta.data[i,79] <- as.character(combo.reference@meta.data[i,79])
+    combo.reference@meta.data[i,"RefineMarkerBased"] <- as.character(combo.reference@meta.data[i,"RefineMarkerBased"])
     
   }
 }
@@ -3174,104 +3190,104 @@ table(combo.reference$RefineMarkerBased)
 
 combo.reference$RefineExpBased <- "hi"
 for (i in 1:nrow(combo.reference@meta.data)) {
-  combo.reference@meta.data[i,80] <-ifelse(is.na(combo.reference@meta.data[i,78]),
-                                           as.character(combo.reference@meta.data[i,75]), as.character(combo.reference@meta.data[i,78]))
+  combo.reference@meta.data[i,"RefineExpBased"] <-ifelse(is.na(combo.reference@meta.data[i,"ExpBasedOnly"]),
+                                           as.character(combo.reference@meta.data[i,"celltype_UCell"]), as.character(combo.reference@meta.data[i,"ExpBasedOnly"]))
 }
 
 for (i in 1:nrow(combo.reference@meta.data)) {
   
-  if (combo.reference@meta.data[i,80] == "Unspecific T Cells")
+  if (combo.reference@meta.data[i,"RefineExpBased"] == "Unspecific T Cells")
   {
-    if ((combo.reference@meta.data[i,75] == "CD8+ T Cells") |
-        (combo.reference@meta.data[i,75] == "CD4+ T Cells") |
-        (combo.reference@meta.data[i,75] == "Regulatory T Cells")) 
+    if ((combo.reference@meta.data[i,"celltype_UCell"] == "CD8+ T Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "CD4+ T Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Regulatory T Cells")) 
     {
-      combo.reference@meta.data[i,80] <- as.character(combo.reference@meta.data[i,75])
+      combo.reference@meta.data[i,"RefineExpBased"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
       
     }
     else {
-      combo.reference@meta.data[i,80] <- "not Tcell by UScore"
+      combo.reference@meta.data[i,"RefineExpBased"] <- "not Tcell by UScore"
     }  
   }
-  else if (combo.reference@meta.data[i,80] == "Unspecific Myeloid Cells")
+  else if (combo.reference@meta.data[i,"RefineExpBased"] == "Unspecific Myeloid Cells")
   {
-    if ((combo.reference@meta.data[i,75] == "Macrophages") |
-        (combo.reference@meta.data[i,75] == "Mast Cells") |
-        (combo.reference@meta.data[i,75] == "Monocytes") |
-        (combo.reference@meta.data[i,75] == "Dendritic Cells") |
-        (combo.reference@meta.data[i,75] == "Neutrophils") |
-        (combo.reference@meta.data[i,75] == "MDSCs")) 
+    if ((combo.reference@meta.data[i,"celltype_UCell"] == "Macrophages") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Mast Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Monocytes") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Dendritic Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Neutrophils") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "MDSCs")) 
     {
-      combo.reference@meta.data[i,80] <- as.character(combo.reference@meta.data[i,75])
+      combo.reference@meta.data[i,"RefineExpBased"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
       
     }
     else {
-      combo.reference@meta.data[i,80] <- "not Myeloid cell by UScore"
+      combo.reference@meta.data[i,"RefineExpBased"] <- "not Myeloid cell by UScore"
     }  
   }
-  else if (combo.reference@meta.data[i,80] == "Myeloid Cells")
+  else if (combo.reference@meta.data[i,"RefineExpBased"] == "Myeloid Cells")
   {
-    if ((combo.reference@meta.data[i,75] == "Macrophages") |
-        (combo.reference@meta.data[i,75] == "Mast Cells") |
-        (combo.reference@meta.data[i,75] == "Monocytes") |
-        (combo.reference@meta.data[i,75] == "Dendritic Cells") |
-        (combo.reference@meta.data[i,75] == "Neutrophils") |
-        (combo.reference@meta.data[i,75] == "MDSCs")) 
+    if ((combo.reference@meta.data[i,"celltype_UCell"] == "Macrophages") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Mast Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Monocytes") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Dendritic Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Neutrophils") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "MDSCs")) 
     {
-      combo.reference@meta.data[i,80] <- as.character(combo.reference@meta.data[i,75])
+      combo.reference@meta.data[i,"RefineExpBased"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
       
     }
     else {
-      combo.reference@meta.data[i,80] <- "not Myeloid cell by UScore"
+      combo.reference@meta.data[i,"RefineExpBased"] <- "not Myeloid cell by UScore"
     }  
   }
-  else if (combo.reference@meta.data[i,80] == "T Cells")
+  else if (combo.reference@meta.data[i,"RefineExpBased"] == "T Cells")
   {
-    if ((combo.reference@meta.data[i,75] == "CD8+ T Cells") |
-        (combo.reference@meta.data[i,75] == "CD4+ T Cells") |
-        (combo.reference@meta.data[i,75] == "Regulatory T Cells")) 
+    if ((combo.reference@meta.data[i,"celltype_UCell"] == "CD8+ T Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "CD4+ T Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Regulatory T Cells")) 
     {
-      combo.reference@meta.data[i,80] <- as.character(combo.reference@meta.data[i,75])
+      combo.reference@meta.data[i,"RefineExpBased"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
       
     }
     else {
-      combo.reference@meta.data[i,80] <- "not Tcell by UScore"
+      combo.reference@meta.data[i,"RefineExpBased"] <- "not Tcell by UScore"
     }
     
   }
   
-  else if (combo.reference@meta.data[i,80] == "Unknown")
+  else if (combo.reference@meta.data[i,"RefineExpBased"] == "Unknown")
   {
-    combo.reference@meta.data[i,80] <- as.character(combo.reference@meta.data[i,75])
+    combo.reference@meta.data[i,"RefineExpBased"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
   }
-  else if (combo.reference@meta.data[i,80] == "Zero Expression for All Markers")
+  else if (combo.reference@meta.data[i,"RefineExpBased"] == "Zero Expression for All Markers")
   {
-    combo.reference@meta.data[i,80] <- as.character(combo.reference@meta.data[i,75])
+    combo.reference@meta.data[i,"RefineExpBased"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
   }
-  else if (combo.reference@meta.data[i,80] == "Non-Specific Immune Cells")
+  else if (combo.reference@meta.data[i,"RefineExpBased"] == "Non-Specific Immune Cells")
   {
-    if ((combo.reference@meta.data[i,75] == "CD8+ T Cells") |
-        (combo.reference@meta.data[i,75] == "CD4+ T Cells") |
-        (combo.reference@meta.data[i,75] == "Regulatory T Cells") | 
-        (combo.reference@meta.data[i,75] == "NK Cells") |
-        (combo.reference@meta.data[i,75] == "B Cells") |
-        (combo.reference@meta.data[i,75] == "Plasma Cells") |
-        (combo.reference@meta.data[i,75] == "MDSCs") |
-        (combo.reference@meta.data[i,75] == "Macrophages") |
-        (combo.reference@meta.data[i,75] == "Monocytes") |
-        (combo.reference@meta.data[i,75] == "Neutrophils") |
-        (combo.reference@meta.data[i,75] == "Dendritic Cells") |
-        (combo.reference@meta.data[i,75] == "Mast Cells")) 
+    if ((combo.reference@meta.data[i,"celltype_UCell"] == "CD8+ T Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "CD4+ T Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Regulatory T Cells") | 
+        (combo.reference@meta.data[i,"celltype_UCell"] == "NK Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "B Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Plasma Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "MDSCs") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Macrophages") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Monocytes") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Neutrophils") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Dendritic Cells") |
+        (combo.reference@meta.data[i,"celltype_UCell"] == "Mast Cells")) 
     {
-      combo.reference@meta.data[i,80] <- as.character(combo.reference@meta.data[i,75])
+      combo.reference@meta.data[i,"RefineExpBased"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
       
     }
     else {
-      combo.reference@meta.data[i,80] <- "not immune cell by UScore"
+      combo.reference@meta.data[i,"RefineExpBased"] <- "not immune cell by UScore"
     }  }
   
   else {
-    combo.reference@meta.data[i,80] <- as.character(combo.reference@meta.data[i,80])
+    combo.reference@meta.data[i,"RefineExpBased"] <- as.character(combo.reference@meta.data[i,"RefineExpBased"])
     
   }
 }
@@ -3297,156 +3313,156 @@ colnames(combo.reference@meta.data)
 
 combo.reference$celltype_final <- "hi"
 for (i in 1:nrow(combo.reference@meta.data)){
-  test <- c(as.character(combo.reference@meta.data[i,75]), 
-            as.character(combo.reference@meta.data[i,79]), 
-            as.character(combo.reference@meta.data[i,80]))
+  test <- c(as.character(combo.reference@meta.data[i,"celltype_UCell"]), 
+            as.character(combo.reference@meta.data[i,"RefineMarkerBased"]), 
+            as.character(combo.reference@meta.data[i,"RefineExpBased"]))
   
   test.entry <- as.character(Mode(test))
   
   if (!is.na(test.entry) == T) {
-    if ((as.character(combo.reference@meta.data[i,1]) == "Savas") && (
+    if ((as.character(combo.reference@meta.data[i,"orig.ident"]) == "Savas") && (
       (test.entry != "Regulatory T Cells") && (test.entry != "CD8+ T Cells") &&
       (test.entry != "CD4+ T Cells"))){
-      combo.reference@meta.data[i,81] <- as.character(combo.reference@meta.data[i,75])
+      combo.reference@meta.data[i,"celltype_final"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
     }
     
-    else if ((as.character(combo.reference@meta.data[i,1]) == "AziziT") && (
+    else if ((as.character(combo.reference@meta.data[i,"orig.ident"]) == "AziziT") && (
       (test.entry != "Regulatory T Cells") && (test.entry != "CD8+ T Cells") &&
       (test.entry != "CD4+ T Cells"))){
-      combo.reference@meta.data[i,81] <- as.character(combo.reference@meta.data[i,75])
+      combo.reference@meta.data[i,"celltype_final"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
     }
     
-    else if ((as.character(combo.reference@meta.data[i,1]) == "Aziziimmune") && (
+    else if ((as.character(combo.reference@meta.data[i,"orig.ident"]) == "Aziziimmune") && (
       (test.entry != "Mast Cells") | (test.entry != "Dendritic Cells") | (test.entry != "Neutrophils") |
       (test.entry != "Monocytes") | (test.entry != "Macrophages") | (test.entry != "MDSCs") |
       (test.entry != "Regulatory T Cells") | (test.entry != "CD4+ T Cells") | (test.entry != "CD8+ T Cells") |
       (test.entry != "Plasma Cells") | (test.entry != "B Cells") | (test.entry != "NK Cells"))){
       #if UCell has it as some immune cell
-      if ((as.character(combo.reference@meta.data[i,75]) == "Mast Cells") |
-          (as.character(combo.reference@meta.data[i,75]) == "Dendritic Cells") |
-          (as.character(combo.reference@meta.data[i,75]) == "Neutrophils") | 
-          (as.character(combo.reference@meta.data[i,75]) == "Monocytes") |
-          (as.character(combo.reference@meta.data[i,75]) == "Macrophages") |
-          (as.character(combo.reference@meta.data[i,75]) == "MDSCs") | 
-          (as.character(combo.reference@meta.data[i,75]) == "Regulatory T Cells") |
-          (as.character(combo.reference@meta.data[i,75]) == "CD4+ T Cells") |
-          (as.character(combo.reference@meta.data[i,75]) == "CD8+ T Cells") |
-          (as.character(combo.reference@meta.data[i,75]) == "Plasma Cells") | 
-          (as.character(combo.reference@meta.data[i,75]) == "B Cells") | 
-          (as.character(combo.reference@meta.data[i,75]) == "NK Cells")) 
+      if ((as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "Mast Cells") |
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "Dendritic Cells") |
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "Neutrophils") | 
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "Monocytes") |
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "Macrophages") |
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "MDSCs") | 
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "Regulatory T Cells") |
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "CD4+ T Cells") |
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "CD8+ T Cells") |
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "Plasma Cells") | 
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "B Cells") | 
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "NK Cells")) 
       {
-        combo.reference@meta.data[i,81] <- as.character(combo.reference@meta.data[i,75])
+        combo.reference@meta.data[i,"celltype_final"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
       }
       #if karaavaz has it as some immune cell
-      else if ((as.character(combo.reference@meta.data[i,79]) == "Mast Cells") |
-               (as.character(combo.reference@meta.data[i,79]) == "Dendritic Cells") |
-               (as.character(combo.reference@meta.data[i,79]) == "Neutrophils") | 
-               (as.character(combo.reference@meta.data[i,79]) == "Monocytes") |
-               (as.character(combo.reference@meta.data[i,79]) == "Macrophages") |
-               (as.character(combo.reference@meta.data[i,79]) == "MDSCs") | 
-               (as.character(combo.reference@meta.data[i,79]) == "Regulatory T Cells") |
-               (as.character(combo.reference@meta.data[i,79]) == "CD4+ T Cells") |
-               (as.character(combo.reference@meta.data[i,79]) == "CD8+ T Cells") |
-               (as.character(combo.reference@meta.data[i,79]) == "Plasma Cells") | 
-               (as.character(combo.reference@meta.data[i,79]) == "B Cells") | 
-               (as.character(combo.reference@meta.data[i,79]) == "NK Cells")) {
-        combo.reference@meta.data[i,81] <- as.character(combo.reference@meta.data[i,79])
+      else if ((as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "Mast Cells") |
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "Dendritic Cells") |
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "Neutrophils") | 
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "Monocytes") |
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "Macrophages") |
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "MDSCs") | 
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "Regulatory T Cells") |
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "CD4+ T Cells") |
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "CD8+ T Cells") |
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "Plasma Cells") | 
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "B Cells") | 
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "NK Cells")) {
+        combo.reference@meta.data[i,"celltype_final"] <- as.character(combo.reference@meta.data[i,"RefineMarkerBased"])
       }
       #if marker expression has it as some kind of immune cell
-      else if ((as.character(combo.reference@meta.data[i,80]) == "Mast Cells") |
-               (as.character(combo.reference@meta.data[i,80]) == "Dendritic Cells") |
-               (as.character(combo.reference@meta.data[i,80]) == "Neutrophils") | 
-               (as.character(combo.reference@meta.data[i,80]) == "Monocytes") |
-               (as.character(combo.reference@meta.data[i,80]) == "Macrophages") |
-               (as.character(combo.reference@meta.data[i,80]) == "MDSCs") | 
-               (as.character(combo.reference@meta.data[i,80]) == "Regulatory T Cells") |
-               (as.character(combo.reference@meta.data[i,80]) == "CD4+ T Cells") |
-               (as.character(combo.reference@meta.data[i,80]) == "CD8+ T Cells") |
-               (as.character(combo.reference@meta.data[i,80]) == "Plasma Cells") | 
-               (as.character(combo.reference@meta.data[i,80]) == "B Cells") | 
-               (as.character(combo.reference@meta.data[i,80]) == "NK Cells")) {
-        combo.reference@meta.data[i,81] <- as.character(combo.reference@meta.data[i,80])
+      else if ((as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "Mast Cells") |
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "Dendritic Cells") |
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "Neutrophils") | 
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "Monocytes") |
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "Macrophages") |
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "MDSCs") | 
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "Regulatory T Cells") |
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "CD4+ T Cells") |
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "CD8+ T Cells") |
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "Plasma Cells") | 
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "B Cells") | 
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "NK Cells")) {
+        combo.reference@meta.data[i,"celltype_final"] <- as.character(combo.reference@meta.data[i,"RefineExpBased"])
       }
       else {
-        combo.reference@meta.data[i,81] <- "noone called it immune"
+        combo.reference@meta.data[i,"celltype_final"] <- "noone called it immune"
 
       }
     }
     
     else if (test.entry == "not Tcell by UScore") {
-      combo.reference@meta.data[i,81] <- as.character(combo.reference@meta.data[i,75])
+      combo.reference@meta.data[i,"celltype_final"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
     }
     else if (test.entry == "not Myeloid cell by UScore") {
-      combo.reference@meta.data[i,81] <- as.character(combo.reference@meta.data[i,75])
+      combo.reference@meta.data[i,"celltype_final"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
       
     }
     else {
-      combo.reference@meta.data[i,81] <- test.entry
+      combo.reference@meta.data[i,"celltype_final"] <- test.entry
     }
   }
   else {
-    if ((as.character(combo.reference@meta.data[i,1]) == "Savas")){
-      combo.reference@meta.data[i,81] <- as.character(combo.reference@meta.data[i,75])
+    if ((as.character(combo.reference@meta.data[i,"orig.ident"]) == "Savas")){
+      combo.reference@meta.data[i,"celltype_final"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
     }
     
-    else if ((as.character(combo.reference@meta.data[i,1]) == "AziziT")){
-      combo.reference@meta.data[i,81] <- as.character(combo.reference@meta.data[i,75])
+    else if ((as.character(combo.reference@meta.data[i,"orig.ident"]) == "AziziT")){
+      combo.reference@meta.data[i,"celltype_final"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
     }
     
-    else if ((as.character(combo.reference@meta.data[i,1]) == "Aziziimmune")){
+    else if ((as.character(combo.reference@meta.data[i,"orig.ident"]) == "Aziziimmune")){
       #if UCell has it as some immune cell
-      if ((as.character(combo.reference@meta.data[i,75]) == "Mast Cells") |
-          (as.character(combo.reference@meta.data[i,75]) == "Dendritic Cells") |
-          (as.character(combo.reference@meta.data[i,75]) == "Neutrophils") | 
-          (as.character(combo.reference@meta.data[i,75]) == "Monocytes") |
-          (as.character(combo.reference@meta.data[i,75]) == "Macrophages") |
-          (as.character(combo.reference@meta.data[i,75]) == "MDSCs") | 
-          (as.character(combo.reference@meta.data[i,75]) == "Regulatory T Cells") |
-          (as.character(combo.reference@meta.data[i,75]) == "CD4+ T Cells") |
-          (as.character(combo.reference@meta.data[i,75]) == "CD8+ T Cells") |
-          (as.character(combo.reference@meta.data[i,75]) == "Plasma Cells") | 
-          (as.character(combo.reference@meta.data[i,75]) == "B Cells") | 
-          (as.character(combo.reference@meta.data[i,75]) == "NK Cells")) 
+      if ((as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "Mast Cells") |
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "Dendritic Cells") |
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "Neutrophils") | 
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "Monocytes") |
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "Macrophages") |
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "MDSCs") | 
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "Regulatory T Cells") |
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "CD4+ T Cells") |
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "CD8+ T Cells") |
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "Plasma Cells") | 
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "B Cells") | 
+          (as.character(combo.reference@meta.data[i,"celltype_UCell"]) == "NK Cells")) 
       {
-        combo.reference@meta.data[i,81] <- as.character(combo.reference@meta.data[i,75])
+        combo.reference@meta.data[i,"celltype_final"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
       }
       #if karaavaz has it as some immune cell
-      else if ((as.character(combo.reference@meta.data[i,79]) == "Mast Cells") |
-               (as.character(combo.reference@meta.data[i,79]) == "Dendritic Cells") |
-               (as.character(combo.reference@meta.data[i,79]) == "Neutrophils") | 
-               (as.character(combo.reference@meta.data[i,79]) == "Monocytes") |
-               (as.character(combo.reference@meta.data[i,79]) == "Macrophages") |
-               (as.character(combo.reference@meta.data[i,79]) == "MDSCs") | 
-               (as.character(combo.reference@meta.data[i,79]) == "Regulatory T Cells") |
-               (as.character(combo.reference@meta.data[i,79]) == "CD4+ T Cells") |
-               (as.character(combo.reference@meta.data[i,79]) == "CD8+ T Cells") |
-               (as.character(combo.reference@meta.data[i,79]) == "Plasma Cells") | 
-               (as.character(combo.reference@meta.data[i,79]) == "B Cells") | 
-               (as.character(combo.reference@meta.data[i,79]) == "NK Cells")) {
-        combo.reference@meta.data[i,81] <- as.character(combo.reference@meta.data[i,79])
+      else if ((as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "Mast Cells") |
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "Dendritic Cells") |
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "Neutrophils") | 
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "Monocytes") |
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "Macrophages") |
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "MDSCs") | 
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "Regulatory T Cells") |
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "CD4+ T Cells") |
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "CD8+ T Cells") |
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "Plasma Cells") | 
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "B Cells") | 
+               (as.character(combo.reference@meta.data[i,"RefineMarkerBased"]) == "NK Cells")) {
+        combo.reference@meta.data[i,"celltype_final"] <- as.character(combo.reference@meta.data[i,"RefineMarkerBased"])
       }
       #if marker expression has it as some kind of immune cell
-      else if ((as.character(combo.reference@meta.data[i,80]) == "Mast Cells") |
-               (as.character(combo.reference@meta.data[i,80]) == "Dendritic Cells") |
-               (as.character(combo.reference@meta.data[i,80]) == "Neutrophils") | 
-               (as.character(combo.reference@meta.data[i,80]) == "Monocytes") |
-               (as.character(combo.reference@meta.data[i,80]) == "Macrophages") |
-               (as.character(combo.reference@meta.data[i,80]) == "MDSCs") | 
-               (as.character(combo.reference@meta.data[i,80]) == "Regulatory T Cells") |
-               (as.character(combo.reference@meta.data[i,80]) == "CD4+ T Cells") |
-               (as.character(combo.reference@meta.data[i,80]) == "CD8+ T Cells") |
-               (as.character(combo.reference@meta.data[i,80]) == "Plasma Cells") | 
-               (as.character(combo.reference@meta.data[i,80]) == "B Cells") | 
-               (as.character(combo.reference@meta.data[i,80]) == "NK Cells")) {
-        combo.reference@meta.data[i,81] <- as.character(combo.reference@meta.data[i,80])
+      else if ((as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "Mast Cells") |
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "Dendritic Cells") |
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "Neutrophils") | 
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "Monocytes") |
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "Macrophages") |
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "MDSCs") | 
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "Regulatory T Cells") |
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "CD4+ T Cells") |
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "CD8+ T Cells") |
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "Plasma Cells") | 
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "B Cells") | 
+               (as.character(combo.reference@meta.data[i,"RefineExpBased"]) == "NK Cells")) {
+        combo.reference@meta.data[i,"celltype_final"] <- as.character(combo.reference@meta.data[i,"RefineExpBased"])
       }
       else {
-        combo.reference@meta.data[i,81] <- "noone called it immune"
+        combo.reference@meta.data[i,"celltype_final"] <- "noone called it immune"
       }
     }
     
     else {
-      combo.reference@meta.data[i,81] <- as.character(combo.reference@meta.data[i,75])
+      combo.reference@meta.data[i,"celltype_final"] <- as.character(combo.reference@meta.data[i,"celltype_UCell"])
       
     }
   }
