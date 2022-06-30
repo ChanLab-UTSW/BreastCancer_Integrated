@@ -109,9 +109,10 @@ FeaturePlot(object = combo.reference, features = "signature_1NK.mark2", order = 
 dev.off()
 
 
-combo.reference <- RenameIdents(combo.reference, `109` = "NK Cells", `35` = "NK Cells", 
-                                `27` = "NK Cells", `75` = "NK Cells", 
-                                `156` = "NK Cells", `83` = "NK Cells")
+combo.reference <- RenameIdents(combo.reference, `175` = "NK Cells", `43` = "NK Cells", 
+                                `128` = "NK Cells", `163` = "NK Cells", 
+                                `98` = "NK Cells", `18` = "NK Cells", `64` = "NK Cells",
+                                `178` = "NK Cells",`102` = "NK Cells")
 NK <- subset(combo.reference, idents = "NK Cells")
 NK <- AddModuleScore_UCell(NK, features = "CD3", name = "CD3", assay = "RNA")
 NK <- AddModuleScore_UCell(NK, features = "CD3D", name = "CD3D", assay = "RNA")
@@ -155,22 +156,30 @@ pdf("test.pdf")
 FeaturePlot(object = combo.reference, features = "signature_1T_karacd4", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) + ggtitle(label = "Chung's T Cell Signature (PC = 40)")
 dev.off()
 
-combo.reference <- RenameIdents(combo.reference, `95` = "T Cells", `115` = "T Cells",
-                                `10` = "T Cells", `12` = "T Cells", `183` = "T Cells",
-                                `149` = "T Cells", `63` = "T Cells", `148` = "T Cells",
-                                `152` = "T Cells", `1` = "T Cells", `42` = "T Cells",
-                                `2` = "T Cells", `6` = "T Cells", `8` = "T Cells",
-                                `169` = "T Cells", `150` = "T Cells", `92` = "T Cells",
-                                `49` = "T Cells", `143` = "T Cells", `0` = "T Cells",
-                                `13` = "T Cells", `180` = "T Cells", `87` = "T Cells",
-                                `123` = "T Cells", `151` = "T Cells", `48` = "T Cells",
-                                `158` = "T Cells", `43` = "T Cells", `118` = "T Cells",
-                                `44` = "T Cells", `130` = "T Cells", `7` = "T Cells",
-                                `33` = "T Cells", `119` = "T Cells", 
-                                `22` = "T Cells", `5` = "T Cells", `69` = "T Cells",
-                                `47` = "T Cells", `16` = "T Cells", `54` = "T Cells",
-                                `28` = "T Cells", `71` = "T Cells", `69` = "T Cells",
-                                `76` = "T Cells", `107` = "T Cells", `36` = "T Cells")
+combo.reference <- RenameIdents(combo.reference, `103` = "T Cells", `75` = "T Cells",
+                                `12` = "T Cells", `209` = "T Cells", `208` = "T Cells",
+                                `0` = "T Cells", `245` = "T Cells", `143` = "T Cells",
+                                `190` = "T Cells", `249` = "T Cells", `21` = "T Cells",
+                                `182` = "T Cells", `126` = "T Cells", `62` = "T Cells",
+                                `4` = "T Cells", `66` = "T Cells", `5` = "T Cells",
+                                `188` = "T Cells", `156` = "T Cells", `8` = "T Cells",
+                                `146` = "T Cells", `59` = "T Cells", `250` = "T Cells",
+                                `38` = "T Cells", `1` = "T Cells", `150` = "T Cells",
+                                `28` = "T Cells", `213` = "T Cells", `38` = "T Cells",
+                                `215` = "T Cells", `11` = "T Cells", `7` = "T Cells",
+                                `48` = "T Cells", `37` = "T Cells", 
+                                `20` = "T Cells", `176` = "T Cells", `9` = "T Cells",
+                                `45` = "T Cells", `95` = "T Cells", `22` = "T Cells",
+                                `118` = "T Cells", `67` = "T Cells", `238` = "T Cells",
+                                `32` = "T Cells", `33` = "T Cells", 
+                                `151` = "T Cells", `6` = "T Cells", `196` = "T Cells",
+                                `15` = "T Cells", `100` = "T Cells", `232` = "T Cells",
+                                `13` = "T Cells", `88` = "T Cells", `31` = "T Cells",
+                                `51` = "T Cells", `123` = "T Cells", `198` = "T Cells",
+                                `206` = "T Cells", `241` = "T Cells", `228` = "T Cells",
+                                `60` = "T Cells", `40` = "T Cells", `24` = "T Cells",
+                                `30` = "T Cells", `119` = "T Cells",
+                                `99` = "T Cells", `220` = "T Cells")
 
 #B Cells __________________________________________________________________
 
@@ -186,8 +195,10 @@ pdf("test.pdf")
 FeaturePlot(object = combo.reference, features = "signature_1B_KaraBrech", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) #+ ggtitle(label = "Chung's B Cell Signature (PC = 40)")
 dev.off()
 
-combo.reference <- RenameIdents(combo.reference, `164` = "B Cells", `122` = "B Cells", `4` = "B Cells",
-                                `167` = "B Cells", `179` = "B Cells", `78` = "B Cells")
+combo.reference <- RenameIdents(combo.reference, `219` = "B Cells", `159` = "B Cells", 
+                                `216` = "B Cells", `74` = "B Cells", 
+                                `172` = "B Cells", `246` = "B Cells", `2` = "B Cells",
+                                `124` = "B Cells", `236` = "B Cells")
 
 
 #plasma cells __________________________________________________________________
@@ -209,9 +220,9 @@ pdf("test.pdf")
 FeaturePlot(object = combo.reference, features = "signature_1plasma_colo", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) + ggtitle(label = "Ramachandran's Plasma Cell Signature (PC = 40)")
 dev.off()
 
-combo.reference <- RenameIdents(combo.reference, `163` = "Plasma Cells", `64` = "Plasma Cells",
-                                `84` = "Plasma Cells", `168` = "Plasma Cells", `154` = "Plasma Cells",
-                                `127` = "Plasma Cells")
+combo.reference <- RenameIdents(combo.reference, `135` = "Plasma Cells", `214` = "Plasma Cells",
+                                `235` = "Plasma Cells", `52` = "Plasma Cells", `168` = "Plasma Cells",
+                                `189` = "Plasma Cells", `210` = "Plasma Cells", `144` = "Plasma Cells")
 
 
 #myeloid __________________________________________________________________
@@ -233,13 +244,15 @@ pdf("test.pdf")
 FeaturePlot(object = combo.reference, features = "signature_1myeloid_wuElliot", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) #+ ggtitle(label = "Wu's Myeloid Cell Signature (PC = 40)")
 dev.off()
 
-combo.reference <- RenameIdents(combo.reference,`96` = "Myeloid Cells", #mast cells
-                                `131` = "Myeloid Cells", `165` = "Myeloid Cells", `142` = "Myeloid Cells",
-                                `65` = "Myeloid Cells", `66` = "Myeloid Cells", `37` = "Myeloid Cells",
-                                `138` = "Myeloid Cells", `128` = "Myeloid Cells", `173` = "Myeloid Cells",
-                                `98` = "Myeloid Cells",`19` = "Myeloid Cells", `68` = "Myeloid Cells",
-                                `99` = "Myeloid Cells", `21` = "Myeloid Cells", `176` = "Myeloid Cells",
-                                `26` = "Myeloid Cells") 
+combo.reference <- RenameIdents(combo.reference,`231` = "Myeloid Cells", `109` = "Myeloid Cells",#mast cells
+                                `225` = "Myeloid Cells", `116` = "Myeloid Cells", `78` = "Myeloid Cells",
+                                `239` = "Myeloid Cells", `173` = "Myeloid Cells", `139` = "Myeloid Cells",
+                                `193` = "Myeloid Cells", `136` = "Myeloid Cells", `205` = "Myeloid Cells",
+                                `134` = "Myeloid Cells",`177` = "Myeloid Cells", `19` = "Myeloid Cells",
+                                `131` = "Myeloid Cells", `141` = "Myeloid Cells", `106` = "Myeloid Cells",
+                                `77` = "Myeloid Cells", `251` = "Myeloid Cells", `10` = "Myeloid Cells",
+                                `130` = "Myeloid Cells", `138` = "Myeloid Cells", `107` = "Myeloid Cells", 
+                                `97` = "Myeloid Cells") 
 
 
 #Non-Immune _________________________________________________________
@@ -271,31 +284,38 @@ pdf("test.pdf")
 FeaturePlot(object = combo.reference, features = "signature_1genepi_baslumgen", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) + ggtitle(label = "Karaayvaz's General Epithelial Signature (PC = 40)")
 dev.off()
 
-combo.reference <- RenameIdents(combo.reference, `85` = "Epithelial Cells", `113` = "Epithelial Cells",
-                                `159` = "Epithelial Cells", `31` = "Epithelial Cells", `166` = "Epithelial Cells",
-                                `140` = "Epithelial Cells", `70` = "Epithelial Cells", `58` = "Epithelial Cells",
-                                `94` = "Epithelial Cells", `112` = "Epithelial Cells", `102` = "Epithelial Cells",
-                                `178` = "Epithelial Cells", `20` = "Epithelial Cells",
-                                `106` = "Epithelial Cells", `125` = "Epithelial Cells", `97` = "Epithelial Cells",
-                                `79` = "Epithelial Cells", `57` = "Epithelial Cells", `45` = "Epithelial Cells",
-                                `38` = "Epithelial Cells", `55` = "Epithelial Cells", `136` = "Epithelial Cells",
-                                `52` = "Epithelial Cells", `60` = "Epithelial Cells", `67` = "Epithelial Cells",
-                                `18` = "Epithelial Cells", `74` = "Epithelial Cells", `114` = "Epithelial Cells",
-                                `40` = "Epithelial Cells", `141` = "Epithelial Cells", `126` = "Epithelial Cells",
-                                `32` = "Epithelial Cells", `103` = "Epithelial Cells", `41` = "Epithelial Cells",
-                                `88` = "Epithelial Cells", `105` = "Epithelial Cells", `39` = "Epithelial Cells",
-                                `50` = "Epithelial Cells", `15` = "Epithelial Cells", `80` = "Epithelial Cells",
-                                `172` = "Epithelial Cells", `132` = "Epithelial Cells", `91` = "Epithelial Cells",
-                                `157` = "Epithelial Cells", `29` = "Epithelial Cells", `160` = "Epithelial Cells",
-                                `177` = "Epithelial Cells", `9` = "Epithelial Cells", `61` = "Epithelial Cells",
-                                `62` = "Epithelial Cells", `145` = "Epithelial Cells", `73` = "Epithelial Cells",
-                                `34` = "Epithelial Cells", `3` = "Epithelial Cells", `139` = "Epithelial Cells",
-                                `82` = "Epithelial Cells", `147` = "Epithelial Cells", `108` = "Epithelial Cells",
-                                `129` = "Epithelial Cells", `146` = "Epithelial Cells", `161` = "Epithelial Cells",
-                                `25` = "Epithelial Cells", `89`= "Epithelial Cells", `93`= "Epithelial Cells", `81`= "Epithelial Cells",
-                                `51`= "Epithelial Cells", `53`= "Epithelial Cells", `110`= "Epithelial Cells", `170`= "Epithelial Cells",
-                                `101`= "Epithelial Cells", `137`= "Epithelial Cells",`181`= "Epithelial Cells", `135`= "Epithelial Cells",
-                                `153`= "Epithelial Cells", `134`= "Epithelial Cells")
+combo.reference <- RenameIdents(combo.reference, `3` = "Epithelial Cells", `17` = "Epithelial Cells",
+                                `23` = "Epithelial Cells", `26` = "Epithelial Cells", `35` = "Epithelial Cells",
+                                `36` = "Epithelial Cells", `39` = "Epithelial Cells", `42` = "Epithelial Cells",
+                                `44` = "Epithelial Cells", `46` = "Epithelial Cells", `47` = "Epithelial Cells",
+                                `49` = "Epithelial Cells", `50` = "Epithelial Cells",
+                                `53` = "Epithelial Cells", `55` = "Epithelial Cells", `56` = "Epithelial Cells",
+                                `58` = "Epithelial Cells", `61` = "Epithelial Cells", `65` = "Epithelial Cells",
+                                `69` = "Epithelial Cells", `70` = "Epithelial Cells", `71` = "Epithelial Cells",
+                                `72` = "Epithelial Cells", `73` = "Epithelial Cells", `79` = "Epithelial Cells",
+                                `80` = "Epithelial Cells", `81` = "Epithelial Cells", `84` = "Epithelial Cells",
+                                `85` = "Epithelial Cells", `87` = "Epithelial Cells", `89` = "Epithelial Cells",
+                                `90` = "Epithelial Cells", `91` = "Epithelial Cells", `92` = "Epithelial Cells",
+                                `94` = "Epithelial Cells", `101` = "Epithelial Cells", `105` = "Epithelial Cells",
+                                `108` = "Epithelial Cells", `110` = "Epithelial Cells", `111` = "Epithelial Cells",
+                                `112` = "Epithelial Cells", `115` = "Epithelial Cells", `117` = "Epithelial Cells",
+                                `121` = "Epithelial Cells", `122` = "Epithelial Cells", `125` = "Epithelial Cells",
+                                `129` = "Epithelial Cells", `133` = "Epithelial Cells", `137` = "Epithelial Cells",
+                                `140` = "Epithelial Cells", `145` = "Epithelial Cells", `147` = "Epithelial Cells",
+                                `149` = "Epithelial Cells", `152` = "Epithelial Cells", `153` = "Epithelial Cells",
+                                `157` = "Epithelial Cells", `158` = "Epithelial Cells", `160` = "Epithelial Cells",
+                                `161` = "Epithelial Cells", `162` = "Epithelial Cells", `164` = "Epithelial Cells",
+                                `165` = "Epithelial Cells", `166`= "Epithelial Cells", `167`= "Epithelial Cells", `169`= "Epithelial Cells",
+                                `170`= "Epithelial Cells", `171`= "Epithelial Cells", `174`= "Epithelial Cells", `183`= "Epithelial Cells",
+                                `184`= "Epithelial Cells", `186`= "Epithelial Cells",`187`= "Epithelial Cells", `191`= "Epithelial Cells",
+                                `192`= "Epithelial Cells", `194`= "Epithelial Cells", `195`= "Epithelial Cells",
+                                `197`= "Epithelial Cells", `199`= "Epithelial Cells", `200`= "Epithelial Cells",
+                                `201`= "Epithelial Cells", `203`= "Epithelial Cells", `211`= "Epithelial Cells",
+                                `212`= "Epithelial Cells", `217`= "Epithelial Cells", `221`= "Epithelial Cells",
+                                `222`= "Epithelial Cells", `223`= "Epithelial Cells", `226`= "Epithelial Cells",
+                                `227`= "Epithelial Cells", `229`= "Epithelial Cells", `230`= "Epithelial Cells",
+                                `234`= "Epithelial Cells", `240`= "Epithelial Cells", `243`= "Epithelial Cells",
+                                `244`= "Epithelial Cells", `247`= "Epithelial Cells")
 
 #myoepi __________________________________________________________________
 
@@ -311,7 +331,7 @@ FeaturePlot(object = combo.reference, features = "signature_1Myoepi_wuNguyen", o
 dev.off()
 FeaturePlot(object = combo.reference, features = "EPCAM", order = TRUE, label = TRUE, min.cutoff = 0,  raster = FALSE) + ggtitle(label = "Wu's Myoepithelial Signature (PC = 40)")
 
-combo.reference <- RenameIdents(combo.reference, `59` = "Myoepithelial Cells")
+combo.reference <- RenameIdents(combo.reference, `114` = "Myoepithelial Cells")
 
 #PVL _________________________
 
@@ -320,10 +340,11 @@ combo.reference <- AddModuleScore_UCell(combo.reference, features = PVL.mark, na
 pdf("test.pdf")
 FeaturePlot(object = combo.reference, features = "signature_1newWuPVL", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) + ggtitle(label = "New Wu's PVL Signature (PC = 40)")
 dev.off()
-combo.reference <- RenameIdents(combo.reference, `56` = "Perivascular-like (PVL) Cells",
-                                `155` = "Perivascular-like (PVL) Cells", `124` = "Perivascular-like (PVL) Cells",
-                                `30` = "Perivascular-like (PVL) Cells", `120` = "Perivascular-like (PVL) Cells",
-                                `182` = "Perivascular-like (PVL) Cells")
+combo.reference <- RenameIdents(combo.reference, `248` = "Perivascular-like (PVL) Cells",
+                                `179` = "Perivascular-like (PVL) Cells", `224` = "Perivascular-like (PVL) Cells",
+                                `185` = "Perivascular-like (PVL) Cells", `41` = "Perivascular-like (PVL) Cells",
+                                `54` = "Perivascular-like (PVL) Cells", `132` = "Perivascular-like (PVL) Cells",
+                                `93` = "Perivascular-like (PVL) Cells")
 
 #Fibroblasts ________________________-
 
@@ -342,12 +363,14 @@ pdf("test.pdf")
 FeaturePlot(object = combo.reference, features = "signature_1fibro_wumelan", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) + ggtitle(label = "Karaayvaz's Stroma Signature (PC = 40)")
 dev.off()
 
-combo.reference <- RenameIdents(combo.reference, `100` = "Fibroblasts",`171` = "Fibroblasts", 
-                                `121` = "Fibroblasts", `111` = "Fibroblasts", `17` = "Fibroblasts",
-                                `133` = "Fibroblasts", `11` = "Fibroblasts", `86` = "Fibroblasts",
-                                `90` = "Fibroblasts", `175` = "Fibroblasts", `162` = "Fibroblasts",
-                                `104` = "Fibroblasts", `72` = "Fibroblasts", `14` = "Fibroblasts",
-                                `23` = "Fibroblasts")
+combo.reference <- RenameIdents(combo.reference, `68` = "Fibroblasts",`204` = "Fibroblasts", 
+                                `63` = "Fibroblasts", `27` = "Fibroblasts", `113` = "Fibroblasts",
+                                `154` = "Fibroblasts", `34` = "Fibroblasts", `233` = "Fibroblasts",
+                                `25` = "Fibroblasts", `16` = "Fibroblasts", `207` = "Fibroblasts",
+                                `218` = "Fibroblasts", `202` = "Fibroblasts", `76` = "Fibroblasts",
+                                `83` = "Fibroblasts", `86` = "Fibroblasts", `181` = "Fibroblasts",
+                                `14` = "Fibroblasts", `155` = "Fibroblasts", `237` = "Fibroblasts",
+                                `120` = "Fibroblasts", `127` = "Fibroblasts")
 
 #emdo __________________________________________________________________
 
@@ -361,9 +384,10 @@ combo.reference <- AddModuleScore_UCell(combo.reference, features = endo_kara, n
 pdf("test.pdf")
 FeaturePlot(object = combo.reference, features = "signature_1endokara", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) + ggtitle(label = "Karaayvaz's Endothelial Signature (PC = 40)")
 dev.off()
-combo.reference <- RenameIdents(combo.reference, `174` = "Endothelial Cells", `144` = "Endothelial Cells",
-                                `116` = "Endothelial Cells", `77` = "Endothelial Cells", `24` = "Endothelial Cells",
-                                `46` = "Endothelial Cells", `117` = "Endothelial Cells")
+combo.reference <- RenameIdents(combo.reference, `29` = "Endothelial Cells", `57` = "Endothelial Cells",
+                                `82` = "Endothelial Cells", `148` = "Endothelial Cells", `180` = "Endothelial Cells",
+                                `242` = "Endothelial Cells", `104` = "Endothelial Cells",
+                                `142` = "Endothelial Cells", `96` = "Endothelial Cells")
 
 DimPlot(combo.reference, reduction = "umap", label = FALSE, raster = FALSE, 
         order = c("NK Cells", "Epithelial Cells", "T Cells", "Stroma", "B Cells",
@@ -383,11 +407,15 @@ Idents(combo.reference, AziziT.cells) <- "T Cells"
 
 #T cell subsets ========================
 
+DefaultAssay(combo.reference) <- "RNA"
+combo.reference <- NormalizeData(combo.reference, assay = "RNA")
+
 Tcellsub <- subset(combo.reference, idents = "T Cells")
 
 table(Tcellsub$Capture.Method)
 table(Tcellsub$orig.ident)
 DefaultAssay(Tcellsub) <- "RNA"
+Tcellsub <- NormalizeData(Tcellsub, assay = "RNA")
 
 Tcellsub.list <- SplitObject(Tcellsub, split.by = "Capture.Method")
 for (i in 1:length(Tcellsub.list)) {
@@ -412,11 +440,12 @@ T.anchors <- FindIntegrationAnchors(object.list = Tcellsub.list, normalization.m
 
 Tcellsub.combo <- IntegrateData(anchorset = T.anchors, normalization.method = "SCT")
 
+
 DefaultAssay(Tcellsub.combo) <- "integrated"
 
 Tcellsub.combo <- RunPCA(Tcellsub.combo, npcs = 100, verbose = FALSE)
 
-pdf("BatchTestTsub.pdf", width = 14.22, height = 13.01)
+pdf("BatchTestTsub_62922.pdf", width = 14.22, height = 13.01)
 DimPlot(Tcellsub.combo, reduction = "pca", raster = F, group.by = "Capture.Method")
 DimPlot(Tcellsub.combo, reduction = "pca", raster = F, group.by = "orig.ident")
 
@@ -433,25 +462,15 @@ DimHeatmap(Tcellsub.combo, dims = 45:55, cells = 500, balanced = TRUE)
 DimHeatmap(Tcellsub.combo, dims = 55:65, cells = 500, balanced = TRUE)
 dev.off()
 
-#Epi.all.combo <- readRDS(file = "Epiprim_withUMAPrenamednewmarkes.rds") #start here to get actual clustering
-
-Tcellsub.combo <- FindNeighbors(Tcellsub.combo, reduction = "pca", dims = 1:60)
-
-resolution.range <- c(0.05, 0.1, 0.2, 0.4, 0.7, 1.0, 1.3, 1.6)
-Tcellsub.combo <- FindClusters(Tcellsub.combo, resolution = resolution.range)
-pdf("test.pdf", width = 14.22, height = 13.01)
-clustree(Tcellsub.combo, prefix = "integrated_snn_res.", node_colour = "sc3_stability", layout = "sugiyama")
-dev.off()
-
 DefaultAssay(Tcellsub.combo) <- "integrated"
 
 Tcellsub.combo <- FindNeighbors(Tcellsub.combo, reduction = "pca", dims = 1:60)
-Tcellsub.combo <- FindClusters(Tcellsub.combo, resolution = 5)
+Tcellsub.combo <- FindClusters(Tcellsub.combo, resolution = 9)
 Tcellsub.combo <- RunUMAP(Tcellsub.combo, reduction = "pca", dims = 1:60, verbose = TRUE, seed.use=123)
 
 pdf("test.pdf", width = 14.22, height = 13.01)
 DimPlot(Tcellsub.combo, reduction = "umap", label = TRUE, repel = TRUE, raster = FALSE) #+ ggtitle(label = "NK Cells from Primary Integrated")
-DimPlot(Tcellsub.combo, reduction = "umap", label = TRUE, repel = TRUE, group.by = "old.labels", raster = FALSE) +theme(legend.position = "None")#+ ggtitle(label = "NK Cells from Primary Integrated")
+DimPlot(Tcellsub.combo, reduction = "umap", label = TRUE, repel = TRUE, group.by = "integrated_snn_res.5", raster = FALSE) +theme(legend.position = "None")#+ ggtitle(label = "NK Cells from Primary Integrated")
 dev.off()
 DimPlot(Tcellsub.combo, reduction = "umap", label = TRUE, repel = TRUE, raster = FALSE, group.by = "celltype_main") + ggtitle(label = "NK Cells from lumA samples (PC = 15)")
 DimPlot(Tcellsub.combo, reduction = "umap", label = TRUE, repel = TRUE, raster = FALSE, group.by = "orig.ident")
@@ -459,8 +478,6 @@ DimPlot(Tcellsub.combo, reduction = "umap", label = TRUE, repel = TRUE, raster =
 
 DefaultAssay(Tcellsub.combo) <- "RNA"
 Tcellsub.combo <- NormalizeData(Tcellsub.combo, assay = "RNA")
-
-
 
 #CD8 __________________________________________________________________
 
@@ -471,25 +488,34 @@ pdf("test.pdf")
 FeaturePlot(object = Tcellsub.combo, features = "signature_1CD8sig", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) + ggtitle(label = "Karaayvaz's Endothelial Signature (PC = 40)")
 dev.off()
 
-Tcellsub.combo <- RenameIdents(Tcellsub.combo, `7` = "CD8+ T Cells",
-                               `21` = "CD8+ T Cells", `3` = "CD8+ T Cells",
-                               `53` = "CD8+ T Cells", `15` = "CD8+ T Cells",
-                               `29` = "CD8+ T Cells", `16` = "CD8+ T Cells",
-                               `64` = "CD8+ T Cells", `22` = "CD8+ T Cells",
-                               `72` = "CD8+ T Cells", `26` = "CD8+ T Cells",
-                               `70` = "CD8+ T Cells", `48` = "CD8+ T Cells",
-                               `31` = "CD8+ T Cells", `69` = "CD8+ T Cells",
-                               `32` = "CD8+ T Cells", `73` = "CD8+ T Cells",
-                               `31` = "CD8+ T Cells", `69` = "CD8+ T Cells",
-                               `51` = "CD8+ T Cells", `38` = "CD8+ T Cells",
-                               `68` = "CD8+ T Cells", `8` = "CD8+ T Cells",
-                               `63` = "CD8+ T Cells", `35` = "CD8+ T Cells",
-                               `65` = "CD8+ T Cells", `77` = "CD8+ T Cells",
-                               `33` = "CD8+ T Cells", `37` = "CD8+ T Cells",
-                               `39` = "CD8+ T Cells", `50` = "CD8+ T Cells",
-                               `52` = "CD8+ T Cells", `59` = "CD8+ T Cells",
-                               `80` = "CD8+ T Cells", `2` = "CD8+ T Cells",
-                               `78` = "CD8+ T Cells", `28` = "CD8+ T Cells")
+Tcellsub.combo <- RenameIdents(Tcellsub.combo, `94` = "CD8+ T Cells",
+                               `44` = "CD8+ T Cells", `28` = "CD8+ T Cells",
+                               `36` = "CD8+ T Cells", `103` = "CD8+ T Cells",
+                               `89` = "CD8+ T Cells", `64` = "CD8+ T Cells",
+                               `75` = "CD8+ T Cells", `26` = "CD8+ T Cells",
+                               `85` = "CD8+ T Cells", `117` = "CD8+ T Cells",
+                               `116` = "CD8+ T Cells", `119` = "CD8+ T Cells",
+                               `96` = "CD8+ T Cells", `8` = "CD8+ T Cells",
+                               `97` = "CD8+ T Cells", `61` = "CD8+ T Cells",
+                               `65` = "CD8+ T Cells", `58` = "CD8+ T Cells",
+                               `101` = "CD8+ T Cells", `118` = "CD8+ T Cells",
+                               `34` = "CD8+ T Cells", `77` = "CD8+ T Cells",
+                               `104` = "CD8+ T Cells", `27` = "CD8+ T Cells",
+                               `6` = "CD8+ T Cells", `2` = "CD8+ T Cells",
+                               `105` = "CD8+ T Cells", `13` = "CD8+ T Cells",
+                               `73` = "CD8+ T Cells", `21` = "CD8+ T Cells",
+                               `60` = "CD8+ T Cells", `83` = "CD8+ T Cells",
+                               `55` = "CD8+ T Cells", `76` = "CD8+ T Cells",
+                               `95` = "CD8+ T Cells", `15` = "CD8+ T Cells",
+                               `76` = "CD8+ T Cells", `95` = "CD8+ T Cells",
+                               `112` = "CD8+ T Cells", `57` = "CD8+ T Cells",
+                               `30` = "CD8+ T Cells", `106` = "CD8+ T Cells",
+                               `78` = "CD8+ T Cells", `40` = "CD8+ T Cells",
+                               `72` = "CD8+ T Cells", `17` = "CD8+ T Cells",
+                               `109` = "CD8+ T Cells", `81` = "CD8+ T Cells",
+                               `37` = "CD8+ T Cells", `20` = "CD8+ T Cells",
+                               `31` = "CD8+ T Cells", `81` = "CD8+ T Cells",
+                               `50` = "CD8+ T Cells", `53` = "CD8+ T Cells")
 
 #CD4 __________________________________________________________________
 
@@ -498,28 +524,36 @@ Tcellsub.combo <- AddModuleScore_UCell(Tcellsub.combo, features = CD4sig, name =
 pdf("test.pdf")
 FeaturePlot(object = Tcellsub.combo, features = "signature_1CD4sig", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) + ggtitle(label = "Karaayvaz's Endothelial Signature (PC = 40)")
 dev.off()
-Tcellsub.combo <- RenameIdents(Tcellsub.combo, `12` = "CD4+ T Cells",
-                               `45` = "CD4+ T Cells", `60` = "CD4+ T Cells",
-                               `10` = "CD4+ T Cells", `57` = "CD4+ T Cells",
-                               `61` = "CD4+ T Cells", `14` = "CD4+ T Cells",
-                               `19` = "CD4+ T Cells", `76` = "CD4+ T Cells",
-                               `4` = "CD4+ T Cells", `55` = "CD4+ T Cells",
-                               `9` = "CD4+ T Cells", `18` = "CD4+ T Cells",
-                               `17` = "CD4+ T Cells", `58` = "CD4+ T Cells",
-                               `20` = "CD4+ T Cells", `23` = "CD4+ T Cells",
-                               `62` = "CD4+ T Cells", `56` = "CD4+ T Cells",
-                               `46` = "CD4+ T Cells", `11` = "CD4+ T Cells",
-                               `42` = "CD4+ T Cells", `79` = "CD4+ T Cells",
-                               `27` = "CD4+ T Cells", `5` = "CD4+ T Cells",
-                               `49` = "CD4+ T Cells", `67` = "CD4+ T Cells",
-                               `41` = "CD4+ T Cells", `71` = "CD4+ T Cells",
-                               `66` = "CD4+ T Cells", `75` = "CD4+ T Cells",
-                               `74` = "CD4+ T Cells", `25` = "CD4+ T Cells",
-                               `24` = "CD4+ T Cells", `6` = "CD4+ T Cells",
-                               `10` = "CD4+ T Cells", `9` = "CD4+ T Cells",
-                               `44` = "CD4+ T Cells",
-                               `36` = "CD4+ T Cells", `30` = "CD4+ T Cells",
-                               `13` = "CD4+ T Cells", `47` = "CD4+ T Cells")
+Tcellsub.combo <- RenameIdents(Tcellsub.combo, `0` = "CD4+ T Cells",
+                               `1` = "CD4+ T Cells", `3` = "CD4+ T Cells",
+                               `5` = "CD4+ T Cells", `7` = "CD4+ T Cells",
+                               `9` = "CD4+ T Cells", `10` = "CD4+ T Cells",
+                               `11` = "CD4+ T Cells", `12` = "CD4+ T Cells",
+                               `14` = "CD4+ T Cells", `16` = "CD4+ T Cells",
+                               `18` = "CD4+ T Cells", `23` = "CD4+ T Cells",
+                               `24` = "CD4+ T Cells", `29` = "CD4+ T Cells",
+                               `32` = "CD4+ T Cells", `33` = "CD4+ T Cells",
+                               `35` = "CD4+ T Cells", `38` = "CD4+ T Cells",
+                               `39` = "CD4+ T Cells", `41` = "CD4+ T Cells",
+                               `43` = "CD4+ T Cells", `45` = "CD4+ T Cells",
+                               `46` = "CD4+ T Cells", `47` = "CD4+ T Cells",
+                               `49` = "CD4+ T Cells", `51` = "CD4+ T Cells",
+                               `52` = "CD4+ T Cells", `54` = "CD4+ T Cells",
+                               `59` = "CD4+ T Cells", `62` = "CD4+ T Cells",
+                               `63` = "CD4+ T Cells", `67` = "CD4+ T Cells",
+                               `68` = "CD4+ T Cells", `69` = "CD4+ T Cells",
+                               `70` = "CD4+ T Cells", `74` = "CD4+ T Cells",
+                               `79` = "CD4+ T Cells", `80` = "CD4+ T Cells",
+                               `82` = "CD4+ T Cells", `84` = "CD4+ T Cells",
+                               `87` = "CD4+ T Cells", `88` = "CD4+ T Cells",
+                               `90` = "CD4+ T Cells", `91` = "CD4+ T Cells",
+                               `92` = "CD4+ T Cells", `93` = "CD4+ T Cells",
+                               `98` = "CD4+ T Cells", `99` = "CD4+ T Cells",
+                               `102` = "CD4+ T Cells", `107` = "CD4+ T Cells",
+                               `108` = "CD4+ T Cells", `114` = "CD4+ T Cells",
+                               `115` = "CD4+ T Cells")
+
+
 
 #Treg __________________________________________________________________
 
@@ -528,9 +562,14 @@ Tcellsub.combo <- AddModuleScore_UCell(Tcellsub.combo, features = Treg_sig, name
 pdf("test.pdf")
 FeaturePlot(object = Tcellsub.combo, features = "signature_1Treg_sig", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) + ggtitle(label = "Karaayvaz's Endothelial Signature (PC = 40)")
 dev.off()
-Tcellsub.combo <- RenameIdents(Tcellsub.combo, `40` = "Regulatory T Cells", `1` = "Regulatory T Cells",
-                               `34` = "Regulatory T Cells", `54` = "Regulatory T Cells",
-                               `0` = "Regulatory T Cells", `43` = "Regulatory T Cells")
+Tcellsub.combo <- RenameIdents(Tcellsub.combo, `4` = "Regulatory T Cells", `110` = "Regulatory T Cells",
+                               `22` = "Regulatory T Cells", `71` = "Regulatory T Cells",
+                               `48` = "Regulatory T Cells", `100` = "Regulatory T Cells",
+                               `66` = "Regulatory T Cells", `86` = "Regulatory T Cells",
+                               `42` = "Regulatory T Cells", `56` = "Regulatory T Cells",
+                               `25` = "Regulatory T Cells", `111` = "Regulatory T Cells",
+                               `113` = "Regulatory T Cells", `19` = "Regulatory T Cells")
+
 
 
 CD8 <- WhichCells(Tcellsub.combo, idents = "CD8+ T Cells")
@@ -543,27 +582,23 @@ Idents(combo.reference, cells = Treg) <- "Regulatory T Cells"
 
 #myeloid cell subset ==============================
 
+DefaultAssay(combo.reference) <- "RNA"
+combo.reference <- NormalizeData(combo.reference, assay = "RNA")
+
 Myecellsub <- subset(combo.reference, idents = "Myeloid Cells")
 
 table(Myecellsub$Capture.Method)
 table(Myecellsub$orig.ident)
 DefaultAssay(Myecellsub) <- "RNA"
+Myecellsub <- NormalizeData(Myecellsub, assay = "RNA")
 
 Myecellsub.list <- SplitObject(Myecellsub, split.by = "Capture.Method")
-for (i in names(Tcellsub.list)) {
-  if(i != "Smart-Seq2") {
-    Myecellsub.list[[i]] <- SCTransform(Myecellsub.list[[i]], verbose = T, 
-                                        vars.to.regress = c("percent.mt", "nCount_RNA","nFeature_RNA", "percent.hb", 
-                                                            "percent.platelet", "percent.heatshock"))
-  }
-  else{
-    Myecellsub.list[[i]] <- SCTransform(Myecellsub.list[[i]], verbose = T, 
-                                        vars.to.regress = c("percent.mt", "nCount_RNA","nFeature_RNA", "percent.hb", 
-                                                            "percent.platelet", "percent.heatshock"),
-                                        ncells = 52)
-  }
-  
+for (i in names(Myecellsub.list)) {
+  Myecellsub.list[[i]] <- SCTransform(Myecellsub.list[[i]], verbose = T, 
+                                      vars.to.regress = c("percent.mt", "nCount_RNA","nFeature_RNA", "percent.hb", 
+                                                          "percent.platelet", "percent.heatshock"))
 }
+
 
 Mye.features <- SelectIntegrationFeatures(object.list = Myecellsub.list, nfeatures = 3000)
 Myecellsub.list <- PrepSCTIntegration(object.list = Myecellsub.list, anchor.features = Mye.features)
@@ -580,13 +615,13 @@ reference.list <- c(reference.1,reference.3,
 Mye.anchors <- FindIntegrationAnchors(object.list = Myecellsub.list, normalization.method = "SCT",
                                       anchor.features = Mye.features, reference = reference.list)
 
-Myecellsub.combo <- IntegrateData(anchorset = Mye.anchors, normalization.method = "SCT", k.weight = 52)
+Myecellsub.combo <- IntegrateData(anchorset = Mye.anchors, normalization.method = "SCT", k.weight = 62)
 
 DefaultAssay(Myecellsub.combo) <- "integrated"
 
 Myecellsub.combo <- RunPCA(Myecellsub.combo, npcs = 100, verbose = FALSE)
 
-pdf("BatchTestMyesub.pdf", width = 14.22, height = 13.01)
+pdf("BatchTestMyesub_62822.pdf", width = 14.22, height = 13.01)
 DimPlot(Myecellsub.combo, reduction = "pca", raster = F, group.by = "Capture.Method")
 DimPlot(Myecellsub.combo, reduction = "pca", raster = F, group.by = "orig.ident")
 
@@ -604,14 +639,6 @@ DimHeatmap(Myecellsub.combo, dims = 55:65, cells = 500, balanced = TRUE)
 dev.off()
 
 
-Myecellsub.combo <- FindNeighbors(Myecellsub.combo, reduction = "pca", dims = 1:60)
-
-resolution.range <- c(0.05, 0.1, 0.2, 0.4, 0.7, 1.0, 1.3, 1.6)
-Myecellsub.combo <- FindClusters(Myecellsub.combo, resolution = resolution.range)
-pdf("test.pdf", width = 14.22, height = 13.01)
-clustree(Myecellsub.combo, prefix = "integrated_snn_res.", node_colour = "sc3_stability", layout = "sugiyama")
-dev.off()
-
 DefaultAssay(Myecellsub.combo) <- "integrated"
 Myecellsub.combo <- FindNeighbors(Myecellsub.combo, reduction = "pca", dims = 1:50)
 Myecellsub.combo <- FindClusters(Myecellsub.combo, resolution = 3)
@@ -619,15 +646,10 @@ Myecellsub.combo <- RunUMAP(Myecellsub.combo, reduction = "pca", dims = 1:50, ve
 
 pdf("test.pdf")
 DimPlot(Myecellsub.combo, reduction = "umap", label = TRUE, repel = TRUE, raster = FALSE) #+ ggtitle(label = "NK Cells from Primary Integrated")
-DimPlot(Myecellsub.combo, reduction = "umap", label = TRUE, repel = TRUE, group.by = "old.labels", raster = FALSE) +theme(legend.position = "None")#+ ggtitle(label = "NK Cells from Primary Integrated")
 dev.off()
-DimPlot(Myecellsub.combo, reduction = "umap", label = TRUE, repel = TRUE, raster = FALSE, group.by = "celltype_main") + ggtitle(label = "NK Cells from lumA samples (PC = 15)")
-DimPlot(Myecellsub.combo, reduction = "umap", label = TRUE, repel = TRUE, raster = FALSE, group.by = "orig.ident")
-
 
 DefaultAssay(Myecellsub.combo) <- "RNA"
 Myecellsub.combo <- NormalizeData(Myecellsub.combo, assay = "RNA")
-
 
 #MDSc __________________________________________________________________
 
@@ -650,7 +672,9 @@ Myecellsub.combo <- AddModuleScore_UCell(Myecellsub.combo, features = MDSc_sig, 
 pdf("test.pdf")
 FeaturePlot(object = Myecellsub.combo, features = "signature_1MDSc_sig", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) + ggtitle(label = "Karaayvaz's Endothelial Signature (PC = 40)")
 dev.off()
-Myecellsub.combo <-RenameIdents(Myecellsub.combo, `15` = "MDSCs", `4` = "MDSCs", `25` = "MDSCs")
+
+Myecellsub.combo <-RenameIdents(Myecellsub.combo, `32` = "MDSCs", `19` = "MDSCs", `8` = "MDSCs",
+                                `9` = "MDSCs", `24` = "MDSCs")
 
 #Macrophage __________________________________________________________________
 
@@ -665,19 +689,17 @@ pdf("test.pdf")
 FeaturePlot(object = Myecellsub.combo, features = "signature_1Macro_Cheng", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) 
 dev.off()
 
-Myecellsub.combo <- RenameIdents(Myecellsub.combo, `39` = "Macrophages", `30` = "Macrophages", 
-                                 `43` = "Macrophages", `46` = "Macrophages", 
-                                 `13` = "Macrophages", `24` = "Macrophages", `38` = "Macrophages",
-                                 `17` = "Macrophages", `45` = "Macrophages", `16` = "Macrophages",
-                                 `26` = "Macrophages", `42` = "Macrophages", `3` = "Macrophages",
-                                 `10` = "Macrophages", `0` = "Macrophages", `2` = "Macrophages",
-                                 `17` = "Macrophages", `45` = "Macrophages", `16` = "Macrophages",
-                                 `14` = "Macrophages", `9` = "Macrophages", `32` = "Macrophages",
-                                 `34` = "Macrophages", `44` = "Macrophages", `22` = "Macrophages",
-                                 `20` = "Macrophages", `7` = "Macrophages", `41` = "Macrophages",
-                                 `5` = "Macrophages", `6` = "Macrophages", `11` = "Macrophages",
-                                 `8` = "Macrophages", `23` = "Macrophages", `40` = "Macrophages", `33` = "Macrophages",
-                                 `1` = "Macrophages")
+Myecellsub.combo <- RenameIdents(Myecellsub.combo, `0` = "Macrophages", `1` = "Macrophages", 
+                                 `2` = "Macrophages", `3` = "Macrophages", 
+                                 `4` = "Macrophages", `5` = "Macrophages", `6` = "Macrophages",
+                                 `7` = "Macrophages", `10` = "Macrophages", `11` = "Macrophages",
+                                 `12` = "Macrophages", `13` = "Macrophages", `16` = "Macrophages",
+                                 `20` = "Macrophages", `21` = "Macrophages", `22` = "Macrophages",
+                                 `23` = "Macrophages", `25` = "Macrophages", `26` = "Macrophages",
+                                 `27` = "Macrophages", `28` = "Macrophages", `30` = "Macrophages",
+                                 `36` = "Macrophages", `37` = "Macrophages", `38` = "Macrophages",
+                                 `39` = "Macrophages", `41` = "Macrophages", `42` = "Macrophages",
+                                 `43` = "Macrophages")
 #Monocytes __________________________________________________________________
 
 #https://link.springer.com/article/10.1007/s00262-011-1161-9/tables/1 <- other
@@ -689,7 +711,8 @@ Myecellsub.combo <- AddModuleScore_UCell(Myecellsub.combo, features = Mono_sig, 
 pdf("test.pdf")
 FeaturePlot(object = Myecellsub.combo, features = "signature_1Mono_sig", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE)
 dev.off()
-Myecellsub.combo <-RenameIdents(Myecellsub.combo, `19` = "Monocytes", `28` = "Monocytes", `18` = "Monocytes")
+
+Myecellsub.combo <-RenameIdents(Myecellsub.combo, `18` = "Monocytes", `17` = "Monocytes", `14` = "Monocytes")
 
 
 #Neutrophil __________________________________________________________________
@@ -707,7 +730,8 @@ Myecellsub.combo <- AddModuleScore_UCell(Myecellsub.combo, features = Neutro_sig
 pdf("test.pdf")
 FeaturePlot(object = Myecellsub.combo, features = "signature_1Neutro_sig", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) 
 dev.off()
-Myecellsub.combo <- RenameIdents(Myecellsub.combo, `36` = "Neutrophils")
+
+Myecellsub.combo <- RenameIdents(Myecellsub.combo, `34` = "Neutrophils")
 
 #Dendritic Cells __________________________________________________________________
 
@@ -724,9 +748,8 @@ pdf("test.pdf")
 FeaturePlot(object = Myecellsub.combo, features = "signature_1DC_sig", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) 
 dev.off()
 
-Myecellsub.combo <- RenameIdents(Myecellsub.combo, `37` = "Dendritic Cells",
-                                 `35` = "Dendritic Cells", `31` = "Dendritic Cells",
-                                 `21` = "Dendritic Cells")
+Myecellsub.combo <- RenameIdents(Myecellsub.combo, `29` = "Dendritic Cells",
+                                 `35` = "Dendritic Cells")
 
 #mast cells __________________________________________________________________
 
@@ -736,8 +759,9 @@ Myecellsub.combo <- AddModuleScore_UCell(Myecellsub.combo, features = mast_Cheng
 pdf("test.pdf")
 FeaturePlot(object = Myecellsub.combo, features = "signature_1mast_Cheng", order = TRUE, label = TRUE, min.cutoff = 0, max.cutoff = 0.5, raster = FALSE) + ggtitle(label = "Chung's Mast Cell Signature (PC = 40)")
 dev.off()
-Myecellsub.combo <- RenameIdents(Myecellsub.combo, `29` = "Mast Cells", `12` = "Mast Cells",
-                                 `27` = "Mast Cells")
+
+Myecellsub.combo <- RenameIdents(Myecellsub.combo, `33` = "Mast Cells", `15` = "Mast Cells",
+                                 `31` = "Mast Cells", `40` = "Mast Cells")
 
 
 
@@ -757,7 +781,9 @@ Idents(combo.reference, cells = Mast) <- "Mast Cells"
 
 
 combo.reference$celltype_UCell <- Idents(combo.reference)
-combo.reference$celltype_final <- Idents(combo.reference)
+#combo.reference$celltype_final <- Idents(combo.reference)
+
+saveRDS(combo.reference, "finalfixed_primobj_withmarkersigs_62822_savecopysafe.rds")
 
 #Marker and Expression Tests ========================================
 
@@ -2804,227 +2830,8 @@ head(MarkerBased.dataframe)
 table(MarkerBased.dataframe)
 
 
-Uscore.result <- list()
-for (cell in names(markersum.list)) {
-  
-  cell.name <- markersum.list[[cell]]
-  
-  NK.UScore <- sobj@meta.data[cell,"signature_1NK.mark2"]
-  T.UScore <- sobj@meta.data[cell,"signature_1T_karacd4"]
-  B.UScore <- sobj@meta.data[cell,"signature_1B_KaraBrech"]
-  Plasma.UScore <- sobj@meta.data[cell,"signature_1plasma_colo"]
-  Myeloid.UScore <- sobj@meta.data[cell,"signature_1myeloid_wuElliot"]
-  Epi.UScore <- sobj@meta.data[cell,"signature_1genepi_Kara"]
-  MyoEpi.UScore <- sobj@meta.data[cell,"signature_1Myoepi_wuNguyen"]
-  PVL.UScore <- sobj@meta.data[cell,"signature_1newWuPVL"]
-  Fibro.UScore <- sobj@meta.data[cell,"signature_1fibro_wumelan"]
-  Endo.UScore <- sobj@meta.data[cell,"signature_1endokara"]
-  
-  CD8.UScore <- sobj@meta.data[cell,"signature_1CD8sig"]
-  CD4.UScore <- sobj@meta.data[cell,"signature_1CD4sig"]
-  Treg.UScore <- sobj@meta.data[cell,"signature_1Treg_sig"]
-  MDSc.UScore <- sobj@meta.data[cell,"signature_1MDSc_sig"]
-  Macro.UScore <- sobj@meta.data[cell,"signature_1Macro_Cheng"]
-  Mono.UScore <- sobj@meta.data[cell,"signature_1Mono_sig"]
-  Neut.UScore <- sobj@meta.data[cell,"signature_1Neutro_sig"]
-  DC.UScore <- sobj@meta.data[cell,"signature_1DC_sig"]
-  Mast.UScore <- sobj@meta.data[cell,"signature_1mast_Cheng"]
-  
-  
-  # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  # Final Call ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  # +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  
-  
-  if ((NK.UScore > T.UScore) & (NK.UScore > B.UScore) &
-      (NK.UScore > Plasma.UScore) & (NK.UScore > Myeloid.UScore) &
-      (NK.UScore > MyoEpi.UScore) & (NK.UScore > PVL.UScore) & 
-      (NK.UScore > Fibro.UScore) & (NK.UScore > Endo.UScore) &
-      (NK.UScore > Epi.UScore)) {
-    
-    Uscore.result[[cell]] <- "NK Cells"
-    
-    
-  }
-  
-  else if ((T.UScore > NK.UScore) & (T.UScore > B.UScore) &
-           (T.UScore > Plasma.UScore) & (T.UScore > Myeloid.UScore) &
-           (T.UScore > MyoEpi.UScore) & (T.UScore > PVL.UScore) & 
-           (T.UScore > Fibro.UScore) & (T.UScore > Endo.UScore) &
-           (T.UScore > Epi.UScore)) {
-    
-    
-    
-    if ((CD8.UScore > CD4.UScore) & (CD8.UScore > Treg.UScore))
-    {
-      Uscore.result[[cell]] <- "CD8+ T Cells"
-    }
-    
-    else if ((CD4.UScore > CD8.UScore) & (CD4.UScore > Treg.UScore))
-    {
-      Uscore.result[[cell]] <- "CD4+ T Cells"
-    }
-    
-    else if ((Treg.UScore > CD8.UScore) & (Treg.UScore > CD4.UScore))
-    {
-      Uscore.result[[cell]] <- "Regulatory T Cells"
-    }
-    
-    else 
-    {
-      Uscore.result[[cell]] <- "Unspecific T Cells"
-    }
-    
-  }
-  
-  else if ((B.UScore > NK.UScore) & (B.UScore > T.UScore) &
-           (B.UScore > Plasma.UScore) & (B.UScore > Myeloid.UScore) &
-           (B.UScore > MyoEpi.UScore) & (B.UScore > PVL.UScore) & 
-           (B.UScore > Fibro.UScore) & (B.UScore > Endo.UScore) &
-           (B.UScore > Epi.UScore)) {
-    
-    Uscore.result[[cell]] <- "B Cells"
-    
-    
-  }
-  
-  else if ((Plasma.UScore > NK.UScore) & (Plasma.UScore > T.UScore) &
-           (Plasma.UScore > B.UScore) & (Plasma.UScore > Myeloid.UScore) &
-           (Plasma.UScore > MyoEpi.UScore) & (Plasma.UScore > PVL.UScore) & 
-           (Plasma.UScore > Fibro.UScore) & (Plasma.UScore > Endo.UScore) &
-           (Plasma.UScore > Epi.UScore)) {
-    
-    Uscore.result[[cell]] <- "Plasma Cells"
-    
-    
-  }
-  
-  else if ((Myeloid.UScore > NK.UScore) & (Myeloid.UScore > T.UScore) &
-           (Myeloid.UScore > B.UScore) & (Myeloid.UScore > Plasma.UScore) &
-           (Myeloid.UScore > MyoEpi.UScore) & (Myeloid.UScore > PVL.UScore) & 
-           (Myeloid.UScore > Fibro.UScore) & (Myeloid.UScore > Endo.UScore) &
-           (Myeloid.UScore > Epi.UScore)) {
-    
-    
-    if ((MDSc.UScore > Macro.UScore) & (MDSc.UScore > Mono.UScore) & 
-        (MDSc.UScore > Neut.UScore) & (MDSc.UScore > DC.UScore) &
-        (MDSc.UScore > Mast.UScore))
-    {
-      Uscore.result[[cell]] <- "MDSCs"
-    }
-    
-    else if ((Macro.UScore > MDSc.UScore) & (Macro.UScore > Mono.UScore) & 
-             (Macro.UScore > Neut.UScore) & (Macro.UScore > DC.UScore) &
-             (Macro.UScore > Mast.UScore))
-    {
-      Uscore.result[[cell]] <- "Macrophages"
-    }
-    
-    else if ((Mono.UScore > MDSc.UScore) & (Mono.UScore > Macro.UScore) & 
-             (Mono.UScore > Neut.UScore) & (Mono.UScore > DC.UScore) &
-             (Mono.UScore > Mast.UScore))
-    {
-      Uscore.result[[cell]] <- "Monocytes"
-    }
-    
-    else if ((Neut.UScore > MDSc.UScore) & (Neut.UScore > Macro.UScore) & 
-             (Neut.UScore > Mono.UScore) & (Neut.UScore > DC.UScore) &
-             (Neut.UScore > Mast.UScore))
-    {
-      Uscore.result[[cell]] <- "Neutrophils"
-    }
-    
-    else if ((DC.UScore > MDSc.UScore) & (DC.UScore > Macro.UScore) & 
-             (DC.UScore > Mono.UScore) & (DC.UScore > Neut.UScore) &
-             (DC.UScore > Mast.UScore))
-    {
-      Uscore.result[[cell]] <- "Dendritic Cells"
-    }
-    
-    else if ((Mast.UScore > MDSc.UScore) & (Mast.UScore > Macro.UScore) & 
-             (Mast.UScore > Mono.UScore) & (Mast.UScore > Neut.UScore) &
-             (Mast.UScore > DC.UScore))
-    {
-      Uscore.result[[cell]] <- "Mast Cells"
-    }
-    
-    else 
-    {
-      Uscore.result[[cell]] <- "Unspecific Myeloid Cells"
-    }
-    
-    
-  }
-  
-  else if ((MyoEpi.UScore > NK.UScore) & (MyoEpi.UScore > T.UScore) &
-           (MyoEpi.UScore > B.UScore) & (MyoEpi.UScore > Plasma.UScore) &
-           (MyoEpi.UScore > Myeloid.UScore) & (MyoEpi.UScore > PVL.UScore) & 
-           (MyoEpi.UScore > Fibro.UScore) & (MyoEpi.UScore > Endo.UScore) &
-           (MyoEpi.UScore > Epi.UScore)) {
-    
-    Uscore.result[[cell]] <- "Myoepithelial Cells"
-    
-    
-  }
-  
-  else if ((PVL.UScore > NK.UScore) & (PVL.UScore > T.UScore) &
-           (PVL.UScore > B.UScore) & (PVL.UScore > Plasma.UScore) &
-           (PVL.UScore > Myeloid.UScore) & (PVL.UScore > MyoEpi.UScore) & 
-           (PVL.UScore > Fibro.UScore) & (PVL.UScore > Endo.UScore) &
-           (PVL.UScore > Epi.UScore)) {
-    
-    Uscore.result[[cell]] <- "Perivascular-like (PVL) Cells"
-    
-    
-  }
-  
-  else if ((Fibro.UScore > NK.UScore) & (Fibro.UScore > T.UScore) &
-           (Fibro.UScore > B.UScore) & (Fibro.UScore > Plasma.UScore) &
-           (Fibro.UScore > Myeloid.UScore) & (Fibro.UScore > MyoEpi.UScore) & 
-           (Fibro.UScore > PVL.UScore) & (Fibro.UScore > Endo.UScore) &
-           (Fibro.UScore > Epi.UScore)) {
-    
-    Uscore.result[[cell]] <- "Fibroblasts"
-    
-    
-  }
-  
-  else if ((Endo.UScore > NK.UScore) & (Endo.UScore > T.UScore) &
-           (Endo.UScore > B.UScore) & (Endo.UScore > Plasma.UScore) &
-           (Endo.UScore > Myeloid.UScore) & (Endo.UScore > MyoEpi.UScore) & 
-           (Endo.UScore > PVL.UScore) & (Endo.UScore > Fibro.UScore) &
-           (Endo.UScore > Epi.UScore)) {
-    
-    Uscore.result[[cell]] <- "Endothelial Cells"
-    
-    
-  }
-  
-  else if ((Epi.UScore > NK.UScore) & (Epi.UScore > T.UScore) &
-           (Epi.UScore > B.UScore) & (Epi.UScore > Plasma.UScore) &
-           (Epi.UScore > Myeloid.UScore) & (Epi.UScore > MyoEpi.UScore) & 
-           (Epi.UScore > PVL.UScore) & (Epi.UScore > Fibro.UScore) &
-           (Epi.UScore > Endo.UScore)) {
-    
-    Uscore.result[[cell]] <- "Epithelial Cells"
-    
-    
-  }
-  else 
-    Uscore.result[[cell]] <- "Unknown"
-  
-  
-}
-
-head(Uscore.result)
-UScore.dataframe <- t(as.data.frame(Uscore.result))
-head(UScore.dataframe)
-table(UScore.dataframe) 
-
-
 rownames(MarkerBased.dataframe) <- gsub(".", "-", rownames(MarkerBased.dataframe), fixed=TRUE)
 rownames(ExpOnly.Results) <- gsub(".", "-", rownames(ExpOnly.Results), fixed=TRUE)
-#rownames(UScore.dataframe) <- gsub(".", "-", rownames(UScore.dataframe), fixed=TRUE)
 
 
 #test NA cell: Palprim_AACCGCGTCTCTGTCG-1_0135_TNBCTot #<- dash got turned into "." 
@@ -3032,32 +2839,50 @@ rownames(ExpOnly.Results) <- gsub(".", "-", rownames(ExpOnly.Results), fixed=TRU
 combo.reference <- AddMetaData(combo.reference, MarkerBased.dataframe, "MarkerBasedKara.NK")
 combo.reference <- AddMetaData(combo.reference, ExpOnly.Results, "ExpBasedOnly.NK")
 
+rm(MarkerBased.dataframe)
+rm(ExpOnly.Results)
+
 combo.reference <- AddMetaData(combo.reference, MarkerBased.dataframe, "MarkerBasedKara.Epi")
 combo.reference <- AddMetaData(combo.reference, ExpOnly.Results, "ExpBasedOnly.Epi")
+
+rm(MarkerBased.dataframe)
+rm(ExpOnly.Results)
 
 combo.reference <- AddMetaData(combo.reference, MarkerBased.dataframe, "MarkerBasedKara.Stroma")
 combo.reference <- AddMetaData(combo.reference, ExpOnly.Results, "ExpBasedOnly.Stroma")
 
+rm(MarkerBased.dataframe)
+rm(ExpOnly.Results)
+
 combo.reference <- AddMetaData(combo.reference, MarkerBased.dataframe, "MarkerBasedKara.B")
 combo.reference <- AddMetaData(combo.reference, ExpOnly.Results, "ExpBasedOnly.B")
+
+rm(MarkerBased.dataframe)
+rm(ExpOnly.Results)
 
 combo.reference <- AddMetaData(combo.reference, MarkerBased.dataframe, "MarkerBasedKara.Mye")
 combo.reference <- AddMetaData(combo.reference, ExpOnly.Results, "ExpBasedOnly.Mye")
 
+rm(MarkerBased.dataframe)
+rm(ExpOnly.Results)
+
 combo.reference <- AddMetaData(combo.reference, MarkerBased.dataframe, "MarkerBasedKara.T")
 combo.reference <- AddMetaData(combo.reference, ExpOnly.Results, "ExpBasedOnly.T")
 
+rm(MarkerBased.dataframe)
+rm(ExpOnly.Results)
+
 colnames(combo.reference@meta.data)
 
-combo.reference$MarkerBasedKara <- apply(combo.reference@meta.data[,c(77, 79, 81, 83, 85, 87)], 1, function(x) x[!is.na(x)][1])
-combo.reference@meta.data <- combo.reference@meta.data[,-c(77, 79, 81, 83, 85, 87)]
+combo.reference$MarkerBasedKara <- apply(combo.reference@meta.data[,c(78, 80, 82, 84, 86, 88)], 1, function(x) x[!is.na(x)][1])
+combo.reference@meta.data <- combo.reference@meta.data[,-c(78, 80, 82, 84, 86, 88)]
 
-combo.reference$ExpBasedOnly <- apply(combo.reference@meta.data[,c(77:82)], 1, function(x) x[!is.na(x)][1])
-combo.reference@meta.data <- combo.reference@meta.data[,-c(77:82)]
+combo.reference$ExpBasedOnly <- apply(combo.reference@meta.data[,c(78:83)], 1, function(x) x[!is.na(x)][1])
+combo.reference@meta.data <- combo.reference@meta.data[,-c(78:83)]
 
-setwd("/project/InternalMedicine/Chan_lab/shared/FinalObjects")
+setwd("/project/InternalMedicine/Chan_lab/shared/FinalObjects/Primary_Only/")
 #saveRDS(combo.reference, "PrimObject_6422.rds")
-combo.reference <- readRDS("PrimObject_6422.rds")
+combo.reference <- readRDS("PrimObject_62922.rds")
 
 #Refine Expression and Marker Methods ============================
 
@@ -3080,8 +2905,8 @@ table(combo.reference$MarkerBasedKara)
 
 combo.reference$RefineMarkerBased <- "hi"
 for (i in 1:nrow(combo.reference@meta.data)) {
-  combo.reference@meta.data[i,"RefineMarkerBased"] <-ifelse(is.na(combo.reference@meta.data[i,"markerbased"]),
-                                           as.character(combo.reference@meta.data[i,"celltype_UCell"]), as.character(combo.reference@meta.data[i,"markerbased"]))
+  combo.reference@meta.data[i,"RefineMarkerBased"] <-ifelse(is.na(combo.reference@meta.data[i,"MarkerBasedKara"]),
+                                           as.character(combo.reference@meta.data[i,"celltype_UCell"]), as.character(combo.reference@meta.data[i,"MarkerBasedKara"]))
 }
 
 for (i in 1:nrow(combo.reference@meta.data)) {
@@ -3507,6 +3332,6 @@ table(aziziprim.test$celltype_final)
 
 combo.reference <- subset(combo.reference, idents = "noone called it immune", invert = T)
 
-saveRDS(combo.reference, "PrimObject.rds")
+saveRDS(combo.reference, "FinalPrimObject_62922.rds")
 
 
