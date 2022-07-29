@@ -30,18 +30,14 @@
 
 
 # Libraries -------------------------------------------------------------
-#install.packages("future.batchtools")
 library(BiocManager)
 library(GEOquery) 
-#install.packages("plyr")
-library(plyr)#, lib.loc="/opt/R/4.0.2/lib64/R/library")
+library(plyr)
 library(dplyr) 
 library(Matrix)
 library(devtools)
-#install.packages("Seurat")
-library(Seurat)#, lib.loc="/opt/R/4.0.2/lib64/R/library") 
-#install.packages("ggplot2")
-library(ggplot2)#, lib.loc="/opt/R/4.0.2/lib64/R/library") 
+library(Seurat)
+library(ggplot2)
 library(cowplot) 
 library(SAVER) 
 library(metap)
@@ -53,27 +49,13 @@ library(velocyto.R)
 library(loomR)
 library(clustree)
 library(tibble)
-
-#If you need to find what package a function is in:
-#install.packages("sos")
-#library("sos")
-#findFn("Heatmap")
-
-
-
 library(devtools)
-#install_github("immunogenomics/harmony")
 library(harmony)
 library(SeuratData)
 library(UCell)
-
-#install.packages("sctransform")
-#remotes::install_github("ChristophH/sctransform@develop")
-#devtools::install_github("const-ae/sparseMatrixStats")
-#BiocManager::install("glmGamPoi")
 library(glmGamPoi)
-library(sctransform)#, lib.loc="/opt/R/4.0.2/lib64/R/library")
-library(matrixStats)#, lib.loc="/opt/R/4.0.2/lib64/R/library")
+library(sctransform)
+library(matrixStats)
 library(sparseMatrixStats)
 library(DESeq2)
 library(genefu)
