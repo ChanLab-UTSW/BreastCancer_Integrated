@@ -1,4 +1,28 @@
+
+# =========================================================
+
+#none of these will appear on the github ==================
+
+# =========================================================
+
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+
+
+#Dataset Files
+Dataset_Files/
+
+#any objects
+*.rds
+
+#any images
+*.pdf
+*.png
+*.jpg
+*.jpeg
+
+#any tables
+*.csv
+
