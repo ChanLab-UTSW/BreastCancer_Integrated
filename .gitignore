@@ -11,11 +11,35 @@
 .Ruserdata
 
 
-#Dataset Files
-Dataset_Files/
+#Dataset Files ______________________________________________
+
+##scRNA
+PrimscRNA_Orig_Dataset_Files/
+antiPD1_FinalObjects/
+antiPD1_Intermobjects/
+PrimaryBreast_Processing/Individual_Dataset_Objects/
+PrimaryBreast_Processing/Integration_Objects/
+PrimaryBreast_Processing/Main_Prim_Object/
+
+##RPPA
+RPPA_Orig_DataFiles/
+
+##bulkRNA
+Cellline_Orig_Dataset_Files/
+iSPY_Objects/
+iSPY_Original_Dataset_Files/
+brca_metabric_origfiles/
+Metabric_Objects/
+TCGA_Objects/
+
+
+#_________________________________________________________
 
 #any objects
 *.rds
+*.tsv
+*.mtx
+*.txt
 
 #any images
 *.pdf
@@ -25,4 +49,5 @@ Dataset_Files/
 
 #any tables
 *.csv
+*.xlsx
 
