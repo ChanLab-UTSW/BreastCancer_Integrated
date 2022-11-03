@@ -750,7 +750,7 @@ origup <- c("CALD1", "CLU", "ALOX12", "LTBP1", "CAVIN2",
             "FAM81A", "CX3CR1", "RHPN1", "HES1", "F5", 
             "GAS2L1", "THBS1", "MYLK", "TMTC1", "FOSB",
             "NR4A2", "MPIG6B", "SLC6A4", "PLXNA4", "VWF",
-            "TUBB1", "SLC7A5")
+            "TUBB1")#, "SLC7A5") #up
 origdown <- c("BCAT1", "ALDH1L2", "COX6A2", "PYCR1", #down
               "LHFPL2", "AHRR", "EXTL1", "ASNS", "CHAC1",
               "MTHFD2", "NEK6", "SLC6A9", "FMNL2", "ASB2",
@@ -761,7 +761,7 @@ origdown <- c("BCAT1", "ALDH1L2", "COX6A2", "PYCR1", #down
               "TBC1D16", "RN7SL1", "SH3PXD2B", "SCN3B",
               "OSBPL1A", "ME1", "HPGDS", "PPP2R2C",
               "CLBA1", "HMOX1", "NQO1", "CARS1", "SSTR2",
-              "SNORA23")
+              "SNORA23", "SLC7A5")
 # NKup <- c("GNLY", #NK specific
 #           "PRF1",
 #           "KLRD1",
