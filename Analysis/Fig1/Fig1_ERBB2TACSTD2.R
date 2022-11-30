@@ -10,7 +10,6 @@
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 # SETUP -----------------------------------------------------------------------
@@ -59,7 +58,7 @@ library(msigdbr)
 library(UCell)
 library(RColorBrewer)
 
-# simil function ------------------------------------------------------
+# functions ------------------------------------------------------
 
 # calculate similarity matrix 
 # param df is dataframe of all cells for similarity matrix computation
@@ -100,12 +99,44 @@ simil <- function(df, drop, file, method) {
   return(v)
 }
 
+DEG_Remove_mito <- function (df){
+  df_rm_mito <- df[!grepl("^MT-|^MT.",rownames(df)),]
+  return(df_rm_mito)
+}
+
+
 # Load in object ---------------
 
-setwd("/project/InternalMedicine/Chan_lab/shared/FinalObjects/Primary_Only")
-cancer.epi <- readRDS("cancerEpiwithGenes_nozallgenedem_71322.rds")
+##object for pre-print
+# setwd("/project/InternalMedicine/Chan_lab/shared/FinalObjects/Primary_Only")
+# cancer.epi <- readRDS("cancerEpiwithGenes_nozallgenedem_71322.rds")
+# DefaultAssay(cancer.epi) <- "RNA"
+# cancer.epi <- NormalizeData(cancer.epi, assay = "RNA")
+
+##Lily's original object
+#setwd("/project/InternalMedicine/Chan_lab/shared")
+#cancer.epi <- readRDS("cancerepi_withGEmetadata_111122.rds")
+
+
+
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig1")
+cancer.epi <- readRDS("cancerepi_withinferCNV_with_Trop2Her2cats_111422.rds") ##Lily version
+
 DefaultAssay(cancer.epi) <- "RNA"
 cancer.epi <- NormalizeData(cancer.epi, assay = "RNA")
+head(cancer.epi@meta.data)
+
+##run TROP2 and HER2 labeling again
+cancer.epi$TROP2_ident <- NA
+cancer.epi$TROP2_ident[(cancer.epi$TACSTD2 >= quantile(cancer.epi$TACSTD2,0.9))] <- "high"
+cancer.epi$TROP2_ident[(cancer.epi$TACSTD2 <= quantile(cancer.epi$TACSTD2,0.9))] <- "med"
+cancer.epi$TROP2_ident[(cancer.epi$TACSTD2 <= 0)] <- "low"
+
+cancer.epi$HER2_ident <- NA
+cancer.epi$HER2_ident[(cancer.epi$ERBB2 <= quantile(cancer.epi$ERBB2, 0.975))] <- "med"
+cancer.epi$HER2_ident[(cancer.epi$ERBB2 >= quantile(cancer.epi$ERBB2, 0.975))] <- "high"
+cancer.epi$HER2_ident[(cancer.epi$ERBB2 <= 0)] <- "low"
+
 
 # Add UScores for Clinical Targets --------------------------
 
@@ -169,10 +200,13 @@ FeaturePlot(object = cancer.epi, features = "signature_1LAG3", order = TRUE, lab
 colnames(cancer.epi@meta.data) <- sub("signature_1", "", colnames(cancer.epi@meta.data))
 colnames(cancer.epi@meta.data)
 
-saveRDS(cancer.epi, "cancerepi_WHOLEwithsigs_100422.rds")
+# saveRDS(cancer.epi, "cancerepi_WHOLEwithsigs_100422.rds")
 
-setwd("/project/InternalMedicine/Chan_lab/shared/FinalObjects/Primary_Only")
-cancer.epi <- readRDS("cancerepi_WHOLEwithsigs_100422.rds")
+# setwd("/project/InternalMedicine/Chan_lab/shared/FinalObjects/Primary_Only")
+# cancer.epi <- readRDS("cancerepi_WHOLEwithsigs_100422.rds")
+
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig1")
+cancer.epi <- readRDS("cancerepi_withinferCNV_with_Trop2Her2cats_111422.rds")
 
 head(cancer.epi@meta.data)
 
@@ -182,13 +216,15 @@ head(cancer.epi@meta.data)
 
 cancer.epi$TROP2_ident <- NA
 cancer.epi$TROP2_ident[(cancer.epi$TACSTD2 >= quantile(cancer.epi$TACSTD2,0.9))] <- "high"
-cancer.epi$TROP2_ident[(cancer.epi$TACSTD2 <= quantile(cancer.epi$TACSTD2,0.9))] <- "low"
-cancer.epi$TROP2_ident[(cancer.epi$TACSTD2 <= 0)] <- "neg"
+cancer.epi$TROP2_ident[(cancer.epi$TACSTD2 <= quantile(cancer.epi$TACSTD2,0.9))] <- "med"
+cancer.epi$TROP2_ident[(cancer.epi$TACSTD2 <= 0)] <- "low"
 
 Idents(cancer.epi) <- cancer.epi$TROP2_ident
 
 
 # DEG Analysis for TROP2  ---------------------------------------
+
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig1/Subsetting") ##for reintegrated lists
 
 j.markers_DGE <- FindAllMarkers(cancer.epi,
                                 slot = "data",
@@ -199,41 +235,56 @@ j.markers_DGE <- FindAllMarkers(cancer.epi,
 
 j.markers_DGE$min.pct.diff <- abs(j.markers_DGE$pct.1 - j.markers_DGE$pct.2)
 
+write.csv(j.markers_DGE, "reintegrated_TROP2_DGEs_logfc0mincell5minpct0.2_111822_YESmitopresent.csv")
+#write.csv(j.markers_DGE, "TROP2_DGEs_logfc0mincell5minpct0.2_111522_YESmitopresent.csv") ##lily
 
+j.markers_DGE_filtered <- DEG_Remove_mito(j.markers_DGE)
+write.csv(j.markers_DGE_filtered, "reintegrated_TROP2_DGEs_logfc0mincell5minpct0.2_111822_NOmito.csv")
+#write.csv(j.markers_DGE_filtered, "TROP2_DGEs_logfc0mincell5minpct0.2_111522_NOmito.csv") ##lily
+
+
+# 
 j.markers_DGE_nothresh <- FindAllMarkers(cancer.epi,
                                 slot = "data",
-                                min.cells.group = 5,
-                                min.pct = 0.2,
-                                logfc.threshold = 0,
+                                # min.cells.group = 5,
+                                # min.pct = 0.2,
+                                # logfc.threshold = 0,
                                 test.use = "MAST")
 
 j.markers_DGE_nothresh$min.pct.diff <- abs(j.markers_DGE_nothresh$pct.1 - j.markers_DGE_nothresh$pct.2)
 
-write.csv(j.markers_DGE_nothresh, "TROP2_DGEs_71422_NOTHRESH.csv")
-write.csv(j.markers_DGE_nothresh, "TROP2_DGEs_71422_logfc0mincell5minpct0.2.csv")
+write.csv(j.markers_DGE_nothresh, "reintegrated_TROP2_DGEs_ABSOLUTELYNOTHRESH_111822.csv")
+write.csv(j.markers_DGE_nothresh, "TROP2_DGEs_ABSOLUTELYNOTHRESH_111822.csv")
+#write.csv(j.markers_DGE_nothresh, "TROP2_DGEs_ABSOLUTELYNOTHRESH_111522.csv") ##lily
 
 
-j.markers_DGE_filtered <- DEG_Remove_mito(j.markers_DGE_filtered)
+# # write.csv(j.markers_DGE_nothresh, "TROP2_DGEs_71422_NOTHRESH.csv")
+# # write.csv(j.markers_DGE_nothresh, "TROP2_DGEs_71422_logfc0mincell5minpct0.2.csv")
 
 
 # TROP2 MA plot ------------
 
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig1")
+j.markers_DGE <- read.csv("TROP2_DGEs_ABSOLUTELYNOTHRESH_111522.csv")
+head(j.markers_DGE)
+rownames(j.markers_DGE) <- j.markers_DGE$X
+j.markers_DGE_filtered <- DEG_Remove_mito(j.markers_DGE)
 
 Idents(cancer.epi) <- cancer.epi$TROP2_ident
 avgexp <- AverageExpression(object = cancer.epi, features = unique(j.markers_DGE_filtered$gene))
 avgexp <- as.data.frame(avgexp[['RNA']])
 
-j.markers_DGE_filtered <- j.markers_DGE_filtered[which(j.markers_DGE_filtered$cluster == "high"),]
+#j.markers_DGE_filtered <- j.markers_DGE_filtered[which(j.markers_DGE_filtered$cluster == "high"),]
+#j.markers_DGE_filtered <- j.markers_DGE_filtered[which(j.markers_DGE_filtered$cluster == "med"),]
 j.markers_DGE_filtered <- j.markers_DGE_filtered[which(j.markers_DGE_filtered$cluster == "low"),]
-j.markers_DGE_filtered <- j.markers_DGE_filtered[which(j.markers_DGE_filtered$cluster == "neg"),]
 
 avgexp <- avgexp[which(rownames(avgexp) %in% unique(j.markers_DGE_filtered$gene)),]
 
 data <- cbind(j.markers_DGE_filtered, avgexp)
 colnames(data)
-data_input <- data[,c(11,2,5,7)] #up
-data_input <- data[,c(10,2,5,7)] #low
-data_input <- data[,c(9,2,5,7)] #neg
+#data_input <- data[,c(12,3,6,8)] #high
+#data_input <- data[,c(11,3,6,8)] #med
+data_input <- data[,c(10,3,6,8)] #low
 colnames(data_input) <- c("baseMean", "log2FoldChange", "padj", "gene")
 
 options(ggrepel.max.overlaps = 8)
@@ -249,27 +300,33 @@ p <- ggmaplot(data_input,
               ggtheme = ggplot2::theme_classic()) +
   xlim(0,7) + ylim(-2.5,4) + NoLegend()
 
-ggsave("TROP2_MAplot_71422.pdf", plot = p, width = 4.3, height = 4)
-ggsave("TROP2_MAplot_LOWvall_71822.pdf", plot = p, width = 4.3, height = 4)
-ggsave("TROP2_MAplot_NEGvall_71822.pdf", plot = p, width = 4.3, height = 4)
+
+#ggsave("TROP2_MAplot_HIGHvall_111622.pdf", plot = p, width = 4.3, height = 4)
+#ggsave("TROP2_MAplot_MEDvall_111622.pdf", plot = p, width = 4.3, height = 4)
+ggsave("TROP2_MAplot_LOWvall_111622.pdf", plot = p, width = 4.3, height = 4)
+
+
+# ggsave("TROP2_MAplot_71422.pdf", plot = p, width = 4.3, height = 4)
+# ggsave("TROP2_MAplot_LOWvall_71822.pdf", plot = p, width = 4.3, height = 4)
+# ggsave("TROP2_MAplot_NEGvall_71822.pdf", plot = p, width = 4.3, height = 4)
 
 # TROP2 GO analysis -----------------------------
 
 library(org.Hs.eg.db)
 orgdb = "org.Hs.eg.db"
 
-dfsample <- read.csv("TROP2_DGEs_71422_logfc0mincell5minpct0.2.csv", header = T, row.names = 1)
+dfsample <- read.csv("TROP2_DGEs_logfc0mincell5minpct0.2_111522_NOmito.csv", header = T, row.names = 1)
 dfsample <- dfsample[which(abs(dfsample$min.pct.diff) >= 0.1),]
 ##remove mitochondrial genes
 dfsample <- split(dfsample$gene, dfsample$cluster)
 
 dfsample$high <- bitr(dfsample$high, fromType="SYMBOL", toType="ENTREZID", OrgDb=orgdb)
+dfsample$med <- bitr(dfsample$med, fromType="SYMBOL", toType="ENTREZID", OrgDb=orgdb)
 dfsample$low <- bitr(dfsample$low, fromType="SYMBOL", toType="ENTREZID", OrgDb=orgdb)
-dfsample$neg <- bitr(dfsample$neg, fromType="SYMBOL", toType="ENTREZID", OrgDb=orgdb)
 
 genelist <- list("high" = dfsample$high$ENTREZID,
-                 "low" = dfsample$low$ENTREZID,
-                 "neg" = dfsample$neg$ENTREZID)
+                 "med" = dfsample$med$ENTREZID,
+                 "low" = dfsample$low$ENTREZID)
 
 m_df <- msigdbr(species = "Homo sapiens", category ="H") %>%#, subcategory = "CGP") %>% 
   dplyr::select(gs_name, entrez_gene)
@@ -296,7 +353,9 @@ p <- p + scale_x_discrete(label = function(x) {
   x %>% stringr::str_sub(., 1,4)
 }) 
 
-ggsave("TROP2_hallmark_orghsdb_0.1mindiffnologfc_nomito_72522.pdf", plot = p, width = 15, height = 10, units = "cm")
+
+ggsave("TROP2_hallmark_orghsdb_0.1mindiffnologfc_nomito_111522.pdf", plot = p, width = 15, height = 10, units = "cm")
+#ggsave("TROP2_hallmark_orghsdb_0.1mindiffnologfc_nomito_72522.pdf", plot = p, width = 15, height = 10, units = "cm")
 
 
 # Barplot of TROP2 high cells by sample ------------
@@ -315,13 +374,13 @@ sobjlists <- sobjlists %>% dplyr::group_by(samples,
   dplyr::mutate(C = sum(Nb)) %>% 
   dplyr::mutate(percent = Nb/C*100) 
 
-sobjlists$percent_neg <- NA
+sobjlists$percent_low <- NA
 for (i in unique(sobjlists$samples)) {
-  sobjlists$percent_neg[which(sobjlists$samples == i)] <- sobjlists$percent[which((sobjlists$samples == i) & (sobjlists$TROP2_ident == "neg"))]
+  sobjlists$percent_low[which(sobjlists$samples == i)] <- sobjlists$percent[which((sobjlists$samples == i) & (sobjlists$TROP2_ident == "low"))]
 }
 
-sobjlists <- sobjlists[order(match(sobjlists$TROP2_ident, c("high", "low", "neg"))),]
-sobjlists <- sobjlists[order(sobjlists$percent_neg, decreasing = F),] # order by HER2
+sobjlists <- sobjlists[order(match(sobjlists$TROP2_ident, c("high", "med", "low"))),]
+sobjlists <- sobjlists[order(sobjlists$percent_low, decreasing = F),] # order by HER2
 sobjlists <- sobjlists[order(sobjlists$BC.Subtype),] # order by BC Subtype
 sobjlists$samples <- factor(sobjlists$samples, levels = unique(sobjlists$samples))
 
@@ -330,11 +389,11 @@ bp <- ggplot(sobjlists,
                  y = percent, 
                  group = as.factor(BC.Subtype),
                  fill = TROP2_ident)) +
-  scale_fill_manual(name = "TROP2 expression", 
+  scale_fill_manual(name = "TACSTD2 expression", 
                     values = rev(c("light grey", viridis(2))), 
                     unique(sobjlists$TROP2_ident)) +
   geom_bar(stat = "identity", width = 0.93) +
-  geom_text(aes(label = paste0(round(100 - sobjlists$percent_neg), "%"), 
+  geom_text(aes(label = paste0(round(100 - sobjlists$percent_low), "%"), 
                 y = 120, 
                 fill = NULL), 
             angle = 90,
@@ -361,14 +420,16 @@ bp <- ggplot(sobjlists,
                                         fill = "#EEEEEE"), 
         panel.spacing.x = unit(-0.1, "lines"))
 
-ggsave("TROP2_sample_barplot_71422.pdf", plot = bp, width = 14, height = 2)
+ggsave("TROP2_sample_barplot_112322.pdf", plot = bp, width = 14, height = 2)
+#ggsave("TROP2_sample_barplot_71422.pdf", plot = bp, width = 14, height = 2)
 
 # TROP2 correlation analysis ---------
 
 Idents(cancer.epi) <- cancer.epi$TROP2_ident
 
 colnames(cancer.epi@meta.data)
-data_tot <- cancer.epi@meta.data[,c(4,14,106,93:105)]
+data_tot <- cancer.epi@meta.data[,c(4,14,136,137:149)] #"samples","BC.Subtype","TROP2_ident", gene UScores
+#data_tot <- cancer.epi@meta.data[,c(4,14,137,102:114)] #"samples","BC.Subtype","TROP2_ident", gene UScores ##Lily
 
 data <- data_tot %>% dplyr::group_by(TROP2_ident) %>% 
   dplyr::summarise(ESR1 = mean(ESR1),
@@ -417,7 +478,7 @@ data <- data[,-which(colnames(data) == "TACSTD2")]
 p <- Heatmap(data, 
              cluster_rows = F, 
              column_split = 3, 
-             row_split = c("high", "low", "neg"),
+             row_split = c("high", "med", "low"),
              heatmap_legend_param = list(
                title = "Z-score \nAvg Expression",
                at = c(-2, 0, 2)),
@@ -425,7 +486,9 @@ p <- Heatmap(data,
              row_title_gp = gpar(fontsize = 0)
 )
 
-ggsave("TROP2_corr_heatmap_71422.pdf", plot = as.ggplot(p), width = 5.9, height = 3)  
+ggsave("reintegrated_TROP2_corr_heatmap_111822.pdf", plot = as.ggplot(p), width = 5.9, height = 3)  
+#ggsave("TROP2_corr_heatmap_111622.pdf", plot = as.ggplot(p), width = 5.9, height = 3) ##Lily 
+#ggsave("TROP2_corr_heatmap_71422.pdf", plot = as.ggplot(p), width = 5.9, height = 3)  ##preprint
 
 
 # TROP2 clinical correlations (SAMPLE LEVEL) --------------
@@ -458,16 +521,16 @@ sobjlists <- sobjlists %>% dplyr::group_by(samples,
   dplyr::mutate(C = sum(Nb)) %>% 
   dplyr::mutate(percent = Nb/C*100) 
 
-sobjlists$percent_neg <- NA
+sobjlists$percent_low <- NA
 for (i in unique(sobjlists$samples)) {
-  sobjlists$percent_neg[which(sobjlists$samples == i)] <- sobjlists$percent[which((sobjlists$samples == i) & (sobjlists$TROP2_ident == "neg"))]
+  sobjlists$percent_low[which(sobjlists$samples == i)] <- sobjlists$percent[which((sobjlists$samples == i) & (sobjlists$TROP2_ident == "low"))]
 }
 
-sobjlists <- sobjlists[order(match(sobjlists$TROP2_ident, c("high", "low", "neg"))),]
-sobjlists <- sobjlists[order(sobjlists$percent_neg, decreasing = F),] # order by TROP2
+sobjlists <- sobjlists[order(match(sobjlists$TROP2_ident, c("high", "med", "low"))),]
+sobjlists <- sobjlists[order(sobjlists$percent_low, decreasing = F),] # order by TROP2
 sobjlists <- sobjlists[order(sobjlists$BC.Subtype),] # order by BC Subtype
 sobjlists$samples <- factor(sobjlists$samples, levels = unique(sobjlists$samples))
-sobjlists$percent_neg <- 100 - sobjlists$percent_neg
+sobjlists$percent_low <- 100 - sobjlists$percent_low
 
 # Clinical variables relationship
 
@@ -477,12 +540,12 @@ age_linreg <- unique(sobjlists[,c(1,3,15)])
 age_linreg$Age <- as.numeric(age_linreg$Age)
 age_linreg <- age_linreg[which(!is.na(age_linreg$Age)),]
 
-p <- ggscatter(age_linreg, x = "Age", y = "percent_neg",
+p <- ggscatter(age_linreg, x = "Age", y = "percent_low",
                add = "reg.line",
                conf.int = TRUE,
                add.params = list(color = "blue", fill = "lightgray"),
                xlab = "Age",
-               ylab = "% TROP2+ cells") + theme_classic() +
+               ylab = "% TACSTD2+ cells") + theme_classic() +
   stat_cor(method = "pearson") + 
   scale_y_continuous(breaks = c(0, 25, 50, 75, 100),
                      limits = c(0, 120))
@@ -494,9 +557,9 @@ sobjlists$Age[which((sobjlists$Age >= 45) & (sobjlists$Age <= 65))] <- "45-65yo"
 sobjlists$Age[which(sobjlists$Age > 65)] <- ">65yo"
 sobjlists$Age <- factor(sobjlists$Age, levels = c("<45yo", "45-65yo", ">65yo"))
 
-p <- ggplot(unique(sobjlists[,c(1,3,15)]), aes(x = Age, y = percent_neg, fill = Age)) + 
+p <- ggplot(unique(sobjlists[,c(1,3,15)]), aes(x = Age, y = percent_low, fill = Age)) + 
   geom_boxplot(width = 0.5) +
-  ylab("% TROP2+ cells") +
+  ylab("% TACSTD2+ cells") +
   theme_bw() + 
   theme(panel.border = element_blank(), panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
@@ -517,9 +580,9 @@ sobjlists$N[which(grepl("no", sobjlists$nodal_involvement))] <- "N0"
 sobjlists$N[which(grepl("1", sobjlists$nodal_involvement))] <- "N1"
 sobjlists$N[which(sobjlists$N %in% c("N1", "N2", "N3"))] <- "N1-3"
 
-p <- ggplot(unique(sobjlists[which(!is.na(sobjlists$N)),c(1,16,15)]), aes(x = N, y = percent_neg, fill = N)) + 
+p <- ggplot(unique(sobjlists[which(!is.na(sobjlists$N)),c(1,16,15)]), aes(x = N, y = percent_low, fill = N)) + 
   geom_boxplot(width = 0.5) +
-  ylab("% TROP2+ cells") +
+  ylab("% TACSTD2+ cells") +
   theme_bw() + 
   theme(panel.border = element_blank(), panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
@@ -562,16 +625,16 @@ sobjlists <- sobjlists %>% dplyr::group_by(Patient,
   dplyr::mutate(C = sum(Nb)) %>% 
   dplyr::mutate(percent = Nb/C*100) 
 
-sobjlists$percent_neg <- NA
+sobjlists$percent_low <- NA
 for (i in unique(sobjlists$Patient)) {
-  sobjlists$percent_neg[which(sobjlists$Patient == i)] <- sobjlists$percent[which((sobjlists$Patient == i) & (sobjlists$TROP2_ident == "neg"))]
+  sobjlists$percent_low[which(sobjlists$Patient == i)] <- sobjlists$percent[which((sobjlists$Patient == i) & (sobjlists$TROP2_ident == "low"))]
 }
 
-sobjlists <- sobjlists[order(match(sobjlists$TROP2_ident, c("high", "low", "neg"))),]
-sobjlists <- sobjlists[order(sobjlists$percent_neg, decreasing = F),] # order by TROP2
+sobjlists <- sobjlists[order(match(sobjlists$TROP2_ident, c("high", "med", "low"))),]
+sobjlists <- sobjlists[order(sobjlists$percent_low, decreasing = F),] # order by TROP2
 sobjlists <- sobjlists[order(sobjlists$BC.Subtype),] # order by BC Subtype
 sobjlists$Patient <- factor(sobjlists$Patient, levels = unique(sobjlists$Patient))
-sobjlists$percent_neg <- 100 - sobjlists$percent_neg
+sobjlists$percent_low <- 100 - sobjlists$percent_low
 
 # Clinical variables relationship
 
@@ -581,25 +644,27 @@ age_linreg <- unique(sobjlists[,c(1,2,14)])
 age_linreg$Age <- as.numeric(age_linreg$Age)
 age_linreg <- age_linreg[which(!is.na(age_linreg$Age)),]
 
-p <- ggscatter(age_linreg, x = "Age", y = "percent_neg",
+p <- ggscatter(age_linreg, x = "Age", y = "percent_low",
                add = "reg.line",
                conf.int = TRUE,
                add.params = list(color = "blue", fill = "lightgray"),
                xlab = "Age",
-               ylab = "% TROP2+ cells") + theme_classic() +
+               ylab = "% TACSTD2+ cells") + theme_classic() +
   stat_cor(method = "pearson") + 
   scale_y_continuous(breaks = c(0, 25, 50, 75, 100),
                      limits = c(0, 120))
-ggsave("TROP2_age_scatter_allBC_PATIENTLEVEL_101022.pdf", plot = p, width = 3, height = 2.5)
+ggsave("reintegrated_TROP2_age_scatter_allBC_PATIENTLEVEL_111822.pdf", plot = p, width = 3, height = 2.5)
+ggsave("TROP2_age_scatter_allBC_PATIENTLEVEL_111622.pdf", plot = p, width = 3, height = 2.5)
+#ggsave("TROP2_age_scatter_allBC_PATIENTLEVEL_101022.pdf", plot = p, width = 3, height = 2.5)
 
 sobjlists$Age[which(sobjlists$Age < 45)] <- "<45yo"
 sobjlists$Age[which((sobjlists$Age >= 45) & (sobjlists$Age <= 65))] <- "45-65yo"
 sobjlists$Age[which(sobjlists$Age > 65)] <- ">65yo"
 sobjlists$Age <- factor(sobjlists$Age, levels = c("<45yo", "45-65yo", ">65yo"))
 
-p <- ggplot(unique(sobjlists[,c(1,2,14)]), aes(x = Age, y = percent_neg, fill = Age)) + 
+p <- ggplot(unique(sobjlists[,c(1,2,14)]), aes(x = Age, y = percent_low, fill = Age)) + 
   geom_boxplot(width = 0.5) +
-  ylab("% TROP2+ cells") +
+  ylab("% TACSTD2+ cells") +
   theme_bw() + 
   theme(panel.border = element_blank(), panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
@@ -609,7 +674,8 @@ p <- ggplot(unique(sobjlists[,c(1,2,14)]), aes(x = Age, y = percent_neg, fill = 
                                         c("<45yo", ">65yo")), 
                      method="wilcox.test", label="p.format", color="black")
 
-ggsave("TROP2_age_corr_allBC_PATIENTLEVEL_101022.pdf", plot = p, width = 4, height = 3.5)
+ggsave("TROP2_age_corr_allBC_PATIENTLEVEL_111622.pdf", plot = p, width = 4, height = 3.5)
+#ggsave("TROP2_age_corr_allBC_PATIENTLEVEL_101022.pdf", plot = p, width = 4, height = 3.5)
 
 sobjlists$N <- NA
 sobjlists$N[which(grepl("N0", sobjlists$TNM.Classification))] <- "N0"
@@ -621,9 +687,9 @@ sobjlists$N[which(grepl("1", sobjlists$nodal_involvement))] <- "N1"
 sobjlists$N[which(sobjlists$N %in% c("N1", "N2", "N3"))] <- "N1-3"
 
 colnames(sobjlists)
-p <- ggplot(unique(sobjlists[which(!is.na(sobjlists$N)),c(1,15,14)]), aes(x = N, y = percent_neg, fill = N)) + 
+p <- ggplot(unique(sobjlists[which(!is.na(sobjlists$N)),c(1,15,14)]), aes(x = N, y = percent_low, fill = N)) + 
   geom_boxplot(width = 0.5) +
-  ylab("% TROP2+ cells") +
+  ylab("% TACSTD2+ cells") +
   theme_bw() + 
   theme(panel.border = element_blank(), panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
@@ -633,7 +699,9 @@ p <- ggplot(unique(sobjlists[which(!is.na(sobjlists$N)),c(1,15,14)]), aes(x = N,
   scale_y_continuous(breaks = c(0, 25, 50, 75, 100),
                      limits = c(0, 110))
 
-ggsave("TROP2_N_corr_allBC_PATIENTLEVEL_101022.pdf", plot = p, width = 3, height = 2.5)
+ggsave("reintegrated_TROP2_N_corr_allBC_PATIENTLEVEL_111822.pdf", plot = p, width = 3, height = 2.5)
+ggsave("TROP2_N_corr_allBC_PATIENTLEVEL_111622.pdf", plot = p, width = 3, height = 2.5)
+#ggsave("TROP2_N_corr_allBC_PATIENTLEVEL_101022.pdf", plot = p, width = 3, height = 2.5)
 
 
 
@@ -642,11 +710,11 @@ ggsave("TROP2_N_corr_allBC_PATIENTLEVEL_101022.pdf", plot = p, width = 3, height
 # HER2 analysis -------------
 
 cancer.epi$HER2_ident <- NA
-cancer.epi$HER2_ident[(cancer.epi$ERBB2 <= quantile(cancer.epi$ERBB2, 0.975))] <- "low"
+cancer.epi$HER2_ident[(cancer.epi$ERBB2 <= quantile(cancer.epi$ERBB2, 0.975))] <- "med"
 cancer.epi$HER2_ident[(cancer.epi$ERBB2 >= quantile(cancer.epi$ERBB2, 0.975))] <- "high"
-cancer.epi$HER2_ident[(cancer.epi$ERBB2 <= 0)] <- "neg"
-NAsubset <- cancer.epi@meta.data[which(is.na(cancer.epi$HER2_ident) == T),]
-summary(NAsubset$HER2)
+cancer.epi$HER2_ident[(cancer.epi$ERBB2 <= 0)] <- "low"
+# NAsubset <- cancer.epi@meta.data[which(is.na(cancer.epi$HER2_ident) == T),]
+# summary(NAsubset$HER2)
 #cancer.epi$HER2_ident[is.na(cancer.epi$HER2_ident)] <- "high"
 
 Idents(cancer.epi) <- cancer.epi$HER2_ident
@@ -660,47 +728,64 @@ j.markers_DGE <- FindAllMarkers(cancer.epi,
 
 j.markers_DGE$min.pct.diff <- abs(j.markers_DGE$pct.1 - j.markers_DGE$pct.2)
 
+write.csv(j.markers_DGE, "reintegrated_HER2_DGEs_0.2minpct0logfcmincells5_111822_YESmito.csv")
+#write.csv(j.markers_DGE, "HER2_DGEs_0.2minpct0logfcmincells5_111522_YESmito.csv")
+
+j.markers_DGE_filtered <- DEG_Remove_mito(j.markers_DGE)
+write.csv(j.markers_DGE_filtered, "reintegrated_HER2_DGEs_0.2minpct0logfcmincells5_111822_NOmito.csv")
+#write.csv(j.markers_DGE_filtered, "HER2_DGEs_0.2minpct0logfcmincells5_111522_NOmito.csv")
+
+
 j.markers_DGE_nothresh <- FindAllMarkers(cancer.epi,
                                 slot = "data",
                                 test.use = "MAST")
 
 j.markers_DGE_nothresh$min.pct.diff <- abs(j.markers_DGE_nothresh$pct.1 - j.markers_DGE_nothresh$pct.2)
 
+write.csv(j.markers_DGE_nothresh, "reintegrated_HER2_DGEs_NOTHRESH_111822.csv")
+#write.csv(j.markers_DGE_nothresh, "HER2_DGEs_NOTHRESH_111522.csv")
 
-setwd("/endosome/work/InternalMedicine/s437775/simil/simil_cancerepi/061822/Fig1")
-setwd("/project/InternalMedicine/Chan_lab/shared/FinalObjects/Primary_Only/CancerEpiFinal")
-write.csv(j.markers_DGE_nothresh, "HER2_DGEs_NOTHRESH_71422.csv")
-write.csv(j.markers_DGE, "HER2_DGEs_0.2minpct0logfcmincells5_71422.csv")
 
-j.markers_DGE_filtered <- read.csv("HER2_DGEs_NOTHRESH_71422.csv", header = T, row.names = 1)
-# j.markers_DGE_filtered <- j.markers_DGE[which(j.markers_DGE$min.pct.diff > 0.1),]
-# j.markers_DGE_filtered <- j.markers_DGE_filtered[which(j.markers_DGE_filtered$p_val_adj < 0.05),]
-j.markers_DGE_filtered <- DEG_Remove_mito(j.markers_DGE_filtered)
-
-setwd("/project/InternalMedicine/Chan_lab/shared/FinalObjects/Primary_Only")
-j.markers_DGE_filtered <- read.csv("ERBB2_ABSNOLUTELYNOTHRESH.csv")
-j.markers_DGE_filtered <- DEG_Remove_mito(j.markers_DGE_filtered)
-write.csv(j.markers_DGE_filtered, "ERBB2_NOTHRESHnomito.csv")
+# setwd("/endosome/work/InternalMedicine/s437775/simil/simil_cancerepi/061822/Fig1")
+# setwd("/project/InternalMedicine/Chan_lab/shared/FinalObjects/Primary_Only/CancerEpiFinal")
+# write.csv(j.markers_DGE_nothresh, "HER2_DGEs_NOTHRESH_71422.csv")
+# write.csv(j.markers_DGE, "HER2_DGEs_0.2minpct0logfcmincells5_71422.csv")
+# 
+# j.markers_DGE_filtered <- read.csv("HER2_DGEs_NOTHRESH_71422.csv", header = T, row.names = 1)
+# # j.markers_DGE_filtered <- j.markers_DGE[which(j.markers_DGE$min.pct.diff > 0.1),]
+# # j.markers_DGE_filtered <- j.markers_DGE_filtered[which(j.markers_DGE_filtered$p_val_adj < 0.05),]
+# j.markers_DGE_filtered <- DEG_Remove_mito(j.markers_DGE_filtered)
+# 
+# setwd("/project/InternalMedicine/Chan_lab/shared/FinalObjects/Primary_Only")
+# j.markers_DGE_filtered <- read.csv("ERBB2_ABSNOLUTELYNOTHRESH.csv")
+# j.markers_DGE_filtered <- DEG_Remove_mito(j.markers_DGE_filtered)
+# write.csv(j.markers_DGE_filtered, "ERBB2_NOTHRESHnomito.csv")
 
 
 
 # HER2 MA plot ----------
 
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig1")
+j.markers_DGE <- read.csv("HER2_DGEs_NOTHRESH_111522.csv")
+head(j.markers_DGE)
+rownames(j.markers_DGE) <- j.markers_DGE$X
+j.markers_DGE_filtered <- DEG_Remove_mito(j.markers_DGE)
+
 Idents(cancer.epi) <- cancer.epi$HER2_ident
 avgexp <- AverageExpression(object = cancer.epi, features = unique(j.markers_DGE_filtered$gene))
 avgexp <- as.data.frame(avgexp[['RNA']])
 
-j.markers_DGE_filtered <- j.markers_DGE_filtered[which(j.markers_DGE_filtered$cluster == "high"),]
+#j.markers_DGE_filtered <- j.markers_DGE_filtered[which(j.markers_DGE_filtered$cluster == "high"),]
+#j.markers_DGE_filtered <- j.markers_DGE_filtered[which(j.markers_DGE_filtered$cluster == "med"),]
 j.markers_DGE_filtered <- j.markers_DGE_filtered[which(j.markers_DGE_filtered$cluster == "low"),]
-j.markers_DGE_filtered <- j.markers_DGE_filtered[which(j.markers_DGE_filtered$cluster == "neg"),]
 
 avgexp <- avgexp[which(rownames(avgexp) %in% unique(j.markers_DGE_filtered$gene)),]
 
 data <- cbind(j.markers_DGE_filtered, avgexp)
 colnames(data)
-data_input <- data[,c(11,2,5,7)] #high
-data_input <- data[,c(10,2,5,7)] #low
-data_input <- data[,c(9,2,5,7)] #neg
+#data_input <- data[,c(12,3,6,8)] #high
+#data_input <- data[,c(11,3,6,8)] #med
+data_input <- data[,c(10,3,6,8)] #low
 colnames(data_input) <- c("baseMean", "log2FoldChange", "padj", "gene")
 
 options(ggrepel.max.overlaps = 13)
@@ -715,9 +800,14 @@ p <- ggmaplot(data_input,
               ggtheme = ggplot2::theme_classic()) +
   xlim(0,7) + ylim(-2.5,4) + NoLegend()
 
-ggsave("HER2_MAplot_71422.pdf", plot = p, width = 4.3, height = 4)
-ggsave("HER2_MAplotLOWvall_71822.pdf", plot = p, width = 4.3, height = 4)
-ggsave("HER2_MAplotNEGvall_71822.pdf", plot = p, width = 4.3, height = 4)
+#ggsave("HER2_MAplot_111822.pdf", plot = p, width = 4.3, height = 4)
+#ggsave("HER2_MAplotMEDvall_111822.pdf", plot = p, width = 4.3, height = 4)
+ggsave("HER2_MAplotLOWvall_111822.pdf", plot = p, width = 4.3, height = 4)
+
+
+# ggsave("HER2_MAplot_71422.pdf", plot = p, width = 4.3, height = 4)
+# ggsave("HER2_MAplotLOWvall_71822.pdf", plot = p, width = 4.3, height = 4)
+# ggsave("HER2_MAplotNEGvall_71822.pdf", plot = p, width = 4.3, height = 4)
 
 # HER2 GO analysis -----------------------------
 
@@ -727,7 +817,7 @@ library(org.Hs.eg.db)
 orgdb = "org.Hs.eg.db"
 
 
-dfsample <- read.csv("HER2_DGEs_0.2minpct0logfcmincells5_71422.csv", header = T, row.names = 1)
+dfsample <- read.csv("HER2_DGEs_0.2minpct0logfcmincells5_111522_NOmito.csv", header = T, row.names = 1)
 dfsample <- DEG_Remove_mito(dfsample)
 #dfsample <- dfsample[which(dfsample$avg_log2FC >= 0.1),]
 dfsample <- dfsample[which(abs(dfsample$min.pct.diff) >= 0.1),]
@@ -735,12 +825,12 @@ dfsample <- dfsample[which(abs(dfsample$min.pct.diff) >= 0.1),]
 dfsample <- split(dfsample$gene, dfsample$cluster)
 
 dfsample$high <- bitr(dfsample$high, fromType="SYMBOL", toType="ENTREZID", OrgDb=orgdb)
+dfsample$med <- bitr(dfsample$med, fromType="SYMBOL", toType="ENTREZID", OrgDb=orgdb)
 dfsample$low <- bitr(dfsample$low, fromType="SYMBOL", toType="ENTREZID", OrgDb=orgdb)
-dfsample$neg <- bitr(dfsample$neg, fromType="SYMBOL", toType="ENTREZID", OrgDb=orgdb)
 
 genelist <- list("high" = dfsample$high$ENTREZID,
-                 "low" = dfsample$low$ENTREZID,
-                 "neg" = dfsample$neg$ENTREZID)
+                 "med" = dfsample$med$ENTREZID,
+                 "low" = dfsample$low$ENTREZID)
 
 m_df <- msigdbr(species = "Homo sapiens", category ="H") %>%#, subcategory = "CGP") %>% 
   dplyr::select(gs_name, entrez_gene)
@@ -771,6 +861,9 @@ p <- p + scale_x_discrete(label = function(x) {
   x %>% stringr::str_sub(., 1,4)
 }) 
 
+ggsave("HER2_hallmark_orghsdb_minpctdiff0.1_111822.pdf", plot = p, width = 15, height = 10, units = "cm")
+
+
 # ggsave("HER2_hallmark_71022.pdf", plot = p, width = 15, height = 10, units = "cm")
 # ggsave("HER2_hallmark_logfc0.1_71122.pdf", plot = p, width = 15, height = 10, units = "cm")
 ggsave("HER2_hallmark_orghsdb_minpctdiff0.1_71122.pdf", plot = p, width = 15, height = 10, units = "cm")
@@ -794,13 +887,13 @@ sobjlists <- sobjlists %>% dplyr::group_by(samples,
   dplyr::mutate(C = sum(Nb)) %>% 
   dplyr::mutate(percent = Nb/C*100) 
 
-sobjlists$percent_neg <- NA
+sobjlists$percent_low <- NA
 for (i in unique(sobjlists$samples)) {
-  sobjlists$percent_neg[which(sobjlists$samples == i)] <- sobjlists$percent[which((sobjlists$samples == i) & (sobjlists$HER2_ident == "neg"))]
+  sobjlists$percent_low[which(sobjlists$samples == i)] <- sobjlists$percent[which((sobjlists$samples == i) & (sobjlists$HER2_ident == "low"))]
 }
 
-sobjlists <- sobjlists[order(match(sobjlists$HER2_ident, c("high", "low", "neg"))),]
-sobjlists <- sobjlists[order(sobjlists$percent_neg, decreasing = F),] # order by HER2
+sobjlists <- sobjlists[order(match(sobjlists$HER2_ident, c("high", "med", "low"))),]
+sobjlists <- sobjlists[order(sobjlists$percent_low, decreasing = F),] # order by HER2
 sobjlists <- sobjlists[order(sobjlists$BC.Subtype),] # order by BC Subtype
 sobjlists$samples <- factor(sobjlists$samples, levels = unique(sobjlists$samples))
 
@@ -809,11 +902,11 @@ bp <- ggplot(sobjlists,
                  y = percent, 
                  group = as.factor(BC.Subtype),
                  fill = HER2_ident)) +
-  scale_fill_manual(name = "HER2 expression", 
+  scale_fill_manual(name = "ERBB2 expression", 
                     values = rev(c("light grey", viridis(2))), 
                     unique(sobjlists$HER2_ident)) +
   geom_bar(stat = "identity", width = 0.93) +
-  geom_text(aes(label = paste0(round(100 - sobjlists$percent_neg), "%"), 
+  geom_text(aes(label = paste0(round(100 - sobjlists$percent_low), "%"), 
                 y = 120, 
                 fill = NULL), 
             angle = 90,
@@ -840,7 +933,10 @@ bp <- ggplot(sobjlists,
                                         fill = "#EEEEEE"), 
         panel.spacing.x = unit(-0.1, "lines"))
 
-ggsave("HER2_sample_barplot_71422.pdf", plot = bp, width = 14, height = 2)
+ggsave("HER2_sample_barplot_111622.pdf", plot = bp, width = 14, height = 2)
+
+ggsave("HER2_sample_barplot_111622.pdf", plot = bp, width = 14, height = 2) 
+#ggsave("HER2_sample_barplot_71422.pdf", plot = bp, width = 14, height = 2)
 #ggsave("HER2_sample_barplot_71022.pdf", plot = bp, width = 14, height = 2)
 
 # HER2 correlation analysis ---------
@@ -848,7 +944,9 @@ ggsave("HER2_sample_barplot_71422.pdf", plot = bp, width = 14, height = 2)
 Idents(cancer.epi) <- cancer.epi$HER2_ident
 
 colnames(cancer.epi@meta.data)
-data_tot <- cancer.epi@meta.data[,c(4,14,93:105,107)]
+data_tot <- cancer.epi@meta.data[,c(4,14,150, 137:149)]
+data_tot <- cancer.epi@meta.data[,c(4,14,138, 102:114)]
+#data_tot <- cancer.epi@meta.data[,c(4,14,93:105,107)] ##preprint
 
 data <- data_tot %>% dplyr::group_by(HER2_ident) %>% 
   dplyr::summarise(ESR1 = mean(ESR1),
@@ -898,13 +996,15 @@ data <- data[,-which(colnames(data) == "ERBB2")]
 p <- Heatmap(data, 
              cluster_rows = F, 
              column_split = 3, 
-             row_split = c("high", "low", "neg"),
+             row_split = c("high", "med", "low"),
              heatmap_legend_param = list(
                title = "Z-score \nAvg Expression",
                at = c(-2, 0, 2)),
              column_title_gp = gpar(col = c("red", "blue"), fontsize = 0),
              row_title_gp = gpar(fontsize = 0)
 )
+ggsave("reintegrated_HER2_corr_heatmap_81822.pdf", plot = as.ggplot(p), width = 7.5, height = 3)  
+ggsave("HER2_corr_heatmap_81822.pdf", plot = as.ggplot(p), width = 7.5, height = 3)  
 
 ggsave("HER2_corr_heatmap_71422.pdf", plot = as.ggplot(p), width = 7.5, height = 3)  
 
@@ -938,16 +1038,16 @@ sobjlists <- sobjlists %>% dplyr::group_by(samples,
   dplyr::mutate(C = sum(Nb)) %>% 
   dplyr::mutate(percent = Nb/C*100) 
 
-sobjlists$percent_neg <- NA
+sobjlists$percent_low <- NA
 for (i in unique(sobjlists$samples)) {
-  sobjlists$percent_neg[which(sobjlists$samples == i)] <- sobjlists$percent[which((sobjlists$samples == i) & (sobjlists$HER2_ident == "neg"))]
+  sobjlists$percent_low[which(sobjlists$samples == i)] <- sobjlists$percent[which((sobjlists$samples == i) & (sobjlists$HER2_ident == "low"))]
 }
 
-sobjlists <- sobjlists[order(match(sobjlists$HER2_ident, c("high", "low", "neg"))),]
-sobjlists <- sobjlists[order(sobjlists$percent_neg, decreasing = F),] # order by HER2
+sobjlists <- sobjlists[order(match(sobjlists$HER2_ident, c("high", "med", "low"))),]
+sobjlists <- sobjlists[order(sobjlists$percent_low, decreasing = F),] # order by HER2
 sobjlists <- sobjlists[order(sobjlists$BC.Subtype),] # order by BC Subtype
 sobjlists$samples <- factor(sobjlists$samples, levels = unique(sobjlists$samples))
-sobjlists$percent_neg <- 100 - sobjlists$percent_neg
+sobjlists$percent_low <- 100 - sobjlists$percent_low
 
 # Clinical variables relationship
 
@@ -958,12 +1058,12 @@ age_linreg <- unique(sobjlists[,c(1,3,15)])
 age_linreg$Age <- as.numeric(age_linreg$Age)
 age_linreg <- age_linreg[which(!is.na(age_linreg$Age)),]
 
-p <- ggscatter(age_linreg, x = "Age", y = "percent_neg",
+p <- ggscatter(age_linreg, x = "Age", y = "percent_low",
                add = "reg.line",
                conf.int = TRUE,
                add.params = list(color = "blue", fill = "lightgray"),
                xlab = "Age",
-               ylab = "% HER2+ cells") +
+               ylab = "% ERBB2+ cells") +
   stat_cor(method = "pearson") #+ 
 # scale_y_continuous(breaks = c(0, 25, 50),
 #                    limits = c(0, 50))
@@ -977,9 +1077,9 @@ sobjlists$Age[which(sobjlists$Age > 65)] <- ">65yo"
 sobjlists$Age <- factor(sobjlists$Age, levels = c("<45yo", "45-65yo", ">65yo"))
 
 colnames(sobjlists)
-p <- ggplot(unique(sobjlists[,c(1,3,15)]), aes(x = Age, y = percent_neg, fill = Age)) + 
+p <- ggplot(unique(sobjlists[,c(1,3,15)]), aes(x = Age, y = percent_low, fill = Age)) + 
   geom_boxplot(width = 0.5) +
-  ylab("% HER2+ cells") +
+  ylab("% ERBB2+ cells") +
   theme_bw() + 
   theme(panel.border = element_blank(), panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
@@ -1005,9 +1105,9 @@ sobjlists$N[which(grepl("1", sobjlists$nodal_involvement))] <- "N1"
 sobjlists$N[which(sobjlists$N %in% c("N1", "N2", "N3"))] <- "N1-3"
 
 colnames(sobjlists)
-p <- ggplot(unique(sobjlists[which(!is.na(sobjlists$N)),c(1,16,15)]), aes(x = N, y = percent_neg, fill = N)) + 
+p <- ggplot(unique(sobjlists[which(!is.na(sobjlists$N)),c(1,16,15)]), aes(x = N, y = percent_low, fill = N)) + 
   geom_boxplot(width = 0.5) +
-  ylab("% HER2+ cells") +
+  ylab("% ERBB2+ cells") +
   ylim(0,33) +
   theme_bw() + 
   theme(panel.border = element_blank(), panel.grid.major = element_blank(),
@@ -1050,16 +1150,16 @@ sobjlists <- sobjlists %>% dplyr::group_by(Patient,
   dplyr::mutate(C = sum(Nb)) %>% 
   dplyr::mutate(percent = Nb/C*100) 
 
-sobjlists$percent_neg <- NA
+sobjlists$percent_low <- NA
 for (i in unique(sobjlists$Patient)) {
-  sobjlists$percent_neg[which(sobjlists$Patient == i)] <- sobjlists$percent[which((sobjlists$Patient == i) & (sobjlists$HER2_ident == "neg"))]
+  sobjlists$percent_low[which(sobjlists$Patient == i)] <- sobjlists$percent[which((sobjlists$Patient == i) & (sobjlists$HER2_ident == "low"))]
 }
 
-sobjlists <- sobjlists[order(match(sobjlists$HER2_ident, c("high", "low", "neg"))),]
-sobjlists <- sobjlists[order(sobjlists$percent_neg, decreasing = F),] # order by HER2
+sobjlists <- sobjlists[order(match(sobjlists$HER2_ident, c("high", "med", "low"))),]
+sobjlists <- sobjlists[order(sobjlists$percent_low, decreasing = F),] # order by HER2
 sobjlists <- sobjlists[order(sobjlists$BC.Subtype),] # order by BC Subtype
 sobjlists$Patient <- factor(sobjlists$Patient, levels = unique(sobjlists$Patient))
-sobjlists$percent_neg <- 100 - sobjlists$percent_neg
+sobjlists$percent_low <- 100 - sobjlists$percent_low
 
 # Clinical variables relationship
 
@@ -1070,16 +1170,18 @@ age_linreg <- unique(sobjlists[,c(1,2,14)])
 age_linreg$Age <- as.numeric(age_linreg$Age)
 age_linreg <- age_linreg[which(!is.na(age_linreg$Age)),]
 
-p <- ggscatter(age_linreg, x = "Age", y = "percent_neg",
+p <- ggscatter(age_linreg, x = "Age", y = "percent_low",
                add = "reg.line",
                conf.int = TRUE,
                add.params = list(color = "blue", fill = "lightgray"),
                xlab = "Age",
-               ylab = "% HER2+ cells") +
+               ylab = "% ERBB2+ cells") +
   stat_cor(method = "pearson") #+ 
 # scale_y_continuous(breaks = c(0, 25, 50),
 #                    limits = c(0, 50))
-ggsave("HER2_age_scatter_nonHER2_PATIENTLEVEL_101022.pdf", plot = p, width = 3, height = 2.5)
+ggsave("reintegrated_HER2_age_scatter_nonHER2_PATIENTLEVEL_111822.pdf", plot = p, width = 3, height = 2.5)
+ggsave("HER2_age_scatter_nonHER2_PATIENTLEVEL_111822.pdf", plot = p, width = 3, height = 2.5)
+#ggsave("HER2_age_scatter_nonHER2_PATIENTLEVEL_101022.pdf", plot = p, width = 3, height = 2.5) ##preprint
 #ggsave("HER2_age_scatter_nonHER2_71022.pdf", plot = p, width = 3, height = 2.5)
 
 
@@ -1089,9 +1191,9 @@ sobjlists$Age[which(sobjlists$Age > 65)] <- ">65yo"
 sobjlists$Age <- factor(sobjlists$Age, levels = c("<45yo", "45-65yo", ">65yo"))
 
 colnames(sobjlists)
-p <- ggplot(unique(sobjlists[,c(1,2,14)]), aes(x = Age, y = percent_neg, fill = Age)) + 
+p <- ggplot(unique(sobjlists[,c(1,2,14)]), aes(x = Age, y = percent_low, fill = Age)) + 
   geom_boxplot(width = 0.5) +
-  ylab("% HER2+ cells") +
+  ylab("% ERBB2+ cells") +
   theme_bw() + 
   theme(panel.border = element_blank(), panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
@@ -1117,10 +1219,10 @@ sobjlists$N[which(grepl("1", sobjlists$nodal_involvement))] <- "N1"
 sobjlists$N[which(sobjlists$N %in% c("N1", "N2", "N3"))] <- "N1-3"
 
 colnames(sobjlists)
-p <- ggplot(unique(sobjlists[which(!is.na(sobjlists$N)),c(1,15,14)]), aes(x = N, y = percent_neg, fill = N)) + 
+p <- ggplot(unique(sobjlists[which(!is.na(sobjlists$N)),c(1,15,14)]), aes(x = N, y = percent_low, fill = N)) + 
   geom_boxplot(width = 0.5) +
-  ylab("% HER2+ cells") +
-  ylim(0,33) +
+  ylab("% ERBB2+ cells") +
+  ylim(0,40) + #33) +
   theme_bw() + 
   theme(panel.border = element_blank(), panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
@@ -1128,7 +1230,9 @@ p <- ggplot(unique(sobjlists[which(!is.na(sobjlists$N)),c(1,15,14)]), aes(x = N,
   stat_compare_means(comparisons = list(c("N0", "N1-3")), 
                      method="wilcox.test", label="p.format", color="black")
 
-ggsave("HER2_N_corr_nonHER2_PATIENTLEVEL_101022.pdf", plot = p, width = 3, height = 2.5)
+ggsave("reintegrated_HER2_N_corr_nonHER2_PATIENTLEVEL_111822.pdf", plot = p, width = 3, height = 2.5)
+ggsave("HER2_N_corr_nonHER2_PATIENTLEVEL_111822.pdf", plot = p, width = 3, height = 2.5)
+#ggsave("HER2_N_corr_nonHER2_PATIENTLEVEL_101022.pdf", plot = p, width = 3, height = 2.5)
 #ggsave("HER2_N_corr_nonHER2_71022.pdf", plot = p, width = 3, height = 2.5)
 
 
@@ -1170,15 +1274,15 @@ TROP2.high.downstream
 (length(unique(TROP2.high.downstream)) / length(unique(TROP2.high))) * 100
 
 
+TROP2.med <- TROP2.DEGS.up[TROP2.DEGS.up$cluster == "med",]$gene
+TROP2.med.downstream <- TROP2.med[which(TROP2.med %in% TROP2_downstream_list_unique)]
+TROP2.med.downstream
+(length(unique(TROP2.med.downstream)) / length(unique(TROP2.med))) * 100
+
 TROP2.low <- TROP2.DEGS.up[TROP2.DEGS.up$cluster == "low",]$gene
 TROP2.low.downstream <- TROP2.low[which(TROP2.low %in% TROP2_downstream_list_unique)]
 TROP2.low.downstream
 (length(unique(TROP2.low.downstream)) / length(unique(TROP2.low))) * 100
-
-TROP2.neg <- TROP2.DEGS.up[TROP2.DEGS.up$cluster == "neg",]$gene
-TROP2.neg.downstream <- TROP2.neg[which(TROP2.neg %in% TROP2_downstream_list_unique)]
-TROP2.neg.downstream
-(length(unique(TROP2.neg.downstream)) / length(unique(TROP2.neg))) * 100
 
 
 #downstream HER2 enrichment ======================
@@ -1216,14 +1320,14 @@ HER2.high.downstream <- HER2.high[which(HER2.high %in% HER2_downstream_list_uniq
 HER2.high.downstream
 (length(unique(HER2.high.downstream)) / length(unique(HER2.high))) * 100
 
+HER2.med <- HER2.DEGS.up[HER2.DEGS.up$cluster == "med",]$gene
+HER2.med.downstream <- HER2.med[which(HER2.med %in% HER2_downstream_list_unique)]
+HER2.med.downstream
+(length(unique(HER2.med.downstream)) / length(unique(HER2.med))) * 100
+
 HER2.low <- HER2.DEGS.up[HER2.DEGS.up$cluster == "low",]$gene
 HER2.low.downstream <- HER2.low[which(HER2.low %in% HER2_downstream_list_unique)]
 HER2.low.downstream
 (length(unique(HER2.low.downstream)) / length(unique(HER2.low))) * 100
-
-HER2.neg <- HER2.DEGS.up[HER2.DEGS.up$cluster == "neg",]$gene
-HER2.neg.downstream <- HER2.neg[which(HER2.neg %in% HER2_downstream_list_unique)]
-HER2.neg.downstream
-(length(unique(HER2.neg.downstream)) / length(unique(HER2.neg))) * 100
 
 
