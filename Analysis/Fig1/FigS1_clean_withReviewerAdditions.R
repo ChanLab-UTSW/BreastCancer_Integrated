@@ -60,7 +60,10 @@ library(genefu)
 # load in Prim object ------
 
 setwd(PrimDir)
-combo.reference <- readRDS("PrimObject_withreprog_noZallgenedem_71322.rds")
+combo.reference <- readRDS("PrimObject_withreprog_noZallgenedem_71322.rds") ##preprint
+setwd("/project/InternalMedicine/Chan_lab/shared/")
+combo.reference <- readRDS("PrimObj_withGEmeta_with_correctassays_withfinalreprog_111622.rds") ##newnew
+
 DefaultAssay(combo.reference) <- "RNA"
 combo.reference <- NormalizeData(combo.reference, assay = "RNA")
 
@@ -198,29 +201,128 @@ dev.off()
 # ================================================================== ======
 #S1F BC separated UMAP ========================
 # ================================================================== ======
-# BC UMAP -------
+# load in objects (REVIEWER ADDITION) ++++++++++++++++++++++++++++++++++++++++ ====
 
-combo.reference <- readRDS(file = "primOnlyYESSSREFsctINTEGRATED_BiggestRef_doubletRemoved_62722.rds")
-DefaultAssay(combo.reference) <- "integrated"
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/ReviewerAdditions/Pre_post_integration_compare")
+combo.unint <- readRDS("PrimObject_nointegration_102822.rds") ##unintegrated
 
-combo.reference <- RunPCA(combo.reference, npcs = 100, verbose = FALSE)
-
-DefaultAssay(combo.reference) <- "integrated"
-
-combo.reference <- FindNeighbors(combo.reference, reduction = "pca", dims = 1:70, nn.method = "rann")#, k.param= 500)
-combo.reference <- FindClusters(combo.reference, resolution = 12)
-combo.reference <- RunUMAP(combo.reference, reduction = "pca", dims = 1:70, verbose = TRUE, seed.use = 123)
-
-combo.reference$BC.Subtype[which(combo.reference$BC.Subtype == "ER+")] <- "HR+"
-combo.reference$Patient[which(combo.reference$Patient == "BC11_1")] <- "BC11"
-combo.reference$Patient[which(combo.reference$Patient == "BC11_2")] <- "BC11"
-Idents(combo.reference) <- combo.reference$celltype_final
+setwd("/project/InternalMedicine/Chan_lab/shared/")
+combo.reference <- readRDS("PrimObj_withGEmeta_with_correctassays_withfinalreprog_111622.rds") ##integrated
 
 
-pdf("BCsub_wholeUMAP_72822.pdf", width = 16.22, height = 14.22)
-DimPlot(combo.reference, reduction = "umap", group.by = "BC.Subtype", raster = FALSE) + ggtitle(label = " ") +
+# UMAPs (BCsub, orig.ident, samples) -------
+
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/ReviewerAdditions/Pre_post_integration_compare")
+
+
+pdf("preInt_BCsub_primUMAP_112522.pdf", width = 16.22, height = 14.22)
+DimPlot(combo.unint, reduction = "umap", group.by = "BC.Subtype", raster = FALSE,
+        cols = c("#D8197D", "#56A008", "#063970")) + ggtitle(label = " ") +
   theme(axis.line = element_line(colour = 'black', size = 1.5)) + 
   theme(axis.ticks = element_line(colour = "black", size = 1.5)) +
   theme(text = element_text(size = 18)) +
   theme(axis.text = element_text(size = 15))
 dev.off()
+
+pdf("postInt_BCsub_primUMAP_112522.pdf", width = 16.22, height = 14.22)
+DimPlot(combo.reference, reduction = "umap", group.by = "BC.Subtype", raster = FALSE,
+        cols = c("#D8197D", "#56A008", "#063970")) + ggtitle(label = " ") +
+  theme(axis.line = element_line(colour = 'black', size = 1.5)) + 
+  theme(axis.ticks = element_line(colour = "black", size = 1.5)) +
+  theme(text = element_text(size = 18)) +
+  theme(axis.text = element_text(size = 15))
+dev.off()
+
+
+
+combo.unint$orig.ident[which(combo.unint$orig.ident == "AziziT")] <- "Azizi"
+combo.unint$orig.ident[which(combo.unint$orig.ident == "Aziziimmune")] <- "Azizi"
+
+
+pdf("preInt_OrigStudy_primUMAP_112522.pdf", width = 16.22, height = 14.22)
+DimPlot(combo.unint, reduction = "umap", group.by = "orig.ident", raster = FALSE,
+        cols = c("#1432EF", "#E74124", "#54BE38",
+                 "#A941DB", "#EC9336", "#000000",
+                 "#997938", "#071887")) + ggtitle(label = " ") +
+  theme(axis.line = element_line(colour = 'black', size = 1.5)) + 
+  theme(axis.ticks = element_line(colour = "black", size = 1.5)) +
+  theme(text = element_text(size = 18)) +
+  theme(axis.text = element_text(size = 15))
+dev.off()
+
+
+combo.reference$orig.ident[which(combo.reference$orig.ident == "AziziT")] <- "Azizi"
+combo.reference$orig.ident[which(combo.reference$orig.ident == "Aziziimmune")] <- "Azizi"
+
+pdf("postInt_OrigStudy_primUMAP_112522.pdf", width = 16.22, height = 14.22)
+DimPlot(combo.reference, reduction = "umap", group.by = "orig.ident", raster = FALSE,
+        cols = c("#1432EF", "#E74124", "#54BE38",
+                 "#A941DB", "#EC9336", "#000000",
+                 "#997938", "#071887")) + ggtitle(label = " ") +
+  theme(axis.line = element_line(colour = 'black', size = 1.5)) + 
+  theme(axis.ticks = element_line(colour = "black", size = 1.5)) +
+  theme(text = element_text(size = 18)) +
+  theme(axis.text = element_text(size = 15))
+dev.off()
+
+
+pdf("preInt_samples_primUMAP_112522.pdf", width = 16.22, height = 14.22)
+DimPlot(combo.unint, reduction = "umap", group.by = "samples", raster = FALSE,
+        cols = c(turbo(119))) + ggtitle(label = " ") +
+  theme(axis.line = element_line(colour = 'black', size = 1.5)) + 
+  theme(axis.ticks = element_line(colour = "black", size = 1.5)) +
+  theme(text = element_text(size = 18)) +
+  theme(axis.text = element_text(size = 15))
+dev.off()
+
+pdf("postInt_samples_primUMAP_112522.pdf", width = 16.22, height = 14.22)
+DimPlot(combo.reference, reduction = "umap", group.by = "samples", raster = FALSE,
+        cols = c(turbo(119))) + ggtitle(label = " ") +
+  theme(axis.line = element_line(colour = 'black', size = 1.5)) + 
+  theme(axis.ticks = element_line(colour = "black", size = 1.5)) +
+  theme(text = element_text(size = 18)) +
+  theme(axis.text = element_text(size = 15))
+dev.off()
+
+#PC plots (BCsub, orig.ident, samples) ====
+
+pdf("preInt_PCAplots_bcsubTechorigIdent_112522.pdf", width = 16, height = 9)
+p0 <- DimPlot(combo.unint, reduction = "pca", raster = F, group.by = "BC.Subtype", 
+              order = c("HER2+", "TNBC", "HR+"),
+              cols = c("#56A008", "#063970", "#D8197D"))
+p0
+p1 <- DimPlot(combo.unint, reduction = "pca", raster = F, group.by = "Capture.Method",
+              order = c("Smart-Seq2", "inDrop v2", "Singleron GEXSCOPE Single Cell RNAseq Library Kit",
+                        "10X Genomics Single Cell 3' v2", "10X Genomics Chromium v2 5'",
+                        "10X Genomics Chromium Single-Cell v2 3' and 5' Chemistry Library",
+                        "10X Genomics Chromium"), cols = c(turbo(7)))
+p1
+p2 <- DimPlot(combo.unint, reduction = "pca", raster = F, group.by = "orig.ident",
+              order =c("Karaayvaz", "Savas", "Wu", "Xu",
+                       "Azizi", "Qian", "Wu2021prim", "Pal_Prim"),
+              cols = c("#E74124", "#EC9336", "#000000", "#071887", "#1432EF",
+                       "#A941DB", "#997938", "#54BE38"))
+p2
+dev.off()
+
+
+pdf("postInt_PCAplots_bcsubTechorigIdent_112522.pdf", width = 16, height = 9)
+p0 <- DimPlot(combo.reference, reduction = "pca", raster = F, group.by = "BC.Subtype", 
+              order = c("HER2+", "TNBC", "HR+"),
+              cols = c("#56A008", "#063970", "#D8197D"))
+p0
+p1 <- DimPlot(combo.reference, reduction = "pca", raster = F, group.by = "Capture.Method",
+              order = c("Smart-Seq2", "inDrop v2", "Singleron GEXSCOPE Single Cell RNAseq Library Kit",
+                        "10X Genomics Single Cell 3' v2", "10X Genomics Chromium v2 5'",
+                        "10X Genomics Chromium Single-Cell v2 3' and 5' Chemistry Library",
+                        "10X Genomics Chromium"), cols = c(turbo(7)))
+p1
+p2 <- DimPlot(combo.reference, reduction = "pca", raster = F, group.by = "orig.ident",
+              order =c("Karaayvaz", "Savas", "Wu", "Xu",
+                       "Azizi", "Qian", "Wu2021prim", "Pal_Prim"),
+              cols = c("#E74124", "#EC9336", "#000000", "#071887", "#1432EF",
+                              "#A941DB", "#997938", "#54BE38"))
+p2
+dev.off()
+
+
