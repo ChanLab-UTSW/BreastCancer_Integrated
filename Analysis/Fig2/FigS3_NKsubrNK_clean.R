@@ -317,7 +317,7 @@ NK.all.combo <- NormalizeData(NK.all.combo, assay = "RNA")
 
 
 NKsub.mark <- FindAllMarkers(NK.all.combo,
-                              test.use = "MAST")
+                             test.use = "MAST")
 
 setwd(DEGdir)
 write.csv(NKsub.mark, "NKsubDEG_ABSOLUTELYNOTHRESH.csv")
@@ -794,10 +794,12 @@ a <- DotPlot(object = NK.all.combo, features=features, #cluster.idents=T,
              dot.scale = 10) + 
   theme(axis.text.x = element_text(angle = 90)) +
   scale_colour_gradient2(low="steelblue", mid="lightgrey", high="red")
-ggsave("NKdotplotsep.pdf", a, width = 20, height = 5)
-ggsave("NKdotplotsep_updownonly.pdf", a, width = 11.8, height = 4.3)
+# ggsave("NKdotplotsep.pdf", a, width = 20, height = 5)
+# ggsave("NKdotplotsep_updownonly.pdf", a, width = 11.8, height = 4.3)
 
-pdf("ReprogDotplot_71922.pdf", width = 26.3, height = 4.9)
+pdf("correct_ReprogDotplot_111822.pdf", width = 26.3, height = 4.9)
+pdf("preprint_ReprogDotplot_112322.pdf", width = 26.3, height = 4.9) ##correction
+# pdf("ReprogDotplot_71922.pdf", width = 26.3, height = 4.9) ##preprint
 
 a+ theme(axis.line = element_line(colour = 'black', size = 1.5)) +
   theme(axis.ticks = element_line(colour = "black", size = 1.5)) +
