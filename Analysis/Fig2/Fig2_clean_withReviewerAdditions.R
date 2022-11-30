@@ -35,6 +35,7 @@ NKsubDir <- "/project/InternalMedicine/Chan_lab/shared/FinalObjects/Primary_Only
 DEGdir <- "/project/InternalMedicine/Chan_lab/shared/FinalObjects/Primary_Only"
 
 silhouette_dir <- "/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/ReviewerAdditions/silhouette_test"
+subcluster_dir <- "/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/subclustering"
 
 rNKdir <- "/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2"
 rNKcell_dir <- "/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/rNK_labels/"
@@ -306,11 +307,82 @@ simil <- function(df, drop, file, method) {
 # ================================================================== ======
 # load in Prim object ------
 
-setwd(PrimDir)
-combo.reference <- readRDS("PrimObject_withreprog_noZallgenedem_71322.rds")
+# setwd(PrimDir)
+# combo.reference <- readRDS("PrimObject_withreprog_noZallgenedem_71322.rds")
+# DefaultAssay(combo.reference) <- "RNA"
+# combo.reference <- NormalizeData(combo.reference, assay = "RNA")
+
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2")
+combo.reference <- readRDS("PrimObject_withCORRECTreprog_nootherchange_82422.rds") ##newnewnew
+setwd("/project/InternalMedicine/Chan_lab/shared/")
+combo.inferCNV <- readRDS("nichenetobj_111122.rds")
+
+combo.reference@meta.data <- combo.reference@meta.data[,-c(82,85)] 
+head(combo.inferCNV@meta.data)
+
+unique(colnames(combo.inferCNV@meta.data))
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"totalCNV", drop = F], "totalCNV")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"corCNV", drop = F], "corCNV")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"cancer", drop = F], "cancer")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"ESR1", drop = F], "ESR1")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"ERBB2", drop = F], "ERBB2")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"PIK3CA", drop = F], "PIK3CA")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"NTRK", drop = F], "NTRK")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"CD274", drop = F], "CD274")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"ERBB3", drop = F], "ERBB3")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"EGFR", drop = F], "EGFR")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"FGFR", drop = F], "FGFR")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"TACSTD2", drop = F], "TACSTD2")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"CDK", drop = F], "CDK")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"AR", drop = F], "AR")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"NECTIN2", drop = F], "NECTIN2")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"LAG3", drop = F], "LAG3")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"raw_GM1", drop = F], "raw_GE1")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"raw_GM2", drop = F], "raw_GE2")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"raw_GM3", drop = F], "raw_GE3")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"raw_GM4", drop = F], "raw_GE4")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"raw_GM5", drop = F], "raw_GE5")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"raw_GM6", drop = F], "raw_GE6")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"raw_GM7", drop = F], "raw_GE7")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"raw_GM8", drop = F], "raw_GE8")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"raw_GM9", drop = F], "raw_GE9")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"raw_GM10", drop = F], "raw_GE10")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"maxGM", drop = F], "maxGE")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"maxZscore", drop = F], "maxZscore")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM1", drop = F], "GE1")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM2", drop = F], "GE2")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM3", drop = F], "GE3")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM4", drop = F], "GE4")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM5", drop = F], "GE5")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM6", drop = F], "GE6")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM7", drop = F], "GE7")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM8", drop = F], "GE8")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM9", drop = F], "GE9")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM10", drop = F], "GE10")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM1_idents", drop = F], "GE1_idents")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM2_idents", drop = F], "GE2_idents")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM3_idents", drop = F], "GE3_idents")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM4_idents", drop = F], "GE4_idents")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM5_idents", drop = F], "GE5_idents")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM6_idents", drop = F], "GE6_idents")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM7_idents", drop = F], "GE7_idents")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM8_idents", drop = F], "GE8_idents")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM9_idents", drop = F], "GE9_idents")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM10_idents", drop = F], "GE10_idents")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"celltype_final", drop = F], "celltype_final")
+combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"celltype_withreprog", drop = F], "celltype_withreprog")
+
+head(combo.reference@meta.data)
+table(combo.reference$celltype_final)
+table(combo.reference$celltype_withreprog)
+
+setwd("/project/InternalMedicine/Chan_lab/shared")
+#saveRDS(combo.reference, "PrimObj_withGEmeta_with_correctassays_withfinalreprog_111622.rds")
+
+
+combo.reference <- readRDS("PrimObj_withGEmeta_with_correctassays_withfinalreprog_111622.rds")
 DefaultAssay(combo.reference) <- "RNA"
 combo.reference <- NormalizeData(combo.reference, assay = "RNA")
-
 
 # NK clustering ------------------
 
@@ -346,6 +418,8 @@ NKsub.anchors <- FindIntegrationAnchors(object.list = NKsub.list, normalization.
                                         k.score = 27, dims = 1:27)
 
 NK.all.combo <- IntegrateData(anchorset = NKsub.anchors, normalization.method = "SCT", k.weight = 27)
+setwd(subcluster_dir)
+saveRDS(NK.all.combo, "NK_subintegrated_noclustering_fromCNVobj_111622.rds")
 
 DefaultAssay(NK.all.combo) <- "integrated"
 #https://github.com/satijalab/seurat/issues/1963
@@ -407,102 +481,255 @@ library(Seurat)
 library(cluster)
 library(tidyverse)
 library(viridis)
+library(crayon)
 
 #https://www.biorxiv.org/content/10.1101/2022.05.31.494081v1.full
 
-setwd(NKsubDir)
-NK.all.combo <- readRDS("NKall_PC17manhattan0.4res_71322.rds")
+setwd(subcluster_dir)
+#start with just integrated object, no clustering/PC calc on it
+#setwd(silhouette_dir)
+#NK.all.combo <- readRDS("NK_subintegrated_noclustering_11822.rds")
+NK.all.combo <- readRDS("NK_subintegrated_noclustering_fromCNVobj_111622.rds")
 
-testPCs <- c(18, seq(from = 10, to = 100, by = 5))
-cell_label <- "celltype_NKsub"
+DefaultAssay(NK.all.combo) <- "integrated"
+#https://github.com/satijalab/seurat/issues/1963
+NK.all.combo <- RunPCA(NK.all.combo, npcs = 300, verbose = FALSE, approx=FALSE)
 
+DimHeatmap(NK.all.combo, dims = 1:15, cells = 500, balanced = TRUE)
+DimHeatmap(NK.all.combo, dims = 15:25, cells = 500, balanced = TRUE)
+DimHeatmap(NK.all.combo, dims = 25:35, cells = 500, balanced = TRUE)
+DimHeatmap(NK.all.combo, dims = 35:45, cells = 500, balanced = TRUE)
+DimHeatmap(NK.all.combo, dims = 45:55, cells = 500, balanced = TRUE)
+DimHeatmap(NK.all.combo, dims = 55:65, cells = 500, balanced = TRUE)
+
+##this works as long as you don't rename the columns!!!!
+
+# testPCs <- c(18, seq(from = 5, to = 100, by = 5))
+# resolutions <- c(seq(from = 0.5, to = 6.5, by = 0.5), seq(from = 7.5, to = 10, by = 0.5)) #for some reason, 7 doesn't work??
+
+resolutions <- c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 1.0, 1.3, 1.6, 1.8, 2.0)
+testPCs <- 18
 mean_silhouette_score_list <- list()
 #loopy
 for (pc in testPCs)
 {
-  distance_matrix <- dist(Embeddings(NK.all.combo[['pca']])[, 1:pc])
-  clusters <- NK.all.combo@meta.data[[cell_label]]
-  silhouette <- silhouette(as.numeric(clusters), dist = distance_matrix)
-  NK.all.combo@meta.data$silhouette_score <- silhouette[,3]
-  add_meta <- as.data.frame(NK.all.combo@meta.data$silhouette_score)
-  rownames(add_meta) <- row.names(NK.all.combo@meta.data)
+  for (res in resolutions)
+  {
+    
+    cat(blue$bold("Clustering for: \n"))
+    print(paste0("PC number: ", pc))
+    print(paste0("Resolution number: ", res))
+    
+    DefaultAssay(NK.all.combo) <- "integrated"
+    NK.all.combo <- FindNeighbors(NK.all.combo, reduction = "pca", dims = 1:pc, annoy.metric = "manhattan")
+    NK.all.combo <- FindClusters(NK.all.combo, resolution = res) 
+    NK.all.combo <- RunUMAP(NK.all.combo, reduction = "pca", dims = 1:pc, verbose = TRUE, seed.use=123)
+    
+    ## THESE LINES ARE IFFY TBH __________
+    # print(ncol(NK.all.combo@meta.data))
+    # print(colnames(NK.all.combo@meta.data)[c((ncol(NK.all.combo@meta.data) - 1):(ncol(NK.all.combo@meta.data)))])
+    # colnames(NK.all.combo@meta.data)[ncol(NK.all.combo@meta.data)] <- paste0(colnames(NK.all.combo@meta.data)[ncol(NK.all.combo@meta.data)],"_Dim.", pc)
+    # print(colnames(NK.all.combo@meta.data)[c((ncol(NK.all.combo@meta.data) - 1):(ncol(NK.all.combo@meta.data)))])
+    ##after this is fine, though if you don't run above section, input_res object will fail _________________
+    
+    
+    #silhouette _________
+    cat(blue$bold("Calculating silhouette score for: \n"))
+    print(paste0("PC number: ", pc))
+    print(paste0("Resolution number: ", res))
+    
+    distance_matrix <- dist(Embeddings(NK.all.combo[['pca']])[, 1:pc])
+    ##if don't run iffy block, this next immediate line will fail because it assumes the metadata columns were renamed
+    input_res <- NK.all.combo@meta.data[[paste0("integrated_snn_res.",res)]]#, "_Dim.", pc)]]
+    silhouette <- silhouette(as.numeric(input_res), dist = distance_matrix)
+    NK.all.combo@meta.data$silhouette_score <- silhouette[,3]
+    add_meta <- as.data.frame(NK.all.combo@meta.data$silhouette_score)
+    rownames(add_meta) <- row.names(NK.all.combo@meta.data)
+    
+    meta_colname <- paste0("silhouette_score_res.", res, "_Dim.", pc)
+    cat(blue$bold("meta_colname: \n"))
+    print(meta_colname)
+    
+    NK.all.combo <- AddMetaData(NK.all.combo, metadata = add_meta, col.name = meta_colname)
+    
+    mean_silhouette_score_list[[meta_colname]] <- mean(NK.all.combo@meta.data[[meta_colname]])
+  }
   
-  meta_colname <- paste0("silhouette_score_PCA_Dim", pc)
-  NK.all.combo <- AddMetaData(NK.all.combo, metadata = add_meta, col.name = meta_colname)
-  
-  mean_silhouette_score_list[[meta_colname]] <- mean(NK.all.combo@meta.data[[meta_colname]])
-  
+  # cat(blue$bold("Saving object for: \n"))
+  # print(paste0("PC number: ", pc))
+  # 
+  # setwd(paste0(silhouette_dir,"/NK_objects/"))
+  # saveRDS(NK.all.combo, paste0("NK_clustered_silhouette_PC", pc, "_res", res, Sys.Date(), ".rds"))
 }
+
+setwd(subcluster_dir)
+saveRDS(mean_silhouette_score_list, "mean_NKsihouette_PC18_res0.1to2_111622.rds")
+
+# saveRDS(NK.all.combo, "NK_with_silhouette_PCs5to100_res0.5to10_11822.rds")
+# saveRDS(mean_silhouette_score_list2, "mean_NKsihouette_PCs5to100_res0.5to10_11822.rds")
 
 colnames(NK.all.combo@meta.data)
 
-setwd(silhouette_dir)
-for (col in colnames(NK.all.combo@meta.data)[c(124:126)])#143)])
+# NK.all.combo <- readRDS("NK_with_silhouette_PCs5to100_res0.5to10_11822.rds")
+# mean_silhouette_score_list <- readRDS("mean_NKsihouette_PCs5to100_res0.5to10_11822.rds")
+
+
+colnames(NK.all.combo@meta.data)[seq(88, 124, by = 2)]
+setwd(paste0(subcluster_dir, "/Silhouette_pdfs"))
+
+for (indsilette in colnames(NK.all.combo@meta.data)[c(seq(88, 124, by = 2), 886)])
 {
-  for (indmean in mean_silhouette_score_list)
-  {
-    col_num <- which(colnames(NK.all.combo@meta.data)==col )
-    pdf(paste0(col, "_Silouhette_", Sys.Date(), ".pdf"), height = 6,width=7)
-    print(
-      test <- NK.all.combo@meta.data %>%
-        mutate(barcode = rownames(.)) %>%
-        arrange(celltype_NKsub,-col_num) %>%
-        mutate(barcode = factor(barcode, levels = barcode)) %>%
-        ggplot() + 
-        geom_col(aes(barcode, col, fill = celltype_NKsub), show.legend = TRUE) +
-        geom_hline(yintercept = indmean, color = 'red', linetype = 'dashed') +
-        scale_x_discrete(name = 'Cells') +
-        scale_y_continuous(name = 'Silhouette score') +
-        scale_fill_manual(values = c(turbo(6))) +
-        theme_bw() + 
-        theme(
-          axis.title.x = element_blank(),
-          axis.text.x = element_blank(),
-          axis.ticks.x = element_blank(),
-          panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank()
-        )
-    )
-    dev.off()
-  }
+  p <- FeaturePlot(object = NK.all.combo, features = indsilette, 
+                   order = TRUE, label = FALSE, repel = TRUE, 
+                   min.cutoff = 0, raster = FALSE, pt.size = 1.5) +
+    #scale_colour_gradientn(colours = rev(brewer.pal(n = 11, name = "RdBu"))) +
+    scale_color_viridis(option = "D")+
+    ggtitle(label = " ")
   
+  pdf(paste0(indsilette,"_featureplot_", Sys.Date(),".pdf"), width = 7.11, height = 6.5)
+  print(
+    p + theme(axis.line = element_line(colour = 'black', size = 1.5)) + 
+      theme(axis.ticks = element_line(colour = "black", size = 1.5)) +
+      theme(text = element_text(size = 25)) +
+      theme(axis.text = element_text(size = 20))
+  )
+  dev.off()
 }
 
 
+setwd(subcluster_dir)
+# for (col in colnames(NK.all.combo@meta.data)[seq(88, 124, by = 2)])#143)])
+# {
+#   for (indmean in mean_silhouette_score_list)
+#   {
+#     col_num <- which(colnames(NK.all.combo@meta.data)==col )
+#     pdf(paste0(col, "_Silouhette_", Sys.Date(), ".pdf"), height = 6,width=7)
+#     print(
+#       test <- NK.all.combo@meta.data %>%
+#         mutate(barcode = rownames(.)) %>%
+#         arrange(celltype_NKsub,-col_num) %>%
+#         mutate(barcode = factor(barcode, levels = barcode)) %>%
+#         ggplot() + 
+#         geom_col(aes(barcode, col, fill = celltype_NKsub), show.legend = TRUE) +
+#         geom_hline(yintercept = indmean, color = 'red', linetype = 'dashed') +
+#         scale_x_discrete(name = 'Cells') +
+#         scale_y_continuous(name = 'Silhouette score') +
+#         scale_fill_manual(values = c(turbo(6))) +
+#         theme_bw() + 
+#         theme(
+#           axis.title.x = element_blank(),
+#           axis.text.x = element_blank(),
+#           axis.ticks.x = element_blank(),
+#           panel.grid.major = element_blank(),
+#           panel.grid.minor = element_blank()
+#         )
+#     )
+#     dev.off()
+#   }
+#   
+# }
+
+
 # #no loopy - settings for original clustering (PC = 18, cell_label = celltype_NKsub)
+# resolutions <- c(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 1.0, 1.3, 1.6, 1.8, 2.0)
+# 
+# for(res in resolutions)
+# {
+#   DefaultAssay(NK.all.combo) <- "integrated"
+#   NK.all.combo <- FindNeighbors(NK.all.combo, reduction = "pca", dims = 1:18, annoy.metric = "manhattan")
+#   NK.all.combo <- FindClusters(NK.all.combo, resolution = res) 
+#   NK.all.combo <- RunUMAP(NK.all.combo, reduction = "pca", dims = 1:18, verbose = TRUE, seed.use=123)
+# 
+# }
+
+colnames(NK.all.combo@meta.data)[c(133, seq(from = 136, to = 156, by = 2))] <- c("integrated_snn_res.0.1_Dim.18",
+                                                                                 "integrated_snn_res.0.2_Dim.18",
+                                                                                 "integrated_snn_res.0.3_Dim.18", "integrated_snn_res.0.4_Dim.18",
+                                                                                 "integrated_snn_res.0.5_Dim.18", "integrated_snn_res.0.6_Dim.18",
+                                                                                 "integrated_snn_res.0.7_Dim.18", "integrated_snn_res.1_Dim.18",
+                                                                                 "integrated_snn_res.1.3_Dim.18", "integrated_snn_res.1.6_Dim.18", 
+                                                                                 "integrated_snn_res.1.8_Dim.18", "integrated_snn_res.2_Dim.18")
+
+
+
 # distance_matrix <- dist(Embeddings(NK.all.combo[['pca']])[, 1:18])
-# clusters <- NK.all.combo@meta.data$celltype_NKsub
+# clusters <- NK.all.combo@meta.data$integrated_snn_res.2_Dim.18
 # silhouette <- silhouette(as.numeric(clusters), dist = distance_matrix)
 # NK.all.combo@meta.data$silhouette_score <- silhouette[,3]
 # add_meta <- as.data.frame(NK.all.combo@meta.data$silhouette_score)
 # rownames(add_meta) <- row.names(NK.all.combo@meta.data)
-# NK.all.combo <- AddMetaData(NK.all.combo, metadata = add_meta, col.name = "silhouette_score_PCA_Dim18")
+# NK.all.combo <- AddMetaData(NK.all.combo, metadata = add_meta, col.name = "silhouette_score_res.2_Dim.18")
+
+c("integrated_snn_res.0.1_Dim.18",
+  "integrated_snn_res.0.2_Dim.18",
+  "integrated_snn_res.0.3_Dim.18", "integrated_snn_res.0.4_Dim.18",
+  "integrated_snn_res.0.5_Dim.18", "integrated_snn_res.0.6_Dim.18",
+  "integrated_snn_res.0.7_Dim.18", "integrated_snn_res.1_Dim.18",
+  "integrated_snn_res.1.3_Dim.18", "integrated_snn_res.1.6_Dim.18", 
+  "integrated_snn_res.1.8_Dim.18", "integrated_snn_res.2_Dim.18")
+
+p <- NK.all.combo@meta.data %>%
+  mutate(barcode = rownames(.)) %>%
+  arrange(integrated_snn_res.0.1_Dim.18,-silhouette_score_res.0.1_Dim.18) %>%
+  mutate(barcode = factor(barcode, levels = barcode)) %>%
+  ggplot() +
+  geom_col(aes(barcode, silhouette_score_res.0.1_Dim.18, fill = integrated_snn_res.0.1_Dim.18), show.legend = TRUE) +
+  geom_hline(yintercept = mean_silhouette_score_list$silhouette_score_res.0.1_Dim.18, color = 'red', linetype = 'dashed') +
+  scale_x_discrete(name = 'Cells') +
+  scale_y_continuous(name = 'Silhouette score') +
+  #scale_fill_manual(values = c(turbo(6))) +
+  #scale_fill_manual(values = c(turbo(12))) +
+  scale_fill_manual(values = c(turbo(6))) +
+  theme_bw() +
+  theme(
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+
+setwd(paste0(subcluster_dir, "/Silhouette_pdfs"))
+pdf("NKsub_silouhette_silhouette_score_res.0.1_Dim.18_111122.pdf", width = 10, height =5)
+#pdf("NKsub_silouhette_silhouette_score_res.0.2_Dim.18_111122.pdf", width = 10, height =5)
+#pdf("NKsub_silouhette_silhouette_score_res.0.3_Dim.18_111122.pdf", width = 10, height =5)
+#pdf("NKsub_silouhette_silhouette_score_res.0.4_Dim.18_111122.pdf", width = 10, height =5)
+#pdf("NKsub_silouhette_silhouette_score_res.0.5_Dim.18_111122.pdf", width = 10, height =5)
+#pdf("NKsub_silouhette_silhouette_score_res.0.6_Dim.18_111122.pdf", width = 10, height =5)
+#pdf("NKsub_silouhette_silhouette_score_res.0.7_Dim.18_111122.pdf", width = 10, height =5)
+#pdf("NKsub_silouhette_silhouette_score_res.1_Dim.18_111122.pdf", width = 10, height =5)
+#pdf("NKsub_silouhette_silhouette_score_res.1.3_Dim.18_111122.pdf", width = 10, height =5)
+#pdf("NKsub_silouhette_silhouette_score_res.1.6_Dim.18_111122.pdf", width = 10, height =5)
+#pdf("NKsub_silouhette_silhouette_score_res.1.8_Dim.18_111122.pdf", width = 10, height =5)
+#pdf("NKsub_silouhette_silhouette_score_res.2_Dim.18_111122.pdf", width = 10, height =5)
+p
+dev.off()
+
+# mean_silhouette_score<- list()
+# mean_silhouette_score$silhouette_score_res.0.1_Dim.18 <- mean(NK.all.combo@meta.data$silhouette_score_res.0.1_Dim.18)
+# mean_silhouette_score$silhouette_score_res.0.2_Dim.18 <- mean(NK.all.combo@meta.data$silhouette_score_res.0.2_Dim.18)
+# mean_silhouette_score$silhouette_score_res.0.3_Dim.18 <- mean(NK.all.combo@meta.data$silhouette_score_res.0.3_Dim.18)
+# mean_silhouette_score$silhouette_score_res.0.4_Dim.18 <- mean(NK.all.combo@meta.data$silhouette_score_res.0.4_Dim.18)
+# mean_silhouette_score$silhouette_score_res.0.5_Dim.18 <- mean(NK.all.combo@meta.data$silhouette_score_res.0.5_Dim.18)
+# mean_silhouette_score$silhouette_score_res.0.6_Dim.18 <- mean(NK.all.combo@meta.data$silhouette_score_res.0.6_Dim.18)
+# mean_silhouette_score$silhouette_score_res.0.7_Dim.18 <- mean(NK.all.combo@meta.data$silhouette_score_res.0.7_Dim.18)
+# mean_silhouette_score$silhouette_score_res.1_Dim.18 <- mean(NK.all.combo@meta.data$silhouette_score_res.1_Dim.18)
+# mean_silhouette_score$silhouette_score_res.1.3_Dim.18 <- mean(NK.all.combo@meta.data$silhouette_score_res.1.3_Dim.18)
+# mean_silhouette_score$silhouette_score_res.1.6_Dim.18 <- mean(NK.all.combo@meta.data$silhouette_score_res.1.6_Dim.18)
+# mean_silhouette_score$silhouette_score_res.1.8_Dim.18 <- mean(NK.all.combo@meta.data$silhouette_score_res.1.8_Dim.18)
+# mean_silhouette_score$silhouette_score_res.2_Dim.18 <- mean(NK.all.combo@meta.data$silhouette_score_res.2_Dim.18)
 # 
-# mean_silhouette_score <- mean(NK.all.combo@meta.data$silhouette_score_PCA_Dim18)
+# setwd(silhouette_dir)
 # 
-# p <- NK.all.combo@meta.data %>%
-#   mutate(barcode = rownames(.)) %>%
-#   arrange(celltype_NKsub,-silhouette_score_PCA_Dim18) %>%
-#   mutate(barcode = factor(barcode, levels = barcode)) %>%
-#   ggplot() + 
-#   geom_col(aes(barcode, silhouette_score_PCA_Dim18, fill = celltype_NKsub), show.legend = TRUE) +
-#   geom_hline(yintercept = mean_silhouette_score, color = 'red', linetype = 'dashed') +
-#   scale_x_discrete(name = 'Cells') +
-#   scale_y_continuous(name = 'Silhouette score') +
-#   scale_fill_manual(values = c(turbo(6))) +
-#   theme_bw() + 
-#   theme(
-#     axis.title.x = element_blank(),
-#     axis.text.x = element_blank(),
-#     axis.ticks.x = element_blank(),
-#     panel.grid.major = element_blank(),
-#     panel.grid.minor = element_blank()
-#   )
+# saveRDS(mean_silhouette_score, "mean_silhouette_pc18_res0.1to0.1to2_dim18_111122.rds")
+# saveRDS(NK.all.combo, "NKobj_with_dim18_res0.1to2_111122.rds")
 # 
-# setwd(rNKdir)
-# pdf("NKsub_silouhette_original_preprintParams_103122.pdf", width = 10, height =5)
-# p
-# dev.off()
+
+mean_silhouette_score_df <- as.data.frame(unlist(mean_silhouette_score_list))
+colnames(mean_silhouette_score_df) <- "mean_silhouette_score"
+rownames(mean_silhouette_score_df) <- gsub("silhouette_score_","", rownames(mean_silhouette_score_df))
+
+write.csv(mean_silhouette_score_df, "mean_silhouette_score_NK_fromCNVobj_dim18_111622.csv")
 
 # ================================================================== ======
 #2B NKsub Markers ========================
@@ -543,6 +770,7 @@ NK.mark.nomit <- read.csv("NKclustDEGs_pvaladj0.05log056_71322.csv")
 c0.keep <- NK.mark.nomit
 head(c0.keep)
 c0.keep <- c0.keep[c0.keep$cluster == "0",]
+
 
 c0.up <- c0.keep[c0.keep$avg_log2FC >0,]
 # c0.up <- c0.up[c0.up$pct.1 >= 0.2,] #newcutoff
@@ -662,19 +890,29 @@ saveRDS(c5.mark, "NK.c5markers_71322.rds")
 
 # NK subset Bubble heatmap -----------------
 
+
+keep <- NK.mark.nomit[NK.mark.nomit$cluster == "5",]
+
+keep[keep$gene == "HLA-DRB1", ]
+
+
+
+
 setwd(DEGdir)
 c0.mark <- unlist(readRDS("NK.c0markers_71322.rds"))
-c0.up <- c0.mark[1:6]
+c0.up <- c("FCGR3A", "PRF1", "KLRC2", c0.mark[c(1,2,4)]) #not in DEGs: FCGR3A,KLRC2,PRF1
 c1.mark <- unlist(readRDS("NK.c1markers_71322.rds"))
-c1.up <- c1.mark[1:23]
+c1.up <- c1.mark[c(11,22,4,13,2,8)]
+#c1.up <- c1.mark[1:23] ##preprint
 c2.mark <- unlist(readRDS("NK.c2markers_71322.rds"))
-c2.up <- c2.mark[1:10]
+c2.up <- c("FGFBP2", "GZMA", "GZMB", "CXCR1",c2.mark[c(1,4,2,3,5)]) #not in DEGs: GZMB, CXCR1, CXC3R1, S1PR5
 c3.mark <- unlist(readRDS("NK.c3markers_71322.rds"))
-c3.up <- c3.mark[1:13]
+c3.up <- c("GZMK", c3.mark[c(5,7,10)]) #not in DEGs: GZMK
 c4.mark <- unlist(readRDS("NK.c4markers_71322.rds"))
-c4.up <- c4.mark
+c4.up <- c4.mark[c(2,1,4,6)]
+#c4.up <- c4.mark ##preprint
 c5.mark <- unlist(readRDS("NK.c5markers_71322.rds"))
-c5.up <- c5.mark[1:12]
+c5.up <- c("CCL5", "HLA-DRB1", c5.mark[c(12,1,10)])
 
 
 features <- list("NK0" = c0.up,
@@ -691,12 +929,16 @@ factor(Idents(NK.all.combo), levels= myLevels)
 Idents(NK.all.combo) <- factor(Idents(NK.all.combo), levels= rev(myLevels))
 
 table(Idents(NK.all.combo))
-a <- DotPlot(object = NK.all.combo, features=features,
+
+features2 <- unique(c(features$NK0, features$NK1, features$NK2, 
+               features$NK3, features$NK4, features$NK5))
+a <- DotPlot(object = NK.all.combo, features=features2,
              dot.scale = 10) + theme(axis.text.x = element_text(angle = 90)) +
   scale_colour_gradient2(low="steelblue", mid="lightgrey", high="red")
 
-#pdf("NKsubMarkers_7522.pdf", width = 26.3, height = 4.9)
-pdf("NKsubMarkers_71322.pdf", width = 26.3, height = 4.9)
+#pdf("NKsubMarkers_71322.pdf", width = 26.3, height = 4.9)
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2")
+pdf("NKsubMarkers2B_112522.pdf", width = 26.3, height = 4.9)
 a+ theme(axis.line = element_line(colour = 'black', size = 1.5)) +
   theme(axis.ticks = element_line(colour = "black", size = 1.5)) +
   theme(text = element_text(size = 20)) +
@@ -1099,8 +1341,15 @@ stat.test <- compare_means(signature_1ReprogSig~celltype_NKsub, sobjlists,
                            method = "kruskal.test", 
                            p.adjust.method = "bonferroni")
 
-setwd(rNKdir)
-write.csv(stat.test, "Fig2D_kruskal_reprogsig_vNKsub_bonferronicorrec_72822.csv")
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2")
+write.csv(stat.test, "correctreprog_Fig2D_kruskal_reprogsig_vNKsub_bonferronicorrec_111822.csv")
+
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/correctrNK_preprint")
+write.csv(stat.test, "preprint_reprog_Fig2D_kruskal_reprogsig_vNKsub_bonferronicorrec_112322.csv")
+
+
+# setwd(rNKdir)
+# write.csv(stat.test, "Fig2D_kruskal_reprogsig_vNKsub_bonferronicorrec_72822.csv")
 
 library(rstatix)
 
@@ -1117,8 +1366,14 @@ posthoctest <- dunn_test(formula = signature_1ReprogSig~celltype_NKsub,
                          data = sobjlists_grouped,
                          p.adjust.method="bonferroni")
 
-setwd(rNKdir)
-write.csv(posthoctest, "rNK_perNKsub_posthoc_bonferronipost_102422.csv")
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2")
+write.csv(posthoctest, "correct_rNK_perNKsub_posthoc_bonferronipost_111822.csv")
+
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/correctrNK_preprint")
+write.csv(posthoctest, "preprint_correct_rNK_perNKsub_posthoc_bonferronipost_112322.csv")
+
+# setwd(rNKdir)
+# write.csv(posthoctest, "rNK_perNKsub_posthoc_bonferronipost_102422.csv") ##preprint
 #posthoctest <- read.csv("rNK_perNKsub_posthoc_nocorreconpost_72822.csv")
 
 my_comparisons <- list( c("1", "0"),
@@ -1153,8 +1408,9 @@ library(viridis)
 library(viridisLite)
 # pdf("reprogsig_perclust_violin_7122.pdf", width = 12, height = 4.05)
 # pdf("reprogsig_perclust_violin_7522.pdf", width = 12, height = 4.05)
-pdf("reprogsig_perclust_violin_71322.pdf", width = 14, height = 8.05)
-pdf("test.pdf", width = 14, height = 8.05)
+pdf("reprogsig_perclust_violin_71322.pdf", width = 14, height = 8.05) ##preprint
+pdf("preprint_reprogsig_perclust_violin_112322.pdf", width = 14, height = 8.05) ##correction
+pdf("correct_reprogsig_perclust_violin_111822.pdf", width = 14, height = 8.05)
 p + theme(axis.line = element_line(colour = 'black', size = 1.5)) + 
   theme(axis.ticks = element_line(colour = "black", size = 1.5)) +
   theme(text = element_text(size = 25)) +
@@ -1168,11 +1424,77 @@ dev.off()
 
 # load NKsubset =================================
 
-setwd(NKsubDir)
-NK.all.combo <- readRDS("NK_withNKpathways_noZallgenedem_71422.rds") #newnewnew
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2")
+NK.all.combo <- readRDS("NKsubset_withCORRECTreprog_nootherchange_82422.rds") #newnewnew
 DefaultAssay(NK.all.combo) <- "RNA"
 NK.all.combo <- NormalizeData(NK.all.combo, assay = "RNA")
 
+setwd("/project/InternalMedicine/Chan_lab/shared/")
+combo.inferCNV <- readRDS("nichenetobj_111122.rds")
+
+
+head(combo.inferCNV@meta.data)
+
+unique(colnames(combo.inferCNV@meta.data))
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"totalCNV", drop = F], "totalCNV")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"corCNV", drop = F], "corCNV")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"cancer", drop = F], "cancer")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"ESR1", drop = F], "ESR1")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"ERBB2", drop = F], "ERBB2")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"PIK3CA", drop = F], "PIK3CA")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"NTRK", drop = F], "NTRK")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"CD274", drop = F], "CD274")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"ERBB3", drop = F], "ERBB3")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"EGFR", drop = F], "EGFR")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"FGFR", drop = F], "FGFR")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"TACSTD2", drop = F], "TACSTD2")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"CDK", drop = F], "CDK")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"AR", drop = F], "AR")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"NECTIN2", drop = F], "NECTIN2")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"LAG3", drop = F], "LAG3")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"raw_GM1", drop = F], "raw_GE1")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"raw_GM2", drop = F], "raw_GE2")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"raw_GM3", drop = F], "raw_GE3")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"raw_GM4", drop = F], "raw_GE4")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"raw_GM5", drop = F], "raw_GE5")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"raw_GM6", drop = F], "raw_GE6")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"raw_GM7", drop = F], "raw_GE7")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"raw_GM8", drop = F], "raw_GE8")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"raw_GM9", drop = F], "raw_GE9")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"raw_GM10", drop = F], "raw_GE10")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"maxGM", drop = F], "maxGE")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"maxZscore", drop = F], "maxZscore")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM1", drop = F], "GE1")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM2", drop = F], "GE2")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM3", drop = F], "GE3")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM4", drop = F], "GE4")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM5", drop = F], "GE5")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM6", drop = F], "GE6")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM7", drop = F], "GE7")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM8", drop = F], "GE8")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM9", drop = F], "GE9")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM10", drop = F], "GE10")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM1_idents", drop = F], "GE1_idents")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM2_idents", drop = F], "GE2_idents")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM3_idents", drop = F], "GE3_idents")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM4_idents", drop = F], "GE4_idents")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM5_idents", drop = F], "GE5_idents")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM6_idents", drop = F], "GE6_idents")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM7_idents", drop = F], "GE7_idents")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM8_idents", drop = F], "GE8_idents")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM9_idents", drop = F], "GE9_idents")
+NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM10_idents", drop = F], "GE10_idents")
+
+head(NK.all.combo@meta.data)
+table(NK.all.combo$celltype_final)
+table(NK.all.combo$celltype_withreprog)
+table(NK.all.combo$celltype_NKsub)
+
+setwd("/project/InternalMedicine/Chan_lab/shared")
+saveRDS(NK.all.combo, "NKsub_withGEmeta_withCORRECTreprog_111722.rds")
+
+
+NK.all.combo <- readRDS("NKsub_withGEmeta_withCORRECTreprog_111722.rds")
 
 # rNK DEGs -------
 
@@ -1187,8 +1509,14 @@ NK.all.combo <- NormalizeData(NK.all.combo, assay = "RNA")
 Reprog.mark <- FindAllMarkers(NK.all.combo,
                               test.use = "MAST")
 
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2")
+write.csv(Reprog.mark, "rNKvnon_DEGs_NOTHRESH_111822.csv") ##reviewer
+
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/correctrNK_preprint")
+write.csv(Reprog.mark, "preprint_rNKvnon_DEGs_NOTHRESH_112222.csv") ##correction
+
 setwd(DEGdir)
-write.csv(Reprog.mark, "rNKvnon_DEGs_NOTHRESH_71422.csv")
+write.csv(Reprog.mark, "rNKvnon_DEGs_NOTHRESH_71422.csv") ##preprint
 
 
 # j.markers_DGE_filtered <- read.csv("rNKvnonDEG_ABSOLUTELYNOTHRESH.csv")
@@ -1197,7 +1525,10 @@ write.csv(Reprog.mark, "rNKvnon_DEGs_NOTHRESH_71422.csv")
 
 
 # rNK ma plot -------
-dfsample <- read.csv("rNKvnon_DEGs_NOTHRESH_71422.csv", header = T, row.names = 1)
+dfsample <- read.csv("rNKvnon_DEGs_NOTHRESH_111822.csv", header = T, row.names = 1)
+head(dfsample)
+dfsample <- read.csv("preprint_rNKvnon_DEGs_NOTHRESH_112222.csv", header = T, row.names = 1)
+#dfsample <- read.csv("rNKvnon_DEGs_NOTHRESH_71422.csv", header = T, row.names = 1) ##preprint
 dfsample <- DEG_Remove_mito(dfsample)
 
 avgexp <- AverageExpression(object = NK.all.combo, features = unique(dfsample$gene), assays = c("RNA", "SCT"))
@@ -1211,19 +1542,19 @@ avgexpcRNK <- avgexp[rownames(avgexp) %in% rNKDEGs$gene,"Reprogrammed NK Cells",
 
 
 data <- cbind(rNKDEGs, avgexpcRNK)
-data_input <- data[,c(8,2, 5, 7)]
-
-head(data)
 colnames(data)
+data_input <- data[,c(8,2, 5, 7)]
+colnames(data_input) <- c("baseMean", "log2FoldChange", "padj", "gene")
+
 
 which(data_input$gene == "KLRG1")
 which(data_input$gene == "TIGIT")
 which(data_input$gene == "NR4A3")
+which(data_input$gene == "NR4A2")
 
-colnames(data_input) <- c("baseMean", "log2FoldChange", "padj", "gene")
 
 library(ggpubr)
-options(ggrepel.max.overlaps = 15)
+options(ggrepel.max.overlaps = 15)#15)
 #options(ggrepel.max.overlaps = 300)
 
 p <- ggmaplot(data_input, 
@@ -1233,10 +1564,14 @@ p <- ggmaplot(data_input,
               palette = c("#B31B21", "#1465AC", "darkgray"),
               top = 0,              
               #top = 100,
-              label.select = c("NR4A1", "NR4A2", "NR4A3", "RHOB", #up
-                               "HSPA1A", "FOS", "DUSP1", "JUN", "DNAJB1", "HSPA1B",
-                               "FOSB", "TNFAIP3",
-                               "MUCL1", "CYBA"), #down
+              label.select = c("NR4A1", "NR4A2", "NR4A3", "FOSB", #up
+                               "JUN", "DNAJB1", "HSPA1B", "FOS", "DUSP1", "HSPA1A",
+                               "HSPA6", "TNFAIP3",
+                               "MUCL1", "CYBA"), #down ##correction
+              # label.select = c("NR4A1", "NR4A2", "NR4A3", "RHOB", #up
+              #                  "HSPA1A", "FOS", "DUSP1", "JUN", "DNAJB1", "HSPA1B",
+              #                  "FOSB", "TNFAIP3",
+              #                  "MUCL1", "CYBA"), #down ##preprint
               #label.select = c("NR4A1", "NR4A2", "NR4A3"),
               genenames = as.vector(data_input$gene),
               
@@ -1245,9 +1580,12 @@ p <- ggmaplot(data_input,
               ggtheme = ggplot2::theme_classic()) +
   xlim(0,7) + ylim(-2.5,4) + NoLegend()
 
-ggsave("rNK_MAplot_71422.pdf", plot = p, width = 4.3, height = 4)
-ggsave("rNKMAplot_NR4only.pdf", plot = p, width = 4.3, height = 4)
 ggsave("test.pdf", plot = p, width = 4.3, height = 4)
+
+
+ggsave("correctrNK_MAplot_112322.pdf", plot = p, width = 4.3, height = 4) ##correction
+ggsave("rNK_MAplot_71422.pdf", plot = p, width = 4.3, height = 4) ##preprint
+ggsave("rNKMAplot_NR4only.pdf", plot = p, width = 4.3, height = 4)
 
 # ================================================================== ======
 #2H rNK v nonrNK similarity  ========================
@@ -1255,19 +1593,26 @@ ggsave("test.pdf", plot = p, width = 4.3, height = 4)
 # load NKsubset =================================
 
 setwd(NKsubDir)
-NK.all.combo <- readRDS("NK_withNKpathways_noZallgenedem_71422.rds") #newnewnew
+NK.all.combo <- readRDS("NK_withNKpathways_noZallgenedem_71422.rds") #preprint
+DefaultAssay(NK.all.combo) <- "RNA"
+NK.all.combo <- NormalizeData(NK.all.combo, assay = "RNA")
+
+setwd("/project/InternalMedicine/Chan_lab/shared")
+NK.all.combo <- readRDS("NKsub_withGEmeta_withCORRECTreprog_111722.rds")
 DefaultAssay(NK.all.combo) <- "RNA"
 NK.all.combo <- NormalizeData(NK.all.combo, assay = "RNA")
 
 
-
 # lily similarity boxplot =================
 
-setwd(NKsubDir)
+setwd(NKsubDir) ##preprint
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/similarity")
 
 NK.all.mat <- GetAssayData(NK.all.combo[rownames(NK.all.combo@assays$RNA@data) %in% ReprogSig.final, ], slot = "data", assay = "RNA")
 NK.all.mat <- as.data.frame(NK.all.mat)
-saveRDS(NK.all.mat, "NK.all.mat_justreproggenes_71522.rds")
+saveRDS(NK.all.mat, "NK.all.mat_justreproggenes_111822.rds")
+saveRDS(NK.all.mat, "preprint_NK.all.mat_justreproggenes_112222.rds") ##correction
+#saveRDS(NK.all.mat, "NK.all.mat_justreproggenes_71522.rds") ##preprint
 
 # simil(GetAssayData(NK.all.combo, slot = "data", assay = "RNA"),
 #       drop = NULL,
@@ -1277,7 +1622,9 @@ saveRDS(NK.all.mat, "NK.all.mat_justreproggenes_71522.rds")
 
 NK.reprog.mat <- GetAssayData(subset(NK.all.combo[rownames(NK.all.combo@assays$RNA@data) %in% ReprogSig.final, ], subset = celltype_withreprog_simply == "Reprogrammed NK Cells"), slot = "data", assay = "RNA")
 NK.reprog.mat <- as.data.frame(NK.reprog.mat)
-saveRDS(NK.reprog.mat, "NK.reprog.mat_justreproggenes_71522.rds")
+saveRDS(NK.reprog.mat, "NK.reprog.mat_justreproggenes_111822.rds")
+saveRDS(NK.reprog.mat, "preprint_NK.reprog.mat_justreproggenes_112222.rds") ##correction
+#saveRDS(NK.reprog.mat, "NK.reprog.mat_justreproggenes_71522.rds") ##preprint
 
 # simil(GetAssayData(subset(NK.all.combo[rownames(NK.all.combo@assays$SCT@scale.data), ], subset = celltype_withreprog_simply == "Reprogrammed NK Cells"), slot = "data", assay = "RNA"),
 #       #housekeeping_genes,
@@ -1287,7 +1634,9 @@ saveRDS(NK.reprog.mat, "NK.reprog.mat_justreproggenes_71522.rds")
 
 NK.NONreprog.mat <- GetAssayData(subset(NK.all.combo[rownames(NK.all.combo@assays$RNA@data) %in% ReprogSig.final, ], subset = celltype_withreprog_simply == "Non-Reprogrammed NK Cells"), slot = "data", assay = "RNA")
 NK.NONreprog.mat <- as.data.frame(NK.NONreprog.mat)
-saveRDS(NK.NONreprog.mat, "NK.NONreprog.mat_justreproggenes_71522.rds")
+saveRDS(NK.NONreprog.mat, "NK.NONreprog.mat_justreproggenes_111822.rds")
+saveRDS(NK.NONreprog.mat, "preprint_NK.NONreprog.mat_justreproggenes_111822.rds") ##correction
+#saveRDS(NK.NONreprog.mat, "NK.NONreprog.mat_justreproggenes_71522.rds") ##preprint
 
 
 simil(GetAssayData(subset(NK.all.combo, subset = celltype_withreprog_simply == "Non-Reprogrammed NK Cells"), slot = "data", assay = "RNA"),
@@ -1297,7 +1646,11 @@ simil(GetAssayData(subset(NK.all.combo, subset = celltype_withreprog_simply == "
       "corr")
 
 # get list of files for similarity matrices
-files <- list.files(pattern = "_all_simil_corr_71522.rds")
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/similarity")
+files <- list.files(pattern = "_all_simil_corr_111822.rds")
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/correctrNK_preprint")
+files <- list.files(pattern = "_all_simil_corr_preprint_112222.rds") ##correction
+#files <- list.files(pattern = "_all_simil_corr_71522.rds")
 files <- sort(files)
 
 # read in all Jaccard similarity scores into dataframe
@@ -1307,16 +1660,29 @@ list <- data.frame()
 #                 data.frame(name = strsplit(i, ".rds")[[1]],
 #                            value = as.vector(readRDS(i)[upper.tri(readRDS(i), diag = F)])))
 # }
+
+##newnew
 list <- rbind(list,
               data.frame(name = "Reprogrammed NK vs. \nReprogrammed NK",
-                         value = as.vector(readRDS("reprogNK_all_simil_corr_71522.rds")[upper.tri(readRDS("reprogNK_all_simil_corr_71522.rds"), diag = F)])))
+                         value = as.vector(readRDS("reprogNK_all_simil_corr_111822.rds")[upper.tri(readRDS("reprogNK_all_simil_corr_111822.rds"), diag = F)])))
 
+##correction
+list <- rbind(list,
+              data.frame(name = "Reprogrammed NK vs. \nReprogrammed NK",
+                         value = as.vector(readRDS("reprogNK_all_simil_corr_preprint_112222.rds")[upper.tri(readRDS("reprogNK_all_simil_corr_preprint_112222.rds"), diag = F)])))
+
+##preprint (next three lines)
+# list <- rbind(list,
+#               data.frame(name = "Reprogrammed NK vs. \nReprogrammed NK",
+#                          value = as.vector(readRDS("reprogNK_all_simil_corr_71522.rds")[upper.tri(readRDS("reprogNK_all_simil_corr_71522.rds"), diag = F)])))
 
 
 # list <- rbind(list,
 #               data.frame(name = "Non-reprogrammed NK vs. \nNon-reprogrammed NK",
 #                          value = as.vector(readRDS("nonreprogNK_all_simil_corr.rds")[upper.tri(readRDS("nonreprogNK_all_simil_corr.rds"), diag = F)])))
-allNK <- readRDS("allNK_all_simil_corr_71522.rds")
+allNK <- readRDS("allNK_all_simil_corr_111822.rds")
+allNK <- readRDS("allNK_all_simil_corr_preprint_112222.rds") ##correction
+#allNK <- readRDS("allNK_all_simil_corr_71522.rds") ##preprint
 NK_idents <- subset(NK.all.combo,
                     subset = celltype_withreprog_simply == "Reprogrammed NK Cells")
 NK_idents <- colnames(GetAssayData(NK_idents))
@@ -1360,10 +1726,10 @@ p <- ggplot(list, aes(x = name, y = value, fill = name)) +
                      method="wilcox.test", label="..p.adj..", color="black")
 #stat_pvalue_manual(test, label = "p.adj")
 
-pdf("ReprogvallNK_similbox_7122.pdf", width = 5.5, height = 5)
-pdf("ReprogvallNK_similbox_7522.pdf", width = 5.5, height = 5)
-pdf("ReprogvallNK_similbox_71522.pdf", width = 5.5, height = 5)
-pdf("test.pdf", width = 5.5, height = 5)
+# pdf("ReprogvallNK_similbox_7122.pdf", width = 5.5, height = 5)
+# pdf("ReprogvallNK_similbox_7522.pdf", width = 5.5, height = 5)
+pdf("ReprogvallNK_similbox_71522.pdf", width = 5.5, height = 5) ##preprint
+pdf("correct_ReprogvallNK_similbox_112222.pdf", width = 5.5, height = 5)
 p + theme(axis.line = element_line(colour = 'black', size = 1)) +
   theme(axis.ticks = element_line(colour = "black", size = 1)) +
   theme(text = element_text(size = 13)) +
@@ -1508,8 +1874,10 @@ bp <- ggplot(sobjlists,
         panel.spacing.x = unit(-0.1, "lines"))
 
 
-#pdf("percentNKsubpersamplebar_71322.pdf", width = 18.4, height = 3.4)
-pdf("test.pdf", width = 18.4, height = 3.4)
+#pdf("percentNKsubpersamplebar_71322.pdf", width = 18.4, height = 3.4) ##preprint
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2")
+pdf("percentNKsubpersamplebar_GREATER10SAMPLES_111822.pdf", width = 18.4, height = 3.4)
+pdf("preprint_percentNKsubpersamplebar_GREATER10SAMPLES_112222.pdf", width = 18.4, height = 3.4)
 bp
 dev.off()
 
@@ -1522,9 +1890,15 @@ dev.off()
 # load NKsubset =================================
 
 setwd(NKsubDir)
-NK.all.combo <- readRDS("NK_withNKpathways_noZallgenedem_71422.rds") #newnewnew
+NK.all.combo <- readRDS("NK_withNKpathways_noZallgenedem_71422.rds") #preprint
 DefaultAssay(NK.all.combo) <- "RNA"
 NK.all.combo <- NormalizeData(NK.all.combo, assay = "RNA")
+
+setwd("/project/InternalMedicine/Chan_lab/shared")
+NK.all.combo <- readRDS("NKsub_withGEmeta_withCORRECTreprog_111722.rds")
+DefaultAssay(NK.all.combo) <- "RNA"
+NK.all.combo <- NormalizeData(NK.all.combo, assay = "RNA")
+
 
 
 
@@ -1712,9 +2086,11 @@ my_comparisons <- list(c("HR+", "HER2+"), c("HR+", "TNBC"),
 head(sobjlists)
 
 stat.test<- compare_means(
-  ReprogSig ~ BC.Subtype, data = sobjlists, method = "",
-  p.adjust.method = "kruskal.test"
+  ReprogSig ~ BC.Subtype, data = sobjlists, method = "kruskal.test",
+  p.adjust.method = "bonferroni"
 )
+write.csv(stat.test, "reprogsigvBCsub_kruskal_bonferroni_111822.csv") ##newnew
+write.csv(stat.test, "preprint_reprogsigvBCsub_kruskal_bonferroni_112222.csv") ##correction
 
 stat.test
 
@@ -1730,7 +2106,8 @@ posthoctest <- dunn_test(formula = ReprogSig~BC.Subtype,
                          p.adjust.method="none")
 
 setwd(NKsubDir)
-write.csv(posthoctest, "reprogsigvBCsub_nocorrectposthoc_72822.csv")
+write.csv(posthoctest, "preprint_reprogsigvBCsub_nocorrectposthoc_112222.csv") ##correction
+write.csv(posthoctest, "reprogsigvBCsub_nocorrectposthoc_72822.csv") ##preprint
 
 my_comparisons <- list(c("HR+", "HER2+"), c("HR+", "TNBC"),
                        c("HER2+", "TNBC"))
@@ -1759,12 +2136,15 @@ p <- ggplot(unique(sobjlists[which(!is.na(sobjlists$BC.Subtype)),c(1,9,20)]),
 # scale_y_continuous(breaks = c(0, 25, 50, 75, 100),
 #                    limits = c(0, 110))
 
-p$layers[[2]]$aes_params$textsize <- 5
-pdf("percentreprog_BCsubtype_62322.pdf", width = 3, height = 2.5)
-pdf("reprogNKsig_BCsubtype_62322.pdf", width = 3, height = 2.5)
-pdf("reprogNKsig_bcsub_7522_bigger.pdf", width = 5.5, height = 5)
-pdf("reprogNKsig_bcsub_71522_bigger.pdf", width = 5.5, height = 5)
-pdf("test.pdf", width = 5.5, height = 5)
+#p$layers[[2]]$aes_params$textsize <- 5
+# pdf("percentreprog_BCsubtype_62322.pdf", width = 3, height = 2.5)
+# pdf("reprogNKsig_BCsubtype_62322.pdf", width = 3, height = 2.5)
+# pdf("reprogNKsig_bcsub_7522_bigger.pdf", width = 5.5, height = 5)
+pdf("reprogNKsig_bcsub_71522_bigger.pdf", width = 5.5, height = 5) ##preprint
+
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2")
+pdf("correctreprogNKsig_bcsub_111822.pdf", width = 5.5, height = 5)
+pdf("preprint_correctreprogNKsig_bcsub_112222.pdf", width = 5.5, height = 5)
 
 p +
   theme(axis.line = element_line(colour = 'black', size = 1)) + 
@@ -1779,10 +2159,14 @@ dev.off()
 # load NKsubset =================================
 
 setwd(NKsubDir)
-NK.all.combo <- readRDS("NK_withNKpathways_noZallgenedem_71422.rds") #newnewnew
+NK.all.combo <- readRDS("NK_withNKpathways_noZallgenedem_71422.rds") #preprint
 DefaultAssay(NK.all.combo) <- "RNA"
 NK.all.combo <- NormalizeData(NK.all.combo, assay = "RNA")
 
+setwd("/project/InternalMedicine/Chan_lab/shared")
+NK.all.combo <- readRDS("NKsub_withGEmeta_withCORRECTreprog_111722.rds")
+DefaultAssay(NK.all.combo) <- "RNA"
+NK.all.combo <- NormalizeData(NK.all.combo, assay = "RNA")
 
 
 # Prepare data for correlations (>10 samples only) =======================
@@ -1991,8 +2375,10 @@ p <- ggscatter(age_linreg, x = "Age",
 # 
 # pdf("ReprogvAge_ALLBCsub_scatter_62922.pdf", width = 4, height = 3.5)
 # pdf("ReprogvAge_ALLBCsub_scatter_7622.pdf", width = 4, height = 3.5)
-pdf("ReprogvAge_ALLBCsub_scatter_71522.pdf", width = 4, height = 3.5)
-pdf("test.pdf", width = 4, height = 3.5)
+pdf("ReprogvAge_ALLBCsub_scatter_71522.pdf", width = 4, height = 3.5) ##preprint
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2")
+pdf("correctReprogvAge_ALLBCsub_scatter_111822.pdf", width = 4, height = 3.5)
+pdf("preprint_correctReprogvAge_ALLBCsub_scatter_112222.pdf", width = 4, height = 3.5)
 
 p+ theme(axis.line = element_line(colour = 'black', size = 1.5)) + 
   theme(axis.ticks = element_line(colour = "black", size = 1.5)) +
@@ -2010,10 +2396,16 @@ combo.reference <- readRDS("PrimObject_withreprog_noZallgenedem_71322.rds")
 DefaultAssay(combo.reference) <- "RNA"
 combo.reference <- NormalizeData(combo.reference, assay = "RNA")
 
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2")
+combo.reference <- readRDS("PrimObject_withCORRECTreprog_nootherchange_82422.rds") ##correction
+DefaultAssay(combo.reference) <- "RNA"
+combo.reference <- NormalizeData(combo.reference, assay = "RNA")
+
 
 
 # epiNK clustering =========================================
 
+table(Idents(combo.reference))
 epiNKsub <- subset(combo.reference, idents = c("Epithelial Cells",
                                                "Reprogrammed NK Cells",
                                                "NK Cells"))
@@ -2057,6 +2449,7 @@ DimPlot(epiNK.combo, reduction = "pca", raster = F, group.by = "orig.ident",
         order =c("Karaayvaz", "Savas", "Wu", "Aziziimmune", "Xu",
                  "AziziT", "Qian", "Wu2021prim", "Pal_Prim"))
 
+pdf("test.pdf")
 DimHeatmap(epiNK.combo, dims = 1:15, cells = 500, balanced = TRUE)
 DimHeatmap(epiNK.combo, dims = 15:25, cells = 500, balanced = TRUE)
 DimHeatmap(epiNK.combo, dims = 25:35, cells = 500, balanced = TRUE)
@@ -2065,7 +2458,7 @@ DimHeatmap(epiNK.combo, dims = 45:55, cells = 500, balanced = TRUE)
 DimHeatmap(epiNK.combo, dims = 55:65, cells = 500, balanced = TRUE)
 DimHeatmap(epiNK.combo, dims = 65:75, cells = 500, balanced = TRUE)
 DimHeatmap(epiNK.combo, dims = 75:85, cells = 500, balanced = TRUE)
-
+dev.off()
 
 epiNK.combo <- FindNeighbors(epiNK.combo, reduction = "pca", dims = 1:60)
 resolution.range <- c(0.05, 0.1, 0.2, 0.4, 0.7, 1.0, 1.3, 1.6)
@@ -2087,7 +2480,12 @@ DimPlot(epiNK.combo, reduction = "umap", label = TRUE, repel = TRUE, group.by = 
 DefaultAssay(epiNK.combo) <- "RNA"
 epiNK.combo <- NormalizeData(epiNK.combo, assay = "RNA")
 
+NK.all.combo <- readRDS("NKsubset_withCORRECTreprog_nootherchange_82422.rds") ##correction
+DefaultAssay(NK.all.combo) <- "RNA"
+NK.all.combo <- NormalizeData(NK.all.combo, assay = "RNA")
+
 Idents(epiNK.combo) <- epiNK.combo$celltype_final
+table(Idents(epiNK.combo))
 Idents(NK.all.combo) <- NK.all.combo$celltype_NKsub
 Idents(NK.all.combo) <- NK.all.combo$celltype_withreprog
 
@@ -2111,7 +2509,9 @@ table(Idents(epiNK.combo))
 epiNK.combo$celltype_withreprog <- Idents(epiNK.combo)
 epiNK.combo$celltype_NKsub <- Idents(epiNK.combo)
 
-saveRDS(epiNK.combo, "epiNK_withreprog_noZallgenedem_71322.rds")
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/correctrNK_preprint")
+saveRDS(epiNK.combo, "epiNK_withCORRECTreprog_nootherchange_112322.rds") ##correction
+saveRDS(epiNK.combo, "epiNK_withreprog_noZallgenedem_71322.rds") ##preprint
 # nichenet models =========================
 
 library(nichenetr)
@@ -2142,7 +2542,17 @@ head(weighted_networks$gr) # interactions and their weights in the gene regulato
 
 # nichenet (reprog) ===========================================
 
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/subclustering")
+epiNK <- readRDS("CancerEpicnvNK_withreprog_111722.rds")
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/correctrNK_preprint")
+epiNK <- readRDS("epiNK_withCORRECTreprog_nootherchange_112322.rds") ##correction
+# setwd("/project/InternalMedicine/Chan_lab/shared/FinalObjects/Primary_Only")
+# epiNK <- readRDS("epiNK_withreprog_noZallgenedem_71322.rds") ##preprint
+DefaultAssay(epiNK) <- "RNA"
+epiNK <- NormalizeData(epiNK, assay = "RNA")
+
 Idents(epiNK) <- epiNK$celltype_withreprog
+table(Idents(epiNK))
 epiNK <- RenameIdents(epiNK, `0` = "Non-Reprogrammed NK Cells", `1` = "Non-Reprogrammed NK Cells",
                       `2` = "Non-Reprogrammed NK Cells",
                       `3` = "Non-Reprogrammed NK Cells", `4` = "Non-Reprogrammed NK Cells",
@@ -2154,14 +2564,21 @@ temp_nichenet1 = nichenet_seuratobj_cluster_de(
   assay_oi = "RNA",
   receiver_affected = "Reprogrammed NK Cells",
   receiver_reference = "Non-Reprogrammed NK Cells",
-  sender = "Epithelial Cells",
+  sender = "Cancer Epithelial Cells",#"Epithelial Cells",
   geneset = "up", top_n_ligands = 50, top_n_targets = 200,
   ligand_target_matrix = ligand_target_matrix,
   lr_network = lr_network,
   weighted_networks = weighted_networks)
 
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/Nichenet")
+saveRDS(temp_nichenet1, "reprog_non_CANCERepi_nichenetresults_111722.rds")
+
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/correctrNK_preprint")
+saveRDS(temp_nichenet1, "correct_reprog_non_cancerepi_nichenetresults_NOOTHERCHANGE_112322.rds") ##correction
+
+
 setwd(nichenet_dir)
-saveRDS(temp_nichenet1, "reprog_non_epi_nichenetresults_SCTrna_71922.rds")
+saveRDS(temp_nichenet1, "reprog_non_epi_nichenetresults_SCTrna_71922.rds") ##preprint
 
 #epiNK$celltype_mainniche <- Idents(epiNK)
 # epiNK <- RenameIdents(epiNK, `0` = "Non-Reprogrammed NK Cells", `1` = "Non-Reprogrammed NK Cells",
@@ -2175,18 +2592,33 @@ temp_nichenet1 = nichenet_seuratobj_cluster_de(
   assay_oi = "RNA",
   receiver_affected = "Non-Reprogrammed NK Cells",
   receiver_reference = "Reprogrammed NK Cells",
-  sender = "Epithelial Cells",
+  sender = "Cancer Epithelial Cells", #Epithelial Cells",
   geneset = "up", top_n_ligands = 50, top_n_targets = 200,
   ligand_target_matrix = ligand_target_matrix,
   lr_network = lr_network,
   weighted_networks = weighted_networks)
 
-setwd(nichenet_dir)
-saveRDS(temp_nichenet1, "NON_reprogref_epi_nichenetresults_SCTrna_71922.rds")
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/Nichenet")
+saveRDS(temp_nichenet1, "NONreprog_reprogref_CANCERepi_nichenetresults_111722.rds")
+
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/correctrNK_preprint")
+saveRDS(temp_nichenet1, "correct_NONreprog_reprogref_cancerepi_nichenetresults_NOOTHERCHANGE_112322.rds") ##correction
+
+
+# setwd(nichenet_dir)
+# saveRDS(temp_nichenet1, "NON_reprogref_epi_nichenetresults_SCTrna_71922.rds") ##preprint
 #saveRDS(temp_nichenet1, "reprog_non_epi_nichenetresults_SCTrna_7522.rds")
 
 
 # circos plot plain ==============================
+
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/Nichenet")
+temp_nichenet1 <- readRDS(file = "reprog_non_CANCERepi_nichenetresults_111722.rds")
+
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/Nichenet")
+write.csv(temp_nichenet1$ligand_receptor_df, "CANCEREPI_Reprog_nonReF_Ligandreceptor_FULLLIST_111722.csv")
+write.csv(temp_nichenet1$ligand_target_df, "CANCEREPI_Reprog_nonReF_Ligand_target_FULLLIST_111722.csv")
+
 
 setwd(nichenet_dir)
 temp_nichenet1 <- readRDS(file = "reprog_non_epi_nichenetresults_SCTrna_71922.rds")
@@ -2238,18 +2670,38 @@ dev.off()
 #
 # Read in NicheNet results -------
 
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/Nichenet")
+files <- list.files(pattern = "CANCERepi_nichenetresults_111722.rds")
 
-setwd(nichenet_dir)
-files <- list.files(pattern = "nichenetresults_SCTrna_71922.rds")
-files <- files[c(7,12)] #for rNK and non-rNK
-#files <- files[c(1:6)] #for NK subsets
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/correctrNK_preprint")
+files <- list.files(pattern = "_NOOTHERCHANGE_112322.rds") ##correct
+
+
+##preprint next 3 lines
+# setwd(nichenet_dir)
+# files <- list.files(pattern = "nichenetresults_SCTrna_71922.rds")
+# files <- files[c(7,12)] #for rNK and non-rNK
+# #files <- files[c(1:6)] #for NK subsets
 
 #files <- "reprog_non_epi_nichenetresults_SCTrna_8522.rds"
 
 # Nichenet object subsets (NKsub) ----------
 
-setwd(PrimDir)
-combo.reference <- readRDS("PrimObject_withreprog_noZallgenedem_71322.rds") ##newnewnew
+# setwd(PrimDir)
+# combo.reference <- readRDS("PrimObject_withreprog_noZallgenedem_71322.rds") ##preprint
+
+setwd("/project/InternalMedicine/Chan_lab/shared")
+combo.reference <- readRDS("PrimObj_withGEmeta_with_correctassays_withfinalreprog_111622.rds")
+DefaultAssay(combo.reference) <- "RNA"
+combo.reference <- NormalizeData(combo.reference, assay = "RNA")
+
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2")
+combo.reference <- readRDS("PrimObject_withCORRECTreprog_nootherchange_82422.rds") ##correction
+DefaultAssay(combo.reference) <- "RNA"
+combo.reference <- NormalizeData(combo.reference, assay = "RNA")
+
+table(Idents(combo.reference))
+
 
 cell <- unique(combo.reference$celltype_withreprog)
 cell <- cell[which(!(cell %in%c("NK Cells", "Reprogrammed NK Cells")))]
@@ -2261,53 +2713,61 @@ Idents(NKsubset) <- NKsubset$celltype_withreprog
 
 primsubset <- subset(combo.reference, subset = celltype_withreprog %in% cell)
 primsubset$newidents <- "other"
-primsubset$newidents[which(primsubset$celltype_withreprog == "Epithelial Cells")] <- "epi"
+primsubset$newidents[which(primsubset$celltype_withreprog == "Cancer Epithelial Cells")] <- "epi" #Epithelial Cells")] <- "epi"
 Idents(primsubset) <- primsubset$newidents
 
-episubset <- subset(primsubset, subset = celltype_withreprog == "Epithelial Cells")
+episubset <- subset(primsubset, subset = celltype_withreprog == "Cancer Epithelial Cells") #Epithelial Cells")
 DefaultAssay(episubset) <- "RNA"
 episubset <- NormalizeData(episubset, assay = "RNA")
 
-episubset.save <- episubset
+episubset.save <- episubset # #episubset.save is a temp object to store all BC subtypes
 episubset <- subset(episubset, subset = BC.Subtype == "TNBC")
 episubset <- subset(episubset, subset = BC.Subtype == "HR+")
 episubset <- subset(episubset, subset = BC.Subtype == "HER2+")
-episubset <- episubset.save
+episubset <- episubset.save ##run this after finish one subtype
 
 
-# NicheNet Circos plot by grouping -----------
+# NicheNet Circos plot by grouping --------------
+
+## for NK subset nichenet vvvvvvvvvvvvvvv
+# setwd(NKsubDir)
+# NK.all.combo <- readRDS("NK_withNKpathways_noZallgenedem_71422.rds") #preprint
+
+# setwd("/project/InternalMedicine/Chan_lab/shared")
+# NK.all.combo <- readRDS("NKsub_withGEmeta_withCORRECTreprog_111722.rds") #newnewnew
+# 
+# Idents(NK.all.combo) <- NK.all.combo$celltype_NKsub
+# table(Idents(NK.all.combo))
+# 
+# NK0 <- WhichCells(NK.all.combo, idents = "0")
+# NK1 <- WhichCells(NK.all.combo, idents = "1")
+# NK2 <- WhichCells(NK.all.combo, idents = "2")
+# NK3 <- WhichCells(NK.all.combo, idents = "3")
+# NK4 <- WhichCells(NK.all.combo, idents = "4")
+# NK5 <- WhichCells(NK.all.combo, idents = "5")
+# 
+# Idents(NKsubset, cells = NK0) <- "NK0"
+# Idents(NKsubset, cells = NK1) <- "NK1"
+# Idents(NKsubset, cells = NK2) <- "NK2"
+# Idents(NKsubset, cells = NK3) <- "NK3"
+# Idents(NKsubset, cells = NK4) <- "NK4"
+# Idents(NKsubset, cells = NK5) <- "NK5"
+
+table(Idents(NKsubset))
 
 all_receptors <- data.frame()
 all_targets <- data.frame()
 
-setwd(NKsubDir)
-NK.all.combo <- readRDS("NK_withNKpathways_noZallgenedem_71422.rds") #newnewnew
-
-Idents(NK.all.combo) <- NK.all.combo$celltype_NKsub
-table(Idents(NK.all.combo))
-
-NK0 <- WhichCells(NK.all.combo, idents = "0")
-NK1 <- WhichCells(NK.all.combo, idents = "1")
-NK2 <- WhichCells(NK.all.combo, idents = "2")
-NK3 <- WhichCells(NK.all.combo, idents = "3")
-NK4 <- WhichCells(NK.all.combo, idents = "4")
-NK5 <- WhichCells(NK.all.combo, idents = "5")
-
-Idents(NKsubset, cells = NK0) <- "NK0"
-Idents(NKsubset, cells = NK1) <- "NK1"
-Idents(NKsubset, cells = NK2) <- "NK2"
-Idents(NKsubset, cells = NK3) <- "NK3"
-Idents(NKsubset, cells = NK4) <- "NK4"
-Idents(NKsubset, cells = NK5) <- "NK5"
-
-table(Idents(NKsubset))
-
 targetlist <- list()
 receptorlist <- list()
+
 for (j in files) {
   #setwd("/endosome/work/InternalMedicine/s437775/simil/simil_cancerepi/071322/Nichenet")
   
-  setwd(nichenet_dir)
+
+  #setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/Nichenet") ##newnew
+  setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/correctrNK_preprint") ##correction
+  #setwd(nichenet_dir)  ##preprint
   temp_nichenet <- readRDS(j)
   if (j == files[1]) { cell = "NK Cells" ; print(j); print(cell)} else { cell = "Reprogrammed NK Cells" ; print(j); print(cell)} #for rNK and non-rNK
   # if (j == files[1]) { cell = "NK0" ; print(j); print(cell)} 
@@ -2357,17 +2817,28 @@ for (j in files) {
   #                                                                    LR_matrix$recexp[,5]) #nk clusters
   dim(LR_matrix)
   
-  #lr.df.top <- LR_matrix %>% top_n(20, LRexp) #paper cutoff
-  lr.df.top <- LR_matrix %>% top_n(50, LRexp)
+  lr.df.top <- LR_matrix %>% top_n(20, LRexp) #paper cutoff
+  #lr.df.top <- LR_matrix %>% top_n(50, LRexp)
   lr.df.top <- lr.df.top[,c(1:3)]
   #lr.df.top <- unique(rbind(lr.df.top, PD1, PD2))
   
-  setwd(DEGdir)
+  ##setwd(DEGdir)
   
+  setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/Nichenet")
   #generate circos plot with top 20 LR pairs by recexp
+  # pdf(paste(cell, "TNBCcancerEpi_rNK_top20_circos_111722.pdf", sep = "_"), width = 8, height = 8)
+  # pdf(paste(cell, "HRcancerEpi_rNK_top20_circos_111722.pdf", sep = "_"), width = 8, height = 8)
+  # pdf(paste(cell, "HER2cancerEpi_rNK_top20_circos_111722.pdf", sep = "_"), width = 8, height = 8)
+  
+  setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/correctrNK_preprint")
+  #pdf(paste(cell, "correct_TNBCEpi_rNK_top20_circos_112322.pdf", sep = "_"), width = 8, height = 8)
+  #pdf(paste(cell, "correct_HREpi_rNK_top20_circos_112322.pdf", sep = "_"), width = 8, height = 8)
+  pdf(paste(cell, "correct_HER2Epi_rNK_top20_circos_112322.pdf", sep = "_"), width = 8, height = 8)
+  
+  
   # pdf(paste(cell, "allcancerepi_8522_top50_TNBConly_circos.pdf", sep = "_"), width = 8, height = 8)
   # pdf(paste(cell, "allcancerepi_8522_top50_HRonly_circos.pdf", sep = "_"), width = 8, height = 8)
-  pdf(paste(cell, "allcancerepi_8522_top50_HER2only_circos.pdf", sep = "_"), width = 8, height = 8)
+  # pdf(paste(cell, "allcancerepi_8522_top50_HER2only_circos.pdf", sep = "_"), width = 8, height = 8)
   
   # pdf(paste(cell, "allcancerepi_72522_top20_ALLEpi_circos.pdf", sep = "_"), width = 8, height = 8)
   # pdf(paste(cell, "allcancerepi_72522_top20_TNBConly_circos.pdf", sep = "_"), width = 8, height = 8)
@@ -2376,7 +2847,7 @@ for (j in files) {
   
   circos.par(canvas.ylim=c(-1.5,1.5), # edit  canvas size
              track.margin = c(0.01, 0)) # adjust bottom and top margin
-  
+
   chordDiagram(lr.df.top,
                directional = 1,
                link.sort = TRUE,
@@ -2384,47 +2855,63 @@ for (j in files) {
                link.visible = lr.df.top$weight,
                annotationTrack = "grid",
                preAllocateTracks = list(track.height = 0.05))
-  
+
   circos.track(track.index = 1, panel.fun = function(x, y) {
     circos.text(CELL_META$xcenter, CELL_META$ylim[1], CELL_META$sector.index,
                 facing = "clockwise", niceFacing = TRUE, adj = c(0, 0.55), cex = 1)
   }, bg.border = NA)
   circos.clear()
-  
+
   dev.off()
+
   
   # # create NicheNet output plots
   # p <- temp_nichenet$ligand_activity_target_heatmap
   # ggsave(paste0("GM", GM, "_", cell, "_RL_activity_heatmap.pdf"), plot = p, width = 15, height = 10)
-  
-  # targets <- temp_nichenet$ligand_target_df[which(temp_nichenet$ligand_target_df$ligand %in% LR_matrix$ligand),]
-  # #targets <- targets %>% group_by(target) %>% mutate(avg_weight = mean(weight)) %>%
-  # #  add_count(target)
-  # #targets <- unique(targets[,-c(1,3)])
+
+  targets <- temp_nichenet$ligand_target_df[which(temp_nichenet$ligand_target_df$ligand %in% LR_matrix$ligand),]
+  targets <- targets %>% group_by(target) %>% mutate(avg_weight = mean(weight)) %>%
+  add_count(target)
+  targets <- unique(targets[,-c(1,3)])
   # # p <- DotPlot(primsubset, assay = "RNA", features = unique(targets$target), cols = "RdBu") + RotatedAxis()
   # # ggsave(paste0("GM", GM, "_RL_toptarget_dotplot.pdf"), plot = p, width = 20, height = 5)
-  # targets <- as.data.frame(targets)
-  # targets$NK <- cell
-  # targets$cell <- "Epithelial Cells"
-  # targetlist[[cell]] <- targets
-  # all_targets <- rbind(all_targets, targets)
-  # 
-  # receptors <- LR_matrix
+  targets <- as.data.frame(targets)
+  targets$NK <- cell
+  targets$cell <- "HER2+ Epithelial Cells" #"Epithelial Cells"
+  targetlist[[cell]] <- targets
+  all_targets <- rbind(all_targets, targets)
+  
+  receptors <- LR_matrix
   # # p <- DotPlot(primsubset, assay = "RNA", features = unique(receptors$receptor), cols = "RdBu") + RotatedAxis()
   # # ggsave(paste0("GM", GM, "_RL_topreceptor_dotplot.pdf"), plot = p, width = 20, height = 5)
-  # receptors <- as.data.frame(receptors)
-  # receptors$NK <- cell
-  # receptors$cell <- "Epithelial Cells"
-  # receptorlist[[cell]] <- receptors
-  # all_receptors <- rbind(all_receptors, receptors)
+  receptors <- as.data.frame(receptors)
+  receptors$NK <- cell
+  receptors$cell <- "HER2+ Epithelial Cells"#"Epithelial Cells"
+  receptorlist[[cell]] <- receptors
+  all_receptors <- rbind(all_receptors, receptors)
   
 }
 
-write.csv(all_receptors, "rNK_allcancerepi_receptors_8522.csv")
-write.csv(all_targets, "rNK_allcancerepi_targets_8522.csv")
+##revision _________________
+write.csv(all_receptors, "rNK_TNBCcancerEpiONLY_receptors_111822.csv")
+write.csv(all_targets, "rNK_TNBCcancerEpiONLY_targets_111822.csv")
+write.csv(all_receptors, "rNK_HRcancerEpiONLY_receptors_111822.csv")
+write.csv(all_targets, "rNK_HRcancerEpiONLY_targets_111822.csv")
+write.csv(all_receptors, "rNK_HER2cancerEpiONLY_receptors_111822.csv")
+write.csv(all_targets, "rNK_HER2cancerEpiONLY_targets_111822.csv")
 
 
+##correction _________________
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/correctrNK_preprint")
+# write.csv(all_receptors, "preprint_rNK_TNBCepi_receptors_112322.csv")
+# write.csv(all_targets, "preprint_rNK_TNBCepi_targets_112322.csv")
+# write.csv(all_receptors, "preprint_rNK_HRepi_receptors_112322.csv")
+# write.csv(all_targets, "preprint_rNK_HRepi_targets_112322.csv")
+write.csv(all_receptors, "preprint_rNK_HER2epi_receptors_112322.csv")
+write.csv(all_targets, "preprint_rNK_HER2epi_targets_112322.csv")
 
+
+##preprint __________
 saveRDS(receptorlist, "NK_TNBCepi_receptors_72622.rds")
 saveRDS(targetlist, "NK_TNBCepi_targets_72622.rds")
 
@@ -2437,7 +2924,6 @@ saveRDS(targetlist, "NK_HER2epi_targets_72622.rds")
 
 write.csv(all_receptors, "NK_allcancerepi_receptorsTNBC.csv")
 write.csv(all_targets, "NK_allcancerepi_targetsTNBC.csv")
-
 
 write.csv(all_receptors, "NK_allcancerepi_receptorsHR.csv")
 write.csv(all_targets, "NK_allcancerepi_targetsHR.csv")
@@ -2693,10 +3179,13 @@ PatientQ1<-substr(colnames(dataSignature)[idx],1,12)[900:dim(dataSignature)[2]]
 
 BRCA.surv.select<-survivalTCGA(BRCA.clinical, extract.cols = c("patient.histological_type",
                                                                "patient.clinical_cqcf.tumor_type" ,
-                                                               "patient.age_at_initial_pathologic_diagnosis",                                                          "patient.new_tumor_events.new_tumor_event_after_initial_treatment"))
-
+                                                               "patient.age_at_initial_pathologic_diagnosis",
+                                                               "patient.days_to_death",
+                                                               "patient.new_tumor_events.new_tumor_event_after_initial_treatment"))
+##try filtering here for age stuff if bad ;'(
 brca.subtype <- TCGAquery_subtype(tumor = "brca")
 timelim = 3650#2000
+
 #BRCA.surv.select<-BRCA.surv.select %>% #dplyr::filter(bcr_patient_barcode %in% subset(brca.subtype,BRCA_Subtype_PAM50 != "Basal")$patient) %>% 
 #  dplyr::filter(times<timelim)
 BRCA.surv.select$scoreCut<- ifelse(BRCA.surv.select$bcr_patient_barcode %in% PatientHigh, "High","Low")
@@ -2705,7 +3194,7 @@ BRCA.surv.select$scoreQ14<- ifelse(BRCA.surv.select$bcr_patient_barcode %in% Pat
 
 
 # setwd("/project/InternalMedicine/Chan_lab/shared/FinalObjects/TCGA_Analysis/ReprogGenes/noinfiltrate/")
-# 
+
 # pdf(paste("ReprogSig_survplot_NOinfiltrate_61322.pdf", sep = ""), height = 6,width=7)
 # pdf("test.pdf")
 # RTCGA::kmTCGA(
@@ -2730,11 +3219,13 @@ BRCA.surv.select.sub$scoreCut<- ifelse(BRCA.surv.select.sub$bcr_patient_barcode 
 
 
 
-setwd("/project/InternalMedicine/Chan_lab/shared/FinalObjects/TCGA_Analysis/ReprogGenes/yesinfiltrate/")
+setwd("/project/InternalMedicine/Chan_lab/shared/FinalObjects/TCGA_Analysis/ReprogGenes/yesinfiltrate/") ##preprint
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/survival")
 
 #pdf("ReprogSig_survplot_immuneinfiltrate_NKrestact0.015_72722.pdf", width = 5, height = 4.4)
-#pdf("ReprogSig_survplot_immuneinfiltrate_NKrestact0.015_10years_72722.pdf", width = 5, height = 4.4)
+#pdf("ReprogSig_survplot_immuneinfiltrate_NKrestact0.015_10years_72722.pdf", width = 5, height = 4.4) ##preprint
 pdf("reprogSig_survplot_immuneinfiltrate_NKrestact0.015_10years_noSLC7A5_102022.pdf", width = 5, height = 4.4)
+#pdf("reprogSig_survplot_immuneinfiltrate_NKrestact0.015_2000days_noSLC7A5_111722.pdf", width = 5, height = 4.4)
 RTCGA::kmTCGA(
   BRCA.surv.select.sub,
   times = "times",
@@ -2798,7 +3289,7 @@ for (Indgene in geneID.list)
                                                                  "patient.age_at_initial_pathologic_diagnosis",                                                          "patient.new_tumor_events.new_tumor_event_after_initial_treatment"))
   
   brca.subtype <- TCGAquery_subtype(tumor = "brca")
-  timelim = 3650#2000
+  timelim = 3650
   
   BRCA.surv.select$scoreCut<- ifelse(BRCA.surv.select$bcr_patient_barcode %in% PatientHigh, "High","Low")
   BRCA.surv.select$scoreQ14<- ifelse(BRCA.surv.select$bcr_patient_barcode %in% PatientQ1, "Q1",
@@ -2813,9 +3304,11 @@ for (Indgene in geneID.list)
   BRCA.surv.select.sub<-BRCA.surv.select %>% dplyr::filter(bcr_patient_barcode %in% useSample)
   BRCA.surv.select.sub$scoreCut<- ifelse(BRCA.surv.select.sub$bcr_patient_barcode %in% PatientHigh, "High","Low")
   
-  setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/rNK_individual")  
+  setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/survival/rNK_individual")  
+  #setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/survival/rNKind_2000days")  
   
   pdf(paste(gene_name, "_survplot_Immuneinfiltrate_NKrestact0.015_10years_101722.pdf", sep = ""), height = 6,width=7)
+  #pdf(paste(gene_name, "_survplot_Immuneinfiltrate_NKrestact0.015_2000days_111722.pdf", sep = ""), height = 6,width=7)
   print(RTCGA::kmTCGA(
     BRCA.surv.select.sub,
     times = "times",
@@ -2831,5 +3324,63 @@ for (Indgene in geneID.list)
   
 }
 
+
+## correlation age (REVIEWER ADDITION) ++++++++++++++++++++++++++++++++++++++ -----
+
+head(colData(BRCA.surv.select))
+colnames(BRCA.clinical)[grep("days_to_death", colnames(BRCA.clinical))]
+colnames(BRCA.clinical)[grep("age", colnames(BRCA.clinical))]
+
+BRCA.surv.select<-survivalTCGA(BRCA.clinical, extract.cols = c("patient.histological_type",
+                                                               "patient.clinical_cqcf.tumor_type" ,
+                                                               "patient.age_at_initial_pathologic_diagnosis",
+                                                               "patient.days_to_death",
+                                                               "patient.new_tumor_events.new_tumor_event_after_initial_treatment"))
+
+head(BRCA.surv.select)
+
+head(BRCA.surv.select$patient.age_at_initial_pathologic_diagnosis)
+table(BRCA.surv.select$patient.days_to_death)
+
+class(BRCA.surv.select$patient.age_at_initial_pathologic_diagnosis)
+BRCA.surv.select$patient.age_at_initial_pathologic_diagnosis <- as.numeric(BRCA.surv.select$patient.age_at_initial_pathologic_diagnosis)
+BRCA.surv.select <- BRCA.surv.select[which(!is.na(BRCA.surv.select$patient.age_at_initial_pathologic_diagnosis)),]
+
+class(BRCA.surv.select$patient.days_to_death)
+BRCA.surv.select$patient.days_to_death <- as.numeric(BRCA.surv.select$patient.days_to_death)
+BRCA.surv.select <- BRCA.surv.select[which(!is.na(BRCA.surv.select$patient.days_to_death)),]
+
+BRCA.surv.select <- BRCA.surv.select %>% 
+  mutate(patient.years_to_death = patient.days_to_death / 365)
+summary(BRCA.surv.select$patient.years_to_death)
+summary(BRCA.surv.select$patient.age_at_initial_pathologic_diagnosis)
+
+library(ggpubr)
+p <- ggscatter(BRCA.surv.select, x = "patient.age_at_initial_pathologic_diagnosis", 
+               y = "patient.years_to_death",
+               add = "reg.line",
+               conf.int = TRUE,
+               add.params = list(color = "blue", fill = "lightgray"),
+               xlab = "Age",
+               ylab = "Years to Death") + theme_classic() +
+  stat_cor(method = "pearson", size = 6, mapping = aes(label = "..p.adj..")) +
+  scale_y_continuous(breaks = c(0, 5, 10, 15),
+                     limits = c(0, 15))
+
+setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2/survival")
+pdf("agevdeath_TCGAsurvival_112122.pdf", width = 4, height = 3.5)
+
+p+ theme(axis.line = element_line(colour = 'black', size = 1.5)) + 
+  theme(axis.ticks = element_line(colour = "black", size = 1.5)) +
+  theme(text = element_text(size = 16)) +
+  theme(axis.text = element_text(size = 16))
+dev.off()
+
+
+##x = age at diagnosis/365 for years
+## y = days to death/365 for years
+
+##scatter plot with linear regression line and see if significant or not
+## if not significant, then yay, if is significant, then do survival individuall on each age group
 
 
