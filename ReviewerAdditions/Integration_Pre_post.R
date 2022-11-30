@@ -286,7 +286,7 @@ dev.off()
 #PC loadings after -------
 
 setwd("/project/InternalMedicine/Chan_lab/shared/FinalObjects/Primary_Only/")
-combo.reference <- readRDS("PrimObject_withreprog_noZallgenedem_71322.rds") ##newnewnew
+combo.reference <- readRDS("PrimObj_withGEmeta_with_correctassays_withfinalreprog_111622.rds") ##newnewnew
 
 
 #top10_20PC <- Find_top_bot_ngenes_forPCs(combo.reference, "top", "PrimMain", prepostDir)
@@ -327,10 +327,14 @@ bottom_PC_post_final <- bottom_PC_post_final[,-1]
 write.csv(bottom_PC_post_final, "MainPrim_BOTTOM10genestop20PCs_andloadings_102822.csv")
 
 
+pdf("test.pdf")
+VlnPlot(object = combo.reference, features = 'PC_1', group.by = "orig.ident", raster = F)
+dev.off()
+
 #barplot of cohort per cluster ------------------
 
-setwd("/project/InternalMedicine/Chan_lab/shared/FinalObjects/Primary_Only/")
-combo.reference <- readRDS("PrimObject_withreprog_noZallgenedem_71322.rds") ##newnewnew
+setwd("/project/InternalMedicine/Chan_lab/shared/")
+combo.reference <- readRDS("PrimObj_withGEmeta_with_correctassays_withfinalreprog_111622.rds") ##newnewnew
 
 table(Idents(combo.reference))
 
@@ -361,10 +365,10 @@ sobjlists <- FetchData(object = combo.reference,
 sobjlists <- sobjlists %>% dplyr::group_by(celltype_final,
                                            # samples,
                                            # Patient,
-                                          # BC.Subtype,
+                                          BC.Subtype,
                                            # orig.ident,
-                                           # Capture.Method,
-                                           Library.Preparation
+                                           #Capture.Method,
+                                           # Library.Preparation
   ) %>%
   dplyr::summarise(Nb = n()) %>%
   dplyr::mutate(C = sum(Nb)) %>%
@@ -378,7 +382,7 @@ bp <- ggplot(sobjlists,
              aes(x = celltype_final,
                  y = percent,
                  #group = as.factor(BC.Subtype),
-                 fill = Library.Preparation)) +
+                 fill = BC.Subtype)) +
   scale_fill_viridis(option = "H", discrete = T) + 
   # scale_fill_manual(name = "Dataset",
   #                   values = turbo(9),
@@ -420,11 +424,73 @@ bp <- ggplot(sobjlists,
   RotatedAxis()
 
 
-#pdf("proportion_dataset_perclust_11322.pdf", width = 18.4, height = 5.4)
-#pdf("proportion_samples_perclust_11322.pdf", width = 25.4, height = 12.4)
-#pdf("proportion_Patient_perclust_11322.pdf", width = 25.4, height = 12.4)
-#pdf("proportion_CaptureMethod_perclust_11322.pdf", width = 25.4, height = 12.4)
-pdf("proportion_LibraryPrep_perclust_11322.pdf", width = 25.4, height = 12.4)
+#pdf("proportion_dataset_perclust_112522.pdf", width = 18.4, height = 5.4)
+#pdf("proportion_samples_perclust_112522.pdf", width = 25.4, height = 12.4)
+#pdf("proportion_Patient_perclust_112522.pdf", width = 25.4, height = 12.4)
+#pdf("proportion_CaptureMethod_perclust_112522.pdf", width = 25.4, height = 12.4)
+#pdf("proportion_LibraryPrep_perclust_112522.pdf", width = 25.4, height = 12.4)
+pdf("proportion_BCsub_perclust_112522.pdf", width = 25.4, height = 12.4)
 bp
 dev.off()
 
+
+#compare original labsl -=-=======
+
+combo.reference <- readRDS("/project/InternalMedicine/Chan_lab/shared/PrimObj_withGEmeta_with_correctassays_withfinalreprog_111622.rds")
+
+finalQC_Dir <- "/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Preprocessing/scRNA/PrimaryBreast_Processing/Individual_Dataset_Objects/finalQC"
+
+setwd(finalQC_Dir)
+AziziPrim.fixed <- readRDS("AziziPrim_fixed_62722.rds")
+head(AziziPrim.fixed@meta.data)
+AziziT.fixed <- readRDS("AziziT_fixed_62722.rds") #has celltype info (col: celltype_minor)
+head(AziziT.fixed@meta.data)
+Karaayvaz.fixed <- readRDS("Karaayvaz_fixed_62722.rds") #has celltype info (col: celltype_minor)
+head(Karaayvaz.fixed@meta.data)
+Pal.fixed <- readRDS("Pal_fixed_62722.rds")
+head(Pal.fixed@meta.data)
+Qian.fixed <- readRDS("Qian_fixed_62722.rds") #has celltype info (col: celltype_minor)
+head(Qian.fixed@meta.data)
+Savas.fixed <- readRDS("Savas_fixed_62722.rds") #has celltype info (col: celltype_minor)
+head(Savas.fixed@meta.data)
+OldWu.fixed <- readRDS("OldWu_fixed_62722.rds") #has celltype info (col: celltype_minor)
+head(OldWu.fixed@meta.data)
+NewWu.fixed <- readRDS("NewWu_fixed_62722.rds") #has celltype info (cols: celltype_major, celltype_minor, celltype_subset)
+head(NewWu.fixed@meta.data)
+Xu.fixed <- readRDS("Xu_fixed_62722.rds")
+head(Xu.fixed@meta.data)
+
+
+unique(combo.reference$orig.ident)
+
+Kara.new <- subset(combo.reference, subset = orig.ident == "Karaayvaz")
+unique(Kara.new$celltype_final)
+unique(Kara.new$celltype_minor)
+Kara.new$celltype_final[which(Kara.new$celltype_final == "Cancer Epithelial Cells")] <- "epithelial"
+Kara.new$celltype_final[which(Kara.new$celltype_final == "CD4+ T Cells")] <- "Tcell"
+Kara.new$celltype_final[which(Kara.new$celltype_final == "Fibroblasts")] <- "stroma"
+Kara.new$celltype_final[which(Kara.new$celltype_final == "Epithelial Cells")] <- "epithelial"
+Kara.new$celltype_final[which(Kara.new$celltype_final == "Perivascular-like (PVL) Cells")] <- "stroma"
+Kara.new$celltype_final[which(Kara.new$celltype_final == "Plasma Cells")] <- "Bcell"
+
+
+
+AziziT.new <- subset(combo.reference, subset = orig.ident == "AziziT")
+table(Kara.new$celltype_final)
+table(Kara.new$celltype_minor)
+
+Qian.new <- subset(combo.reference, subset = orig.ident == "Qian")
+table(Kara.new$celltype_final)
+table(Kara.new$celltype_minor)
+
+Savas.new <- subset(combo.reference, subset = orig.ident == "Savas")
+table(Kara.new$celltype_final)
+table(Kara.new$celltype_minor)
+
+OldWu.new <- subset(combo.reference, subset = orig.ident == "Wu")
+table(Kara.new$celltype_final)
+table(Kara.new$celltype_minor)
+
+NewWu.new <- subset(combo.reference, subset = orig.ident == "Wu2021prim")
+table(Kara.new$celltype_final)
+table(Kara.new$celltype_minor)
