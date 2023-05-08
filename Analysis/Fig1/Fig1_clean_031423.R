@@ -1,32 +1,34 @@
+setwd("/endosome/work/InternalMedicine/s437775/BreastCancer_Integrated/Analysis/Fig1")
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
+# This will generate all of the sub-figures for Figure 1, ---------------------
+# and is the exploratory analysis for the NK subsets --------------------------
+# as well as the analysis around the rNK population. --------------------------
 
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Note: for extra code, check files: ------------------------------------------
 
-# This will generate all of the sub-figures for Figure 2,
-# and is the exploratory analysis for the NK subsets
-# as well as the analysis around the rNK population.
+# ReprogSCT.R, NKAnalysis.R, similboxplot.R in
+# /project/InternalMedicine/Chan_lab/shared/FinalObjects/Primary_Only 
 
+# and simil_reprogNK2_s204665.R, scRNA_seq_Functions.R in
+# /project/InternalMedicine/Chan_lab/shared
 
-#_____________________________________________________________________
+# and Prim_Subset_Objects.R, Reprogrammed_ID.R in 
+# /project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Preprocessing/scRNA
 
-##note: for extra code check files 
+# and SurvivalFinal.R in 
+# /project/InternalMedicine/Chan_lab/shared/FinalObjects/TCGA_Analysis
 
-##ReprogSCT.R, NKAnalysis.R, similboxplot.R in
-## /project/InternalMedicine/Chan_lab/shared/FinalObjects/Primary_Only 
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
-##and simil_reprogNK2_s204665.R, scRNA_seq_Functions.R in
-## /project/InternalMedicine/Chan_lab/shared
+# SETUP: ----------------------------------------------------------------------
 
-##and Prim_Subset_Objects.R, Reprogrammed_ID.R in 
-## /project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Preprocessing/scRNA
-
-##and SurvivalFinal.R in /project/InternalMedicine/Chan_lab/shared/FinalObjects/TCGA_Analysis
-
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
+# Directories -----------------------------------------------------------------
 
 sharedDir <- "/project/InternalMedicine/Chan_lab/shared/"
 
@@ -66,17 +68,14 @@ ReprogSig.final = c("CALD1", "CLU", "ALOX12", "LTBP1", "CAVIN2", "PARVB",
 
 
 # Libraries -------------------------------------------------------------
-#install.packages("future.batchtools")
+
 library(BiocManager)
 library(GEOquery) 
-#install.packages("plyr")
 library(plyr)#, lib.loc="/opt/R/4.0.2/lib64/R/library")
 library(dplyr) 
 library(Matrix)
 library(devtools)
-#install.packages("Seurat")
 library(Seurat)#, lib.loc="/opt/R/4.0.2/lib64/R/library") 
-#install.packages("ggplot2")
 library(ggplot2)#, lib.loc="/opt/R/4.0.2/lib64/R/library") 
 library(cowplot) 
 library(SAVER) 
@@ -89,8 +88,6 @@ library(velocyto.R)
 library(loomR)
 library(clustree)
 library(tibble)
-
-library(TFEA.ChIP)
 library(org.Hs.eg.db)
 library(TCGAbiolinks)
 library(survminer)
@@ -102,38 +99,16 @@ library(RTCGA.clinical)
 library(pheatmap)
 library(cetcolor)
 library(readxl)
-#If you need to find what package a function is in:
-#install.packages("sos")
-#library("sos")
-#findFn("Heatmap")
-
-
-
 library(devtools)
-#install_github("immunogenomics/harmony")
 library(harmony)
 library(SeuratData)
 library(UCell)
-
-#install.packages("sctransform")
-#remotes::install_github("ChristophH/sctransform@develop")
-#devtools::install_github("const-ae/sparseMatrixStats")
-#BiocManager::install("glmGamPoi")
 library(glmGamPoi)
 library(sctransform)#, lib.loc="/opt/R/4.0.2/lib64/R/library")
 library(matrixStats)#, lib.loc="/opt/R/4.0.2/lib64/R/library")
 library(sparseMatrixStats)
-library(DESeq2)
-library(genefu)
 
-
-
-
-
-
-# ================================================================== ======
-
-# FUNCTIONS ----- ------------------------------
+# Functions ------------------------------------------------------------------
 
 SCT_Ref_Integrate_Seurat <- function(seurat_obj, 
                                      batch = "Capture.Method", 
@@ -299,118 +274,64 @@ simil <- function(df, drop, file, method) {
 
 
 
-# ================================================================== ======
-# ================================================================== ======
+# Load in full primary breast atlas object ------
 
-
-#2A NK Clustering ========================
-# ================================================================== ======
-# load in Prim object ------
-
-# setwd(PrimDir)
-# combo.reference <- readRDS("PrimObject_withreprog_noZallgenedem_71322.rds")
-# DefaultAssay(combo.reference) <- "RNA"
-# combo.reference <- NormalizeData(combo.reference, assay = "RNA")
-
-setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2")
-combo.reference <- readRDS("PrimObject_withCORRECTreprog_nootherchange_82422.rds") ##newnewnew
-setwd("/project/InternalMedicine/Chan_lab/shared/")
-combo.inferCNV <- readRDS("nichenetobj_111122.rds")
-
-combo.reference@meta.data <- combo.reference@meta.data[,-c(82,85)] 
-head(combo.inferCNV@meta.data)
-
-unique(colnames(combo.inferCNV@meta.data))
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"totalCNV", drop = F], "totalCNV")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"corCNV", drop = F], "corCNV")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"cancer", drop = F], "cancer")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"ESR1", drop = F], "ESR1")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"ERBB2", drop = F], "ERBB2")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"PIK3CA", drop = F], "PIK3CA")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"NTRK", drop = F], "NTRK")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"CD274", drop = F], "CD274")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"ERBB3", drop = F], "ERBB3")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"EGFR", drop = F], "EGFR")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"FGFR", drop = F], "FGFR")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"TACSTD2", drop = F], "TACSTD2")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"CDK", drop = F], "CDK")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"AR", drop = F], "AR")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"NECTIN2", drop = F], "NECTIN2")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"LAG3", drop = F], "LAG3")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"raw_GM1", drop = F], "raw_GE1")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"raw_GM2", drop = F], "raw_GE2")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"raw_GM3", drop = F], "raw_GE3")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"raw_GM4", drop = F], "raw_GE4")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"raw_GM5", drop = F], "raw_GE5")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"raw_GM6", drop = F], "raw_GE6")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"raw_GM7", drop = F], "raw_GE7")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"raw_GM8", drop = F], "raw_GE8")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"raw_GM9", drop = F], "raw_GE9")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"raw_GM10", drop = F], "raw_GE10")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"maxGM", drop = F], "maxGE")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"maxZscore", drop = F], "maxZscore")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM1", drop = F], "GE1")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM2", drop = F], "GE2")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM3", drop = F], "GE3")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM4", drop = F], "GE4")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM5", drop = F], "GE5")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM6", drop = F], "GE6")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM7", drop = F], "GE7")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM8", drop = F], "GE8")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM9", drop = F], "GE9")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM10", drop = F], "GE10")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM1_idents", drop = F], "GE1_idents")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM2_idents", drop = F], "GE2_idents")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM3_idents", drop = F], "GE3_idents")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM4_idents", drop = F], "GE4_idents")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM5_idents", drop = F], "GE5_idents")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM6_idents", drop = F], "GE6_idents")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM7_idents", drop = F], "GE7_idents")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM8_idents", drop = F], "GE8_idents")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM9_idents", drop = F], "GE9_idents")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"GM10_idents", drop = F], "GE10_idents")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"celltype_final", drop = F], "celltype_final")
-combo.reference <- AddMetaData(combo.reference, combo.inferCNV@meta.data[,"celltype_withreprog", drop = F], "celltype_withreprog")
-
-head(combo.reference@meta.data)
-table(combo.reference$celltype_final)
-table(combo.reference$celltype_withreprog)
-
-setwd("/project/InternalMedicine/Chan_lab/shared")
-#saveRDS(combo.reference, "PrimObj_withGEmeta_with_correctassays_withfinalreprog_111622.rds")
-
-
-combo.reference <- readRDS("PrimObj_withGEmeta_with_correctassays_withfinalreprog_111622.rds")
+combo.reference <- readRDS("/work/InternalMedicine/s437775/BreastCancer_Integrated/PrimaryBreastAtlas/primarybreastatlas_allcells_v1.1_022723.rds")
 DefaultAssay(combo.reference) <- "RNA"
 combo.reference <- NormalizeData(combo.reference, assay = "RNA")
 
-# NK clustering ------------------
+# Load in object containing only NK cells -------------------------------------
+
+setwd(NKsubDir)
+NK.all.combo <- readRDS("NKall_PC17manhattan0.4res_71322.rds")
+DefaultAssay(NK.all.combo) <- "RNA"
+NK.all.combo <- NormalizeData(NK.all.combo, assay = "RNA")
+
+
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# Fig. 1B: Primary breast atlas UMAP ------------------------------------------
+
+p <- DimPlot(combo.reference, reduction = "umap", 
+             label = F, 
+             repel = TRUE, 
+             raster = FALSE) 
+ggsave("Fig1B_primarybreastatlasUMAP.pdf", 
+       plot = as.ggplot(p), 
+       width = 5.8, height = 5.5)
+
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# Fig. 1C: NK cell clustering -------------------------------------------------
+# NK cell clustering ----------------------------------------------------------
 
 table(Idents(combo.reference))
-Idents(combo.reference) <- combo.reference$celltype_final
+Idents(combo.reference) <- combo.reference$Cell_Type_Annotation
 
 NKsub <- subset(combo.reference, idents = "NK Cells")
 DefaultAssay(NKsub) <- "RNA"
 NKsub <- NormalizeData(NKsub, assay = "RNA")
 
-
 table(NKsub$Capture.Method)
 NKsub.list <- SplitObject(NKsub, split.by = "Capture.Method")
 
 for (i in 1:length(NKsub.list)) {
-  NKsub.list[[i]] <- SCTransform(NKsub.list[[i]], verbose = T, vars.to.regress = c("percent.mt", "nCount_RNA","nFeature_RNA", "percent.hb", 
-                                                                                   "percent.platelet", "percent.heatshock"))
+  NKsub.list[[i]] <- SCTransform(NKsub.list[[i]], verbose = T, 
+                                 vars.to.regress = c("percent.mt", 
+                                                     "nCount_RNA",
+                                                     "nFeature_RNA", 
+                                                     "percent.hb", 
+                                                     "percent.platelet", 
+                                                     "percent.heatshock"))
 }
 
 NK.features <- SelectIntegrationFeatures(object.list = NKsub.list, nfeatures = 3000)
 NKsub.list <- PrepSCTIntegration(object.list = NKsub.list, anchor.features = NK.features)
 
-
 reference.1 <-  which(names(NKsub.list) == c("10X Genomics Chromium"))
 reference.2 <-  which(names(NKsub.list) == c("10X Genomics Chromium Single-Cell v2 3' and 5' Chemistry Library"))
 reference.3 <-  which(names(NKsub.list) == c("10X Genomics Chromium v2 5'"))
 reference.4 <-  which(names(NKsub.list) == c("10X Genomics Single Cell 3' v2"))
-
 reference.list <- c(reference.1, reference.2, reference.3, reference.4)
 
 NKsub.anchors <- FindIntegrationAnchors(object.list = NKsub.list, normalization.method = "SCT",
@@ -418,11 +339,11 @@ NKsub.anchors <- FindIntegrationAnchors(object.list = NKsub.list, normalization.
                                         k.score = 27, dims = 1:27)
 
 NK.all.combo <- IntegrateData(anchorset = NKsub.anchors, normalization.method = "SCT", k.weight = 27)
+
 setwd(subcluster_dir)
 saveRDS(NK.all.combo, "NK_subintegrated_noclustering_fromCNVobj_111622.rds")
 
 DefaultAssay(NK.all.combo) <- "integrated"
-#https://github.com/satijalab/seurat/issues/1963
 NK.all.combo <- RunPCA(NK.all.combo, npcs = 300, verbose = FALSE, approx=FALSE)
 
 DimPlot(NK.all.combo, reduction = "pca", raster = F, group.by = "Capture.Method",
@@ -454,12 +375,10 @@ NK.all.combo <- RunUMAP(NK.all.combo, reduction = "pca", dims = 1:18, verbose = 
 
 NK.all.combo$celltype_NKsub <- Idents(NK.all.combo)
 
-
 library(viridis)
 p <- DimPlot(NK.all.combo, reduction = "umap", label = F, 
              repel = TRUE, raster = FALSE, pt.size = 1.5,
              cols = c(turbo(6))) + ggtitle(label = " ")
-
 
 pdf("test.pdf")
 p + theme(axis.line = element_line(colour = 'black', size = 1.5)) + 
@@ -475,17 +394,17 @@ setwd(NKsubDir)
 saveRDS(NK.all.combo, "NKall_PC17manhattan0.4res_71322.rds")
 
 
-# silhouette (REVIEWER ADDITION) +++++++++++++++++++++++++++++++++++++++++++++ ---------
+# Silhouette scoring ----------------------------------------------------------
 
-library(Seurat)
 library(cluster)
 library(tidyverse)
 library(viridis)
 library(crayon)
 
-#https://www.biorxiv.org/content/10.1101/2022.05.31.494081v1.full
+# from https://www.biorxiv.org/content/10.1101/2022.05.31.494081v1.full
 
 setwd(subcluster_dir)
+
 #start with just integrated object, no clustering/PC calc on it
 #setwd(silhouette_dir)
 #NK.all.combo <- readRDS("NK_subintegrated_noclustering_11822.rds")
@@ -731,18 +650,9 @@ rownames(mean_silhouette_score_df) <- gsub("silhouette_score_","", rownames(mean
 
 write.csv(mean_silhouette_score_df, "mean_silhouette_score_NK_fromCNVobj_dim18_111622.csv")
 
-# ================================================================== ======
-#2B NKsub Markers ========================
-# ================================================================== ======
-
-# load NKsubset =================================
-
-setwd(NKsubDir)
-NK.all.combo <- readRDS("NKall_PC17manhattan0.4res_71322.rds")
-DefaultAssay(NK.all.combo) <- "RNA"
-NK.all.combo <- NormalizeData(NK.all.combo, assay = "RNA")
-
-
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# Fig. 1D: NK cell subset markers ---------------------------------------------
 # FindMarkers (NK) ======================================================
 
 Idents(NK.all.combo) <- NK.all.combo$celltype_NKsub
@@ -915,6 +825,13 @@ c5.mark <- unlist(readRDS("NK.c5markers_71322.rds"))
 c5.up <- c("CCL5", "HLA-DRB1", c5.mark[c(12,1,10)])
 
 
+features <- list("NK0" = c0.mark,
+                 "NK1" = c1.mark,
+                 "NK2" = c2.mark,
+                 "NK3" = c3.mark,
+                 "NK4" = c4.mark,
+                 "NK5" = c5.mark)
+
 features <- list("NK0" = c0.up,
                  "NK1" = c1.up,
                  "NK2" = c2.up,
@@ -946,10 +863,10 @@ a+ theme(axis.line = element_line(colour = 'black', size = 1.5)) +
   theme(strip.text = element_text(size=20))
 dev.off()
 
-# ================================================================== ======
-#2D rNK sig per clust  ========================
-# ================================================================== ======
-# converting mouse rNK to human rNK gene names ==================================
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# Fig. 1E: rNK signature for each NK cell subset  -----------------------------
+# Converting mouse rNK signature to human rNK gene names ==================================
 
 library(biomaRt)
 
@@ -965,24 +882,13 @@ reproglist_mus_all <- as.character(c("Cald1", "Clu", "Alox12", "Ltbp1", "Fhl1", 
                                      "Cemip2", "Osgin1","Zfp503", "Itga1", "Isg20", "Pacsin1", "Tbc1d16", "Rn7s1", "Sh3pxd2b",
                                      "Scn3b", "Osbpl1a", "Me1", "Hpgds", "Ppp2r2c", "Clba1", "Hmox1", "Nqo1", "Cars", "Sstr2", "Snora23",
                                      "ENSMUSG00000108053", "ENSMUSG00000087113"))
-searchFilters(mart = mouse, pattern = "gene") #check what format your genes are in
 
+# Check what format gene names are i
+searchFilters(mart = mouse, pattern = "gene") 
+
+# rNK signature (human gene names)
 reproglist_human_all <- human_mouse_conversion_genesymbol(reproglist_mus_all)
-
 write.csv(reproglist_human_all, file = "allreprogupanddownconverted.csv")
-
-
-# load NKsubset =================================
-
-setwd(NKsubDir)
-NK.all.combo <- readRDS("NKall_PC17manhattan0.4res_71322.rds")
-DefaultAssay(NK.all.combo) <- "RNA"
-NK.all.combo <- NormalizeData(NK.all.combo, assay = "RNA")
-
-# setwd("/project/InternalMedicine/Chan_lab/shared/FinalObjects/Primary_Only/")
-# NK.all.combo <- readRDS("NK_withNKpathways_noZallgenedem_71422.rds") #newnewnew
-# DefaultAssay(NK.all.combo) <- "RNA"
-# NK.all.combo <- NormalizeData(NK.all.combo, assay = "RNA")
 
 # separate into subtypes =======================
 
@@ -1418,84 +1324,9 @@ p + theme(axis.line = element_line(colour = 'black', size = 1.5)) +
 dev.off()
 
 
-# ================================================================== ======
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #2E rNK MA plot  ========================
-# ================================================================== ======
-
-# load NKsubset =================================
-
-setwd("/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Analysis/Fig2")
-NK.all.combo <- readRDS("NKsubset_withCORRECTreprog_nootherchange_82422.rds") #newnewnew
-DefaultAssay(NK.all.combo) <- "RNA"
-NK.all.combo <- NormalizeData(NK.all.combo, assay = "RNA")
-
-setwd("/project/InternalMedicine/Chan_lab/shared/")
-combo.inferCNV <- readRDS("nichenetobj_111122.rds")
-
-
-head(combo.inferCNV@meta.data)
-
-unique(colnames(combo.inferCNV@meta.data))
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"totalCNV", drop = F], "totalCNV")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"corCNV", drop = F], "corCNV")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"cancer", drop = F], "cancer")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"ESR1", drop = F], "ESR1")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"ERBB2", drop = F], "ERBB2")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"PIK3CA", drop = F], "PIK3CA")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"NTRK", drop = F], "NTRK")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"CD274", drop = F], "CD274")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"ERBB3", drop = F], "ERBB3")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"EGFR", drop = F], "EGFR")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"FGFR", drop = F], "FGFR")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"TACSTD2", drop = F], "TACSTD2")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"CDK", drop = F], "CDK")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"AR", drop = F], "AR")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"NECTIN2", drop = F], "NECTIN2")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"LAG3", drop = F], "LAG3")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"raw_GM1", drop = F], "raw_GE1")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"raw_GM2", drop = F], "raw_GE2")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"raw_GM3", drop = F], "raw_GE3")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"raw_GM4", drop = F], "raw_GE4")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"raw_GM5", drop = F], "raw_GE5")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"raw_GM6", drop = F], "raw_GE6")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"raw_GM7", drop = F], "raw_GE7")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"raw_GM8", drop = F], "raw_GE8")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"raw_GM9", drop = F], "raw_GE9")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"raw_GM10", drop = F], "raw_GE10")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"maxGM", drop = F], "maxGE")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"maxZscore", drop = F], "maxZscore")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM1", drop = F], "GE1")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM2", drop = F], "GE2")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM3", drop = F], "GE3")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM4", drop = F], "GE4")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM5", drop = F], "GE5")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM6", drop = F], "GE6")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM7", drop = F], "GE7")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM8", drop = F], "GE8")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM9", drop = F], "GE9")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM10", drop = F], "GE10")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM1_idents", drop = F], "GE1_idents")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM2_idents", drop = F], "GE2_idents")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM3_idents", drop = F], "GE3_idents")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM4_idents", drop = F], "GE4_idents")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM5_idents", drop = F], "GE5_idents")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM6_idents", drop = F], "GE6_idents")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM7_idents", drop = F], "GE7_idents")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM8_idents", drop = F], "GE8_idents")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM9_idents", drop = F], "GE9_idents")
-NK.all.combo <- AddMetaData(NK.all.combo, combo.inferCNV@meta.data[,"GM10_idents", drop = F], "GE10_idents")
-
-head(NK.all.combo@meta.data)
-table(NK.all.combo$celltype_final)
-table(NK.all.combo$celltype_withreprog)
-table(NK.all.combo$celltype_NKsub)
-
-setwd("/project/InternalMedicine/Chan_lab/shared")
-saveRDS(NK.all.combo, "NKsub_withGEmeta_withCORRECTreprog_111722.rds")
-
-
-NK.all.combo <- readRDS("NKsub_withGEmeta_withCORRECTreprog_111722.rds")
-
 # rNK DEGs -------
 
 table(NK.all.combo$celltype_withreprog_simply)
@@ -1587,9 +1418,9 @@ ggsave("correctrNK_MAplot_112322.pdf", plot = p, width = 4.3, height = 4) ##corr
 ggsave("rNK_MAplot_71422.pdf", plot = p, width = 4.3, height = 4) ##preprint
 ggsave("rNKMAplot_NR4only.pdf", plot = p, width = 4.3, height = 4)
 
-# ================================================================== ======
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #2H rNK v nonrNK similarity  ========================
-# ================================================================== ======
 # load NKsubset =================================
 
 setwd(NKsubDir)
@@ -1740,11 +1571,9 @@ ggsave("reprogNK_all_simil_violin.pdf", plot = p, width = 4, height = 4)
 
 
 
-# ================================================================== ======
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #2C NKsub Proportion barchart ========================
-# ================================================================== ======
-
-
 # reduce samples to just those >10 cells (Addition should've done +++++++++++) -------
 
 Idents(NK.all.combo) <- NK.all.combo$celltype_NKsub
@@ -1884,24 +1713,9 @@ dev.off()
 
 
 
-# ================================================================== ======
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #2F rNK UScore per BCsub ========================
-# ================================================================== ======
-# load NKsubset =================================
-
-setwd(NKsubDir)
-NK.all.combo <- readRDS("NK_withNKpathways_noZallgenedem_71422.rds") #preprint
-DefaultAssay(NK.all.combo) <- "RNA"
-NK.all.combo <- NormalizeData(NK.all.combo, assay = "RNA")
-
-setwd("/project/InternalMedicine/Chan_lab/shared")
-NK.all.combo <- readRDS("NKsub_withGEmeta_withCORRECTreprog_111722.rds")
-DefaultAssay(NK.all.combo) <- "RNA"
-NK.all.combo <- NormalizeData(NK.all.combo, assay = "RNA")
-
-
-
-
 # Prepare data for correlations (>10 samples only) =======================
 
 Idents(NK.all.combo) <- NK.all.combo$celltype_withreprog_simply 
@@ -2153,22 +1967,9 @@ p +
   theme(axis.text = element_text(size = 16))
 dev.off()
 
-# ================================================================== ======
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #2I %rNK v age ========================
-# ================================================================== ======
-# load NKsubset =================================
-
-setwd(NKsubDir)
-NK.all.combo <- readRDS("NK_withNKpathways_noZallgenedem_71422.rds") #preprint
-DefaultAssay(NK.all.combo) <- "RNA"
-NK.all.combo <- NormalizeData(NK.all.combo, assay = "RNA")
-
-setwd("/project/InternalMedicine/Chan_lab/shared")
-NK.all.combo <- readRDS("NKsub_withGEmeta_withCORRECTreprog_111722.rds")
-DefaultAssay(NK.all.combo) <- "RNA"
-NK.all.combo <- NormalizeData(NK.all.combo, assay = "RNA")
-
-
 # Prepare data for correlations (>10 samples only) =======================
 
 Idents(NK.all.combo) <- NK.all.combo$celltype_withreprog_simply 
@@ -2386,9 +2187,9 @@ p+ theme(axis.line = element_line(colour = 'black', size = 1.5)) +
   theme(axis.text = element_text(size = 16))
 dev.off()
 
-# ================================================================== ======
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 #2G rNK NicheNet ========================
-# ================================================================== ======
 # load in Prim object ------
 
 setwd(PrimDir)
@@ -2933,48 +2734,21 @@ write.csv(all_targets, "NK_allcancerepi_targetsHER2.csv")
 
 
 
-# ================================================================== ======
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+#2J rNK survival analysis on TCGA samples -------------------------------------
+# Filter TCGA samples for high immune infiltrate ------------------------------ 
 
+# from https://rdrr.io/bioc/TCGAbiolinks/man/TCGAanalyze_SurvivalKM.html and
+# from https://costalab.ukaachen.de/open_data/Bioinformatics_Analysis_in_R_2019/BIAR_D3/handout.html
 
-#2J Survival (see TCGA_Preprocessing.R in /project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Preprocessing/bulkRNA/TCGA) ========================
-# ================================================================== ======
-
-
-# Filtering TCGA =======================================================================
 
 setwd(TCGA_dir)
 BRCA <- readRDS(file = "BRCA_SummExpObj.rds")
-
-#https://rdrr.io/bioc/TCGAbiolinks/man/TCGAanalyze_SurvivalKM.html and
-#https://costalab.ukaachen.de/open_data/Bioinformatics_Analysis_in_R_2019/BIAR_D3/handout.html
-# clinical_patient_Cancer <- GDCquery_clinic("TCGA-BRCA","clinical")
-# #also pick with high immune infiltrate
-# clinical_BRCAsub <- clinical_patient_Cancer[clinical_patient_Cancer$gender=="female", #& clinical_patient_Cancer$prior_treatment=="No", 
-#                                             colnames(clinical_patient_Cancer)]
-# head(clinical_BRCAsub)
-# table(clinical_BRCAsub$gender)
-# table(clinical_BRCAsub$prior_treatment)
-
-colnames(colData(BRCA)) #metadata
-
-#BRCA.subset <- BRCA[,((BRCA$gender == "female") & is.na(BRCA$gender == "female") == F)]
 BRCA.subset <- BRCA
-dim(BRCA.subset)
-dim(BRCA)
-table(BRCA$gender)
-table(BRCA.subset$gender)
-
-head(colData(BRCA)$treatments)
-table(BRCA.subset$gender)
-
-
-#https://costalab.ukaachen.de/open_data/Bioinformatics_Analysis_in_R_2019/BIAR_D3/handout.html#6_gene_expression_and_survival
-#dataBRCAcomplete <- log2(assay(BRCA))
 dataBRCAcomplete <- assay(BRCA.subset)
 
-
 geneinfo_df <- rowData(BRCA.subset)
-
 dataBRCAcomplete <- as.data.frame(dataBRCAcomplete)
 dataBRCAcomplete$ensembl_gene_id <- rownames(dataBRCAcomplete)
 dataBRCAcomplete <- dataBRCAcomplete[,c(1223, 1:1222)]
@@ -2985,13 +2759,11 @@ geneinfo_df$ConvertedGenes <- NA
 geneinfo_df<- geneinfo_df[,c(2, 4, 1, 3)]
 head(geneinfo_df)
 
-
 dataBRCAcomplete <- merge(geneinfo_df, dataBRCAcomplete, by = "ensembl_gene_id")
 dataBRCAcomplete <- as.data.frame(dataBRCAcomplete)
 dataBRCAcomplete[1:5,1:5]
 
-
-# converting genes =====================================
+# Convert gene names -----------------------------------------------
 
 library(limma)
 library(org.Hs.eg.db)
@@ -3003,17 +2775,8 @@ dataBRCAcomplete$ConvertedGenes <- usegenes
 new_mat <- dataBRCAcomplete
 new_mat[1:5,1:5]
 
-#new_mat$ConvertedGenes <- usegenes
 new_mat <- new_mat[which(!(new_mat$ConvertedGenes %in%
                              usegenes[duplicated(usegenes)])),]
-
-# dup_mat <- mRNAmicro[which((mRNAmicro$ConvertedGenes %in%
-#                              usegenes[duplicated(usegenes)])),]
-# 
-# dup_mat[1:5,1:5]
-# dim(mRNAmicro)
-# dim(new_mat)
-
 which(grepl("SMAD5", new_mat$ConvertedGenes))
 new_mat
 
@@ -3026,58 +2789,37 @@ for (i in unique(usegenes[duplicated(usegenes)])) {
   new_mat <- rbind(new_mat,k)
 }
 
-dim(new_mat)
-dim(dataBRCAcomplete)
-
 rownames(new_mat) <- new_mat[,"ConvertedGenes"]
-
 dataBRCAcomplete <- new_mat
-dataBRCAcomplete[1:5,1:5]
-
 dataBRCAcomplete_genedf <- dataBRCAcomplete[,1:4]
-head(dataBRCAcomplete_genedf)
 
 rownames(dataBRCAcomplete) <- dataBRCAcomplete$ConvertedGenes
 dataBRCAcomplete <- dataBRCAcomplete[,-c(1:4)]
-dataBRCAcomplete[1:5,1:5]
 
 dataBRCAcomplete <- as.data.frame(sapply(dataBRCAcomplete, as.numeric))
 rownames(dataBRCAcomplete) <- dataBRCAcomplete_genedf$external_gene_name
 colnames(dataBRCAcomplete) <- gsub(".", "-", colnames(dataBRCAcomplete), fixed=TRUE)
-dataBRCAcomplete[1:5,1:5]
 
 setwd(TCGA_dir)
 saveRDS(dataBRCAcomplete, "TCGA_genesconverted_72722.rds")
 saveRDS(dataBRCAcomplete_genedf, "TCGA_genesinfo_withconverted_72722.rds")
 
+# Normalize gene expression for TCGA object -----------------------------------
 
-# normalization ========
 library(EDASeq)
 
 setwd(TCGA_dir)
 dataBRCAcomplete <- readRDS("TCGA_genesconverted_72722.rds")
 dataBRCAcomplete_genedf <- readRDS("TCGA_genesinfo_withconverted_72722.rds")
 
-dataBRCAcomplete[1:5,1:5]
-head(dataBRCAcomplete_genedf)
-
 rownames(dataBRCAcomplete) <- dataBRCAcomplete_genedf$ensembl_gene_id
-#names(dataBRCAcomplete) <- colnames(dataBRCAcomplete)
 dataNorm <- TCGAanalyze_Normalization(tabDF = dataBRCAcomplete, geneInfo =  geneInfoHT) #use this one for ensembl IDs
 
-#just primary
+# Filter to primary tumor samples only 
 samplesTP <- TCGAquery_SampleTypes(barcode = colnames(dataNorm),
                                    typesample = c("TP"))
-#including other sample types
-# samplesmet <- TCGAquery_SampleTypes(barcode = colnames(dataNorm),
-#                                    typesample = c("TM"))
-
 dataNorm<-dataNorm[,colnames(dataNorm) %in% samplesTP]
-#met
-#dataNorm<-dataNorm[,colnames(dataNorm) %in% samplesmet]
 tcga.vst<-DESeq2::vst(as.matrix(round(dataNorm)))
-
-
 
 # Find genes in object =================================================
 
