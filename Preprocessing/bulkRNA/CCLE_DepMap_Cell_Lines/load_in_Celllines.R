@@ -1,23 +1,25 @@
+#
+# DESCRIPTION
+#
+# Load in RNAseq data of cell lines from CCLE DepMap (Public 22Q2)
+#
+# Data accessed: https://depmap.org/portal/download/all/
+#
+# ------------------------------------------------
+# ------------------------------------------------
 # SETUP ------------------------------------------
 
 # Libraries --------------------------------------
 
 setwd("~/Preprocessing/bulkRNA/CCLE_DepMap_Cell_Lines")
-
-library(BiocManager)
-library(GEOquery) 
+ 
 library(plyr)
 library(dplyr) 
 library(Matrix)
-library(devtools)
 library(ggplot2)
-library(multtest)
-library(tibble)
 library(UCell)
-library(glmGamPoi)
 library(sctransform)
 library(matrixStats)
-library(sparseMatrixStats)
 library(SeuratObject, lib.loc = "/cm/shared/apps/R/gcc/4.1.1/lib64/R/library")
 library(Seurat, lib.loc = "/cm/shared/apps/R/gcc/4.1.1/lib64/R/library")
 
