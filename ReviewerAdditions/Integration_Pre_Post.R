@@ -3,41 +3,20 @@ DoubletResult_Dir <- "/project/InternalMedicine/Chan_lab/shared/IntegratedBreast
 finalQC_Dir <- "/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/Preprocessing/scRNA/PrimaryBreast_Processing/Individual_Dataset_Objects/finalQC"
 prepostDir <- "/project/InternalMedicine/Chan_lab/shared/IntegratedBreast_s204665/ReviewerAdditions/Pre_post_integration_compare"
 
-
 # Libraries -------------------------------------------------------------
+
 library(BiocManager)
-library(GEOquery) 
 library(plyr)
 library(dplyr) 
 library(Matrix)
-library(devtools)
 library(Seurat)
 library(ggplot2)
-library(cowplot) 
-library(SAVER) 
-library(metap)
-library(multtest)
-library(msigdbr)
-library(fgsea)
-library(monocle3)
-library(velocyto.R)
-library(loomR)
-library(clustree)
-library(tibble)
-library(devtools)
-library(harmony)
 library(SeuratData)
 library(UCell)
 library(glmGamPoi)
 library(sctransform)
 library(matrixStats)
 library(sparseMatrixStats)
-library(DESeq2)
-library(genefu)
-
-
-
-
 
 # FUNCTIONS ---------------------
 
@@ -84,11 +63,8 @@ Find_top_bot_ngenes_forPCs <- function(seurat_obj, top_or_bot = c("top", "bottom
     bottom_PC_post_final <- bottom_PC_post_final[,-c(1:PC_count)]
     rownames(bottom_PC_post_final) <- 1:nrow(bottom_PC_post_final)
     
-    write.csv(bottom_PC_post_final, paste0(project_name,"_bottom",gene_count, "genes_top",PC_count, "_PCs_",Sys.Date(),".csv"))
-    
+    write.csv(bottom_PC_post_final, paste0(project_name,"_bottom",gene_count, "genes_top",PC_count, "_PCs_",Sys.Date(),".csv"))  
   }
-  
-  
 }
 
 #UMAP before =============================================================
@@ -124,8 +100,6 @@ combo <- subset(combo, subset = Doublet.Call == "Doublet", invert = T)
 
 combo <- SCTransform(combo, vars.to.regress = c("percent.mt", "nCount_RNA","nFeature_RNA", "percent.hb", 
                                                 "percent.platelet", "percent.heatshock"), verbose = TRUE)
-
-
 combo <- RunPCA(combo, npcs = 100, verbose = FALSE)
 
 combo$orig.ident[which(combo$orig.ident == "AziziT")] <- "Azizi"
@@ -135,7 +109,6 @@ sort(table(combo$Capture.Method))
 sort(table(combo$orig.ident))
 
 setwd(prepostDir)
-#pdf("BatchTestSCTRef_71922_long.pdf", width = 16, height = 9)
 pdf("BatchTest_NOintegration_102822_long.pdf", width = 16, height = 9)
 p1 <- DimPlot(combo, reduction = "pca", raster = F, group.by = "Capture.Method",
               order = c("Smart-Seq2", "inDrop v2", "Singleron GEXSCOPE Single Cell RNAseq Library Kit",
@@ -149,9 +122,6 @@ p2 <- DimPlot(combo, reduction = "pca", raster = F, group.by = "orig.ident",
 p2
 dev.off()
 
-#ggsave("BatchTestSCTRef_origident_71922_long.pdf", plot = p2, width = 16, height = 9)
-
-
 
 ElbowPlot(combo, ndims = 100)
 setwd(prepostDir)
@@ -164,7 +134,6 @@ DimHeatmap(combo, dims = 55:65, cells = 500, balanced = TRUE)
 DimHeatmap(combo, dims = 65:75, cells = 500, balanced = TRUE)
 dev.off()
 
-
 combo <- FindNeighbors(combo, reduction = "pca", dims = 1:55, nn.method = "rann")#, k.param= 500)
 combo <- FindClusters(combo, resolution = 7)
 combo <- RunUMAP(combo, reduction = "pca", dims = 1:55, verbose = TRUE, seed.use = 123)
@@ -172,8 +141,6 @@ combo <- RunUMAP(combo, reduction = "pca", dims = 1:55, verbose = TRUE, seed.use
 combo$BC.Subtype[which(combo$BC.Subtype == "ER+")] <- "HR+"
 combo$Patient[which(combo$Patient == "BC11_1")] <- "BC11"
 combo$Patient[which(combo$Patient == "BC11_2")] <- "BC11"
-
-
 
 p <- DimPlot(combo, reduction = "umap", label = F, repel = T, raster = FALSE) + ggtitle(label = " ") #,
 
@@ -186,7 +153,6 @@ dev.off()
 
 saveRDS(combo, "PrimObject_nointegration_102822.rds")
 
-
 setwd(prepostDir)
 pdf("UNINTEGRATED_BCsub_wholeUMAP_11322.pdf", width = 16.22, height = 14.22)
 DimPlot(combo, reduction = "umap", group.by = "BC.Subtype", raster = FALSE) + ggtitle(label = " ") +
@@ -196,13 +162,9 @@ DimPlot(combo, reduction = "umap", group.by = "BC.Subtype", raster = FALSE) + gg
   theme(axis.text = element_text(size = 15))
 dev.off()
 
-
 combo$orig.ident[which(combo.reference$orig.ident == "AziziT")] <- "Azizi"
 combo$orig.ident[which(combo.reference$orig.ident == "Aziziimmune")] <- "Azizi"
 
-
-#pdf("UNINTEGRATED_capturemethod_primUmAP_11322.pdf", width = 16.22, height = 14.22)
-#pdf("UNINTEGRATED_libraryprep_primUmAP_11322.pdf", width = 16.22, height = 14.22)
 pdf("UNINTEGRATED_dataset_primUmAP_11322.pdf", width = 16.22, height = 14.22)
 DimPlot(combo, reduction = "umap", group.by = "orig.ident", raster = FALSE) + ggtitle(label = " ") +
   theme(axis.line = element_line(colour = 'black', size = 1.5)) + 
@@ -214,9 +176,6 @@ dev.off()
 #PC loadings before ------
 setwd(prepostDir)
 combo.unint <- readRDS("PrimObject_nointegration_102822.rds")
-
-
-#top10_20PC <- Find_top_bot_ngenes_forPCs(combo.unint, "top", "PrimMain", prepostDir)
 
 PC_post <- as.data.frame(combo.unint@reductions$pca@feature.loadings)
 class(PC_post)
@@ -237,7 +196,6 @@ for (compon in colnames(PC_post)[1:20])
 top_PC_post_final <- top_PC_post_final[,-c(1:20)]
 rownames(top_PC_post_final) <- 1:nrow(top_PC_post_final)
 write.csv(top_PC_post_final, "MainPrim_BEFOREINTEGRATION_top10genestop20PCs_andloadings_11222.csv")
-
 
 dim(PC_post)
 bottom_PC_post_final <- data.frame(matrix(ncol = 20, nrow = 1))
@@ -265,13 +223,9 @@ DimPlot(combo.reference, reduction = "umap", group.by = "BC.Subtype", raster = F
   theme(axis.text = element_text(size = 15))
 dev.off()
 
-
 combo.reference$orig.ident[which(combo.reference$orig.ident == "AziziT")] <- "Azizi"
 combo.reference$orig.ident[which(combo.reference$orig.ident == "Aziziimmune")] <- "Azizi"
 
-
-#pdf("capturemethod_primUmAP_102822.pdf", width = 16.22, height = 14.22)
-#pdf("libraryprep_primUmAP_102822.pdf", width = 16.22, height = 14.22)
 pdf("dataset_primUmAP_102822.pdf", width = 16.22, height = 14.22)
 DimPlot(combo.reference, reduction = "umap", group.by = "orig.ident", raster = FALSE) + ggtitle(label = " ") +
   theme(axis.line = element_line(colour = 'black', size = 1.5)) + 
@@ -280,16 +234,10 @@ DimPlot(combo.reference, reduction = "umap", group.by = "orig.ident", raster = F
   theme(axis.text = element_text(size = 15))
 dev.off()
 
-
-
-
 #PC loadings after -------
 
 setwd("/project/InternalMedicine/Chan_lab/shared/FinalObjects/Primary_Only/")
 combo.reference <- readRDS("PrimObj_withGEmeta_with_correctassays_withfinalreprog_111622.rds") ##newnewnew
-
-
-#top10_20PC <- Find_top_bot_ngenes_forPCs(combo.reference, "top", "PrimMain", prepostDir)
 
 PC_post <- as.data.frame(combo.reference@reductions$pca@feature.loadings)
 class(PC_post)
@@ -340,15 +288,12 @@ table(Idents(combo.reference))
 
 Idents(combo.reference) <- combo.reference$celltype_final
 
-
 write.csv(table(combo.reference$celltype_final, combo.reference$BC.Subtype), "BCsub_cellcount_percelltype_11322.csv")
 write.csv(table(combo.reference$celltype_final, combo.reference$Capture.Method), "Technology_cellcount_percelltype_11322.csv")
 write.csv(table(combo.reference$celltype_final, combo.reference$Library.Preparation), "LibraryPrep_cellcount_percelltype_11322.csv")
 write.csv(table(combo.reference$celltype_final, combo.reference$orig.ident), "Dataset_cellcount_percelltype_11322.csv")
 write.csv(table(combo.reference$celltype_final, combo.reference$Patient), "Patient_cellcount_percelltype_11322.csv")
 write.csv(table(combo.reference$celltype_final, combo.reference$samples), "sample_cellcount_percelltype_11322.csv")
-
-
 
 sobjlists <- FetchData(object = combo.reference,
                        vars = c("samples",
@@ -358,9 +303,6 @@ sobjlists <- FetchData(object = combo.reference,
                                 "Capture.Method",
                                 "Library.Preparation",
                                 "celltype_final"))
-
-
-
 
 sobjlists <- sobjlists %>% dplyr::group_by(celltype_final,
                                            # samples,
@@ -384,34 +326,8 @@ bp <- ggplot(sobjlists,
                  #group = as.factor(BC.Subtype),
                  fill = BC.Subtype)) +
   scale_fill_viridis(option = "H", discrete = T) + 
-  # scale_fill_manual(name = "Dataset",
-  #                   values = turbo(9),
-  #                   unique(sobjlists$orig.ident)) +
-  
-  # scale_fill_manual(name = "Reprogrammed Status",
-  #                   values = rev(c("#440154FF", "light grey")),
-  #                   rev(unique(sobjlists$celltype_withreprog_simply))) +
   geom_bar(stat = "identity") +
-  # geom_text(aes(label = paste0(round(sobjlists$percent_reprog), "%"),
-  #               y = 120,
-  #               fill = NULL),
-  #           angle = 90,
-  #           colour = "#666666",
-  #           size = 3) +
   theme_minimal() +
-  # theme(axis.text.x = element_blank(),
-  #       axis.ticks.x = element_blank(),
-  #       axis.title.x = element_text(size = 20),
-  #       axis.text.y = element_text(size = 20),
-  #       axis.title.y = element_text(size = 20)) +
-  # scale_y_continuous(expand = c(0, 0),
-  #                    limits = c(0, 105),#135),
-  #                    breaks = seq(0,100,25)) +
-  # facet_nested( ~ BC.Subtype,
-  #               scales = "free",
-  #               space = "free",
-  #               switch = "x"
-  # ) +
   theme(legend.text=element_text(size=20)) +
   theme(legend.title=element_text(size=20)) +
   ylab("% Cells") +
@@ -423,12 +339,6 @@ bp <- ggplot(sobjlists,
         panel.spacing.x = unit(-0.1, "lines")) +
   RotatedAxis()
 
-
-#pdf("proportion_dataset_perclust_112522.pdf", width = 18.4, height = 5.4)
-#pdf("proportion_samples_perclust_112522.pdf", width = 25.4, height = 12.4)
-#pdf("proportion_Patient_perclust_112522.pdf", width = 25.4, height = 12.4)
-#pdf("proportion_CaptureMethod_perclust_112522.pdf", width = 25.4, height = 12.4)
-#pdf("proportion_LibraryPrep_perclust_112522.pdf", width = 25.4, height = 12.4)
 pdf("proportion_BCsub_perclust_112522.pdf", width = 25.4, height = 12.4)
 bp
 dev.off()
