@@ -5,7 +5,7 @@
 
 # This is the fourth step in processing the scRNA-seq  
 # primary breast datasets, and requires the whole
-# integrated scRNA-seq object from "IntegrationPrimary.R".
+# integrated scRNA-seq object from "Integration.R".
 
 # This same script is also used to label the cell types for 
 # Bassez's antiPD1 dataset.
@@ -14,7 +14,7 @@
 # make sure to run NormalizeData(object, assay = "RNA")
 
 # The output of this R script will be the input 
-# of "sc50Labeling.R"
+# of "SC50_Labeling.R"
 
 # The marker method is inspired by Karaayvaz et. al (2018)
 # Paper link: https://www.nature.com/articles/s41467-018-06052-0 
