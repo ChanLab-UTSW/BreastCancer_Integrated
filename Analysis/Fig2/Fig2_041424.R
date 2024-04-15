@@ -853,3 +853,294 @@ ggsave("HER2_N_corr_nonHER2_PATIENTLEVEL_111822.pdf", plot = p, width = 3, heigh
 # -------------
 # -------------
 # Fig. 2I/J: Cancer epithelial cell heterogeneity exploration ----------
+# Prepare cancer epithelial object -------------------------------------------------------
+
+DefaultAssay(cancer.epi) <- "RNA"
+cancer.epi <- NormalizeData(cancer.epi, assay = "RNA")
+cancer.epi <- FindVariableFeatures(cancer.epi, 
+                                   selection.method = "vst", 
+                                   nfeatures = 2000)
+all.genes <- rownames(cancer.epi)
+cancer.epi <- ScaleData(cancer.epi, features = all.genes)
+
+sobjlists <- FetchData(object = cancer.epi, 
+                       vars = c("samples",
+                                "Patient", 
+                                "BC.Subtype", 
+                                "sc50.Pred"))
+
+# determine number of cancer epi cells per sample
+drop_samples <- sobjlists %>% dplyr::count(sobjlists$samples) # generate dataframe with counts of # cells per sample
+drop_samples <- drop_samples[drop_samples$n < 50, ] # get list of samples with n < 10 cells
+nrow(drop_samples)
+
+# drop samples with too few cells 
+sobjlists <- sobjlists[!(sobjlists$samples %in% drop_samples$`sobjlists$samples`), ] 
+
+# create dataframe for bar graph analysis
+sobjlists <- sobjlists %>% dplyr::group_by(samples, 
+                                           Patient, 
+                                           BC.Subtype, 
+                                           sc50.Pred) %>% # group cells by samples and BC.Subtype
+  dplyr::summarise(Nb = n()) %>% # add column with number of cells by sc50.Pred
+  dplyr::mutate(C = sum(Nb)) %>% # add column with total number of cells in the sample
+  dplyr::mutate(percent = Nb/C*100) # add column with % of cells by sc50.Pred out of all cells in sample
+
+# reorder sobjlists
+sobjlists <- sobjlists[order(sobjlists$BC.Subtype),] # order by BC Subtype
+
+# get list of tumor samples with enough cells for analysis
+samples <- unique(sobjlists$samples)
+
+# Quantify ITTH (similarity scores) --------------------------------------------------------------
+
+# Housekeeping genes to exclude from similarity analysis 
+
+# read in list of human housekeeping genes from https://housekeeping.unicamp.br/
+housekeeping_genes_cancer.epi <- read.csv("Housekeeping_GenesHuman.csv", sep =";")[,2]
+housekeeping_genes_cancer.epi <- unique(housekeeping_genes_cancer.epi[which(housekeeping_genes_cancer.epi %in% rownames(cancer.epi))])
+housekeeping_genes_cancer.epi <- which(rownames(cancer.epi) %in% housekeeping_genes_cancer.epi)
+
+# Calculate tumor similarity matrices and save to .csv ------------------------
+tumor_score <- data.frame()
+tumor_score_sc50 <- data.frame() 
+tumor_score_GM <- data.frame()
+
+# generate similarity matrix for all tumor samples 
+for (i in samples) {
+  j <- as.data.frame(GetAssayData(object = subset(cancer.epi, subset = samples == i), 
+                                  assay = "RNA", 
+                                  slot = "data"))
+  
+  # calculate similarity matrix and save to file (for all non-housekeeping genes and SC50 genes only)
+  k <- simil(j,
+             housekeeping_genes_cancer.epi,
+             paste0(gsub(" ", "",i), "_", gsub(" ", "",i),"_global.rds"),
+             "corr")
+  
+  k2 <- simil_sc50(j,
+                   paste0(gsub(" ", "",i), "_", gsub(" ", "",i),"_sc50.rds"),
+                   "corr")
+
+    # append similarity matrix quantile and mean to tumor_score dataframe
+  tumor_score <- rbind(tumor_score,
+                       data.frame(name = i, value = as.list(k)))
+  
+  tumor_score_sc50 <- rbind(tumor_score_sc50,
+                            data.frame(name = i, value = as.list(k2)))
+}
+
+# save tumor_score to .csv file 
+write.csv(tumor_score, "cancerepi_globalITH_all.csv")
+write.csv(tumor_score_sc50, "cancerepi_sc50ITH_all.csv")
+
+# ROGUE all cancer epi --------
+
+as_matrix <- function(mat){
+  
+  tmp <- matrix(data=0L, nrow = mat@Dim[1], ncol = mat@Dim[2])
+  
+  row_pos <- mat@i+1
+  col_pos <- findInterval(seq(mat@x)-1,mat@p[-1])+1
+  val <- mat@x
+  
+  for (i in seq_along(val)){
+    tmp[row_pos[i],col_pos[i]] <- val[i]
+  }
+  
+  row.names(tmp) <- mat@Dimnames[[1]]
+  colnames(tmp) <- mat@Dimnames[[2]]
+  return(tmp)
+}
+
+expr <- as_matrix(GetAssayData(cancer.epi, slot = "data", assay = "RNA"))
+meta <- cancer.epi@meta.data
+expr <- matr.filter(expr, min.cells = 10, min.genes = 10)
+ent.res <- SE_fun(expr)
+
+pdf("cancerepi_all_SEplot.pdf", width = 5, height = 5)
+SEplot(ent.res)
+dev.off()
+
+rogue.value <- CalculateRogue(ent.res, 
+                              platform = "UMI")
+rogue.value
+
+rogue.res <- rogue(expr, 
+                   labels = meta$BC.Subtype,
+                   samples = meta$samples, 
+                   platform = "UMI",
+                   span = 0.6)
+rogue.res
+
+pdf("cancerepi_all_ROGUEboxplot.pdf", width = 5, height = 5)
+p
+dev.off()
+
+mydata <- rogue.res
+for (i in c(1:dim(rogue.res)[1])) {
+  mydata[i,1] <- rownames(rogue.res)[i]
+  if (length(which(!is.na(rogue.res[i,]))) > 0) {
+    mydata[i,2] <- rogue.res[i, which(!is.na(rogue.res[i,]))]
+    mydata[i,3] <- colnames(rogue.res)[which(!is.na(rogue.res[i,]))]
+  }
+}
+colnames(mydata) <- c("Patient", "ROGUE", "BC.Subtype")
+
+p <- ggplot(mydata, aes(x = BC.Subtype, y = ROGUE, fill = BC.Subtype)) +
+  geom_boxplot(outlier.shape = NA) +
+  stat_compare_means(comparisons = list(c("HER2+", "HR+"), 
+                                        c("HR+", "TNBC"), 
+                                        c("HER2+", "TNBC")),
+                     method="wilcox.test", color="black",
+                     symnum.args = list(cutpoints = c(0, 0.0001, 0.001, 0.01, 0.05, 1), 
+                                        symbols = c("****", "***", "**", "*", "ns")))
+
+# Create dataframe of tumor ITH scores to plot --------------------------------
+
+scores <- data.frame(unique(sobjlists[,c(1,3)]))
+rownames(scores) <- scores$samples
+
+# read in global and sc50 ITH scores
+tumor_score <- read.csv("cancerepi_globalITH_all.csv", stringsAsFactors = FALSE, na.strings = "unknown")[,-1]
+rownames(tumor_score) <- tumor_score$name
+
+tumor_score_sc50 <- read.csv("cancerepi_sc50ITH_all.csv", stringsAsFactors = FALSE, na.strings = "unknown")[,-1]
+rownames(tumor_score_sc50) <- tumor_score_sc50$name
+
+tumor_score_rogue <- as.data.frame(rogue.res)
+colnames(tumor_score_rogue) <- c("ROGUE", "name")
+
+scores <- dplyr::left_join(scores, tumor_score_rogue, by = c("samples" = "name"))
+scores <- dplyr::left_join(scores, tumor_score, by = c("samples" = "name"))
+scores <- dplyr::left_join(scores, tumor_score_sc50, by = c("samples" = "name"))
+
+# create dataframe of scores for plotting
+scores_graph <- scores[,c(1, 2, 3, 9, 15)]
+scores_graph[,c(4,5)] <- (-1)*scores_graph[,c(4,5)]
+scores_graph <- as.data.frame(t(scores_graph)[-1,])
+rownames(scores_graph) <- c("BC.Subtype", "ROGUE", "global     ", "sc50")
+colnames(scores_graph) <- scores$samples
+
+# normalize ITH scores
+scores_graph_rescale <- scores_graph[1,]
+temp <- mutate_all(scores_graph[-1,], function(x) as.numeric(as.character(x)))
+temp <- t(apply(temp, 1, function(x)(1-((x-min(x))/(max(x)-min(x))))))
+scores_graph_rescale <- rbind(scores_graph_rescale, temp)
+
+# order results by ITH score
+scores_graph <- scores_graph[-1,]
+scores_graph <- mutate_all(scores_graph, as.numeric)
+
+scores_graph_rescale <- scores_graph_rescale[,order(as.numeric(scores_graph_rescale[2,]),
+                                                    decreasing = T)]
+scores_graph_rescale <- scores_graph_rescale[,order(as.character(scores_graph_rescale[1,]),
+                                                    decreasing = F)]
+scores_graph_rescale <- scores_graph_rescale[-1,]
+scores_graph_rescale <- 1 - mutate_all(scores_graph_rescale, as.numeric)
+scores_graph_rescale[scores_graph_rescale > 1] <- 1
+scores_graph_rescale[scores_graph_rescale < 0] <- 0
+
+for (i in 1:dim(scores_graph_rescale)[2]) {
+  score <- max(sobjlists[which(sobjlists$samples == colnames(scores_graph_rescale)[i]),]$percent)
+  scores_graph_rescale[3,i] <- (100 - score)/100
+}
+
+scores_graph_rescale[4,] <- abs(scores_graph_rescale[1,] - scores_graph_rescale[3,])
+scores_graph_rescale[4,which(scores_graph_rescale[4,] > 0.5)] <- 1
+scores_graph_rescale[4,which(scores_graph_rescale[4,] <= 0.5)] <- 0
+
+# Create similarity heatmap ---------------------------------------------------
+
+# lots of custom formatting in the parameters
+mydata <- scores_graph_rescale[c(1:4),]
+
+hm <- as.ggplot(ComplexHeatmap::pheatmap(mydata, 
+                                         #col = rev(brewer.pal(n = 11, name = "RdBu")), 
+                                         col = rocket(500),
+                                         breaks = seq(min(mydata[1,]),
+                                                      max(mydata[1,]), 
+                                                      length.out = 11),
+                                         legend = TRUE, 
+                                         cellheight = 30,
+                                         fontsize = 12,
+                                         show_rownames = TRUE, show_colnames = FALSE, 
+                                         cluster_rows = FALSE, cluster_cols = FALSE, 
+                                         treeheight_col = 0, treeheight_row = 0, 
+                                         border_color = "white", 
+                                         border_gp = gpar(col = "black", lty = 2),
+                                         gaps_col = c(12, 41), 
+                                         heatmap_legend_param = list(legend_direction = "horizontal", 
+                                                                     legend_width = unit(6.5, "cm"),
+                                                                     at = c(min(mydata[1,]), 
+                                                                            max(mydata[1,])),
+                                                                     labels = c("                    Least\n                    Heterogeneous", 
+                                                                                "Most                    \nHeterogeneous                    "), 
+                                                                     labels_gp = gpar(fontsize = 12),
+                                                                     title_gp = gpar(fontsize = 14, fontface = "plain"),
+                                                                     title_position = "topcenter", 
+                                                                     title ="Heterogeneity Score"))) + 
+  theme(plot.margin = unit(c(0,1,-0.5,2), "cm"), 
+        legend.position = "bottom")
+
+# Create stacked % bar plot by subtype label ----------------------------------
+
+# reorder sobjlists 
+sobjlists <- sobjlists[order(match(sobjlists$samples, colnames(mydata))), ]
+sobjlists$samples <- factor(sobjlists$samples, levels = unique(sobjlists$samples))
+
+sc50_order <- c("Basal_SC", 
+                "Her2E_SC",
+                "LumA_SC", 
+                "LumB_SC")
+sobjlists <- sobjlists[order(match(sobjlists$samples, sc50_order)), ]
+sobjlists$sc50.Pred <- factor(sobjlists$sc50.Pred, levels = c("Basal_SC", 
+                                                              "Her2E_SC",
+                                                              "LumA_SC", 
+                                                              "LumB_SC"))
+
+# create barplot (again lots of custom formatting)
+bp <- ggplot(sobjlists, 
+             aes(x = samples, 
+                 y = percent, 
+                 group = as.factor(BC.Subtype),
+                 fill = sc50.Pred)) +
+  geom_bar(stat = "identity", width = 0.93) +
+  ylab("% Cells (SC50)") + xlab("Samples (IHC Subtype)") +
+  theme_minimal() + 
+  theme(plot.margin = unit(c(1.2,6.03,-2,0.65), "cm"), 
+        axis.text.x = element_blank(),  
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_text(size = 12), 
+        axis.title.x = element_text(size = 16),
+        axis.title.y = element_text(size = 16)) + 
+  scale_fill_manual(values = c("#76b5c5", "#ad76c5", "#c58676", "#8dc576"), 
+                    sc50_order) +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, 100.1)) + 
+  theme(legend.text = element_text(size = 12), 
+        legend.title = element_text(size = 14)) +
+  facet_nested( ~ BC.Subtype, 
+                scales = "free", 
+                space = "free", 
+                switch = "x" 
+  ) +
+  theme(strip.text.x = element_text(size = 14, face = "italic"), 
+        strip.background = element_rect(colour = "#FFFFFF", 
+                                        size = 1.5, 
+                                        fill = "#EEEEEE"), 
+        panel.spacing.x = unit(-0.1, "lines"))
+
+# Combine bar graph and heatmaps ----------------------------------------------
+
+setwd("/endosome/work/InternalMedicine/s437775/simil/simil_cancerepi/091322/110322_rerun/simil")
+
+ggsave("cancerepi_barplot_globalITH_ROGUE.pdf", 
+       plot = grid.arrange(bp, hm,
+                           nrow = 2, ncol = 1, 
+                           widths = c(200), 
+                           heights = c(10, 15)), 
+       width = 60, height = 9.5, units = "cm") # combine bar graph and heatmap with specified graph dimensions
+
+
+# -------------
+# -------------
