@@ -18,6 +18,7 @@ Here is a breakdown of the file tree:
 
   - **bulkRNA**: Includes subfolders for The Cancer Genome Atlas (TCGA), I-SPY2, and Cancer Cell Line Encyclopedia (CCLE) datasets.
   - **scRNA**: Includes subfolders for the integrated primary breast tumor atlas and Bassez et al. (anti-PD-1-treated) datasets.
+  - **spatial**: Includes code for loading of Visium spatial datasets from Wu et al. 2021 and 10x Genomics.
        
 </details>
 
