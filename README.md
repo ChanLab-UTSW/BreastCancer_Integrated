@@ -6,7 +6,7 @@
 
 This includes all of the code for the manuscript "A comprehensive single-cell breast tumor atlas defines cancer epithelial and immune cell heterogeneity and interactions predicting anti-PD-1 therapy response" (https://doi.org/10.1016/j.xcrm.2024.101511).
 
-
+The integrated primary breast tumor atlas may be downloaded at https://zenodo.org/records/10672250 (contains matrix, genes, barcodes, metadata files).
 
 <hr style="border:2px solid gray">
 
