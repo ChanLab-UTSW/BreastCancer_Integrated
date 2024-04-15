@@ -5,13 +5,13 @@
 
 # This is the third step in processing the scRNA-seq  
 # primary breast datasets, and requires all filtering done
-# from "IndividualDatasetLoading_Primary.R" and "DoubletFinder_Primary.R".
+# from "Individual_Dataset_Loading.R" and "DoubletFinder.R".
 
 # This is SCTransformed and uses reference-based integration.
 # The technology used for cell capture is the batch being corrected for.
 
 # The output of this R script will be the input 
-# of "CellTypeLabeling.R"
+# of "Cell_Type_Labeling.R"
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
