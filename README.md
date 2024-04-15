@@ -1,11 +1,10 @@
 # BreastCancer_Integrated
 
+<p align="center">
+  <img src="https://ars.els-cdn.com/content/image/1-s2.0-S2666379124001800-fx1_lrg.jpg" width="500" title="[Graphical Abstract](https://doi.org/10.1016/j.xcrm.2024.101511)">
+</p>
 
-This includes all of the code for the manuscript 
-
-*A comprehensive single-cell breast tumor atlas defines cancer epithelial and immune cell heterogeneity and interactions predicting anti-PD-1 therapy response*
-
-published at the following link: https://www.biorxiv.org/content/10.1101/2022.08.01.501918v3.full (pre-print)
+This includes all of the code for the manuscript "A comprehensive single-cell breast tumor atlas defines cancer epithelial and immune cell heterogeneity and interactions predicting anti-PD-1 therapy response" (https://doi.org/10.1016/j.xcrm.2024.101511).
 
 
 
@@ -15,25 +14,22 @@ published at the following link: https://www.biorxiv.org/content/10.1101/2022.08
 Here is a breakdown of the file tree:
 
 <details>
-<summary>1. **Preprocessing**: contains the code for setting up and building the datasets.</summary> 
-    <p>
-    (1) Breakdown based on **technology type** (scRNA-seq, bulk RNA-seq, RPPA).
-    (2) Then broken down by **name of dataset** ("scRNA" includes subfolders for the main primary atlas and Bassez's dataset, for instance, while "bulkRNA" includes subfolders for TCGA, iSPY, etc).
-    </p>
+<summary> 1. **Preprocessing:** Contains the code for setting up and building the datasets, broken down based on technology type (scRNA-seq, bulk RNA-seq).</summary> 
+
+  - **bulkRNA**: Includes subfolders for The Cancer Genome Atlas (TCGA), I-SPY2, and Cancer Cell Line Encyclopedia (CCLE) datasets.
+  - **scRNA**: Includes subfolders for the integrated primary breast tumor atlas and Bassez et al. (anti-PD-1-treated) datasets.
+       
+</details>
+
+<details>
+<summary> 2. **Analysis**: Contains the code to generate all of the main figures in https://doi.org/10.1016/j.xcrm.2024.101511. </summary>
+
+ - **Figure 1**: Creation of integrated primary breast tumor atlas and identification of NK cell subsets
+ - **Figure 2**: Analysis of cancer epithelial cell intratumoral transcriptional heterogeneity, focusing on ERBB2/HER2 and TACSTD/TROP2 
+ - **Figure 3**: Identification of 10 GEs to define cancer epithelial cell heterogeneity and immune cell interactions
+ - **Figure 4**: Development of InteractPrint based on GE-immune interaction and predicting response to anti-PD-1 therapy 
     
 </details>
 
-<details>
-<summary>2. **Analysis**: contains the code to generate all of the main and supplementary figures. Subfolders are separated by main figure.</summary>
-    <p>
-    a. **Figure 1**: Initial ERBB2/TACSTD2 exploratory analysis and main primary atlas QC
-    b. **Figure 2**: NK subset and rNK analyses
-    c. **Figure 3**: ITTH score generation and downstream analyses
-    d. **Figure 4**: Validation on Bassez and iSPY
-    </p>
-</details>
-
-<details>
-<summary>3. **ReviewerAdditions**: contains the code for running completely new analyses/datasets suggested by the reviewers (Metabric addition, Gambardella et al. cell line dataset, etc.)</summary>
 
 </details>
