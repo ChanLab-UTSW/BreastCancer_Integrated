@@ -23,7 +23,7 @@
 
 
 # The output of this R script will be the input 
-# of "DoubletFinder_Primary.R"
+# of "DoubletFinder.R"
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
