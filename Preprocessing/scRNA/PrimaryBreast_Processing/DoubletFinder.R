@@ -5,10 +5,10 @@
 # This is the second step in processing the scRNA-seq  
 # primary breast datasets.
 # You will need to have each dataset processed as Seurat objects
-# and filtered from "IndividualDatasetLoading_Primary.R"
+# and filtered from "Individual_Dataset_Loading.R"
 
 # The output of this R script will be the input 
-# of "IntegrationPrimary.R"
+# of "Integration.R"
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
